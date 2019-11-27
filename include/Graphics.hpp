@@ -12,12 +12,6 @@ class Graphics
 public:
 	enum TextureMapping
 	{
-		PlayerSpritesheet,
-		GrassStandard,
-		WaterStandard,
-		BeachStandard,
-		RockStandard,
-		SummerSpritesheet,
 		EnumSize
 	};
 
@@ -30,8 +24,6 @@ public:
 	void Render(const sf::Drawable &drawable);
 	void Render(sf::Vector2f point1, sf::Vector2f point2, sf::Color color);
 	void Draw(const sf::Drawable &drawable);
-	void Draw(class AnimatedSpriteComponent &anim_sc);
-	void Draw(class SpriteComponent &sc);
 	void Draw(String file_path);
 	void Draw(sf::Vector2f point, float raidus = 1.0f, sf::Color color = sf::Color::White);
 
