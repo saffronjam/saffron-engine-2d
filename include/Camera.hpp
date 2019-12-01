@@ -15,6 +15,7 @@ public:
     void SetZoom(sf::Vector2f zoom) { m_zoom = zoom; }
     void SetAngle(float angle) { m_angle = angle; }
 
+    sf::Vector2i GetMousePosition();
     sf::Vector2f GetPos() const { return m_pos; }
     sf::Vector2f GetZoom() const { return m_zoom; }
     float GetAngle() const { return m_angle; }
@@ -35,4 +36,9 @@ private:
 
     sf::Vector2f &m_to_follow;
     class CameraController &m_camera_controller;
+
+public:
+    static constexpr int OffsetX = Graphics::ScreenWidth / 2;
+    static constexpr int OffsetY = Graphics::ScreenHeight / 2;
+    static sf::Vector2i GetOffset() { return sf::Vector2i(OffsetX, OffsetY); };
 };

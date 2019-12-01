@@ -38,6 +38,7 @@ void Application::HandleEvents()
 
 void Application::UpdateLogic()
 {
+	m_kt.Update();
 	m_camera_controller.Update(m_dt);
 	m_camera.Update(m_dt);
 }

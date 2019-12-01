@@ -90,6 +90,43 @@ void Funclib::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line,
     }
 }
 
+void Funclib::MapPointToRect(sf::Vector2f &point, sf::FloatRect rect)
+{
+    float &x = point.x;
+    float &y = point.y;
+    if (x < rect.left)
+    {
+        x = rect.left;
+    }
+    else if (x > rect.left + rect.width)
+    {
+        x = rect.left + rect.width;
+    }
+    if (y < rect.top)
+    {
+        y = rect.top;
+    }
+    else if (y > rect.top + rect.height)
+    {
+        y = rect.top + rect.height;
+    }
+}
+
+void Funclib::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to)
+{
+    float &x = point.x;
+    float &y = point.y;
+
+    float x_diff = x - from.left;
+    float y_diff = y - from.top;
+
+    float x_percent_diff = x_diff / from.width;
+    float y_percent_diff = y_diff / from.height;
+
+    x = to.left + to.width * x_percent_diff;
+    y = to.top + to.height * y_percent_diff;
+}
+
 //Vector functions
 sf::Vector2f vf::GetLineMiddlePoint(sf::Vector2f point1, sf::Vector2f point2)
 {
@@ -185,6 +222,48 @@ bool gf::IsInBetween(float value, float lower_bound, float upper_bound)
         std::swap(lower_bound, upper_bound);
     }
     return value >= lower_bound && value <= upper_bound;
+}
+
+void gf::Constrain(int &x, int lower, int upper)
+{
+    if (x < lower)
+    {
+        x = lower;
+    }
+    else if (x > upper)
+    {
+        x = upper;
+    }
+}
+
+void gf::Constrain(float &x, float lower, float upper)
+{
+    if (x < lower)
+    {
+        x = lower;
+    }
+    else if (x > upper)
+    {
+        x = upper;
+    }
+}
+
+void gf::Map(float &x, float lower_from, float upper_from, float lower_to, float upper_to)
+{
+    if (upper_from < lower_from)
+    {
+        std::swap(lower_from, upper_from);
+    }
+    if (upper_to < lower_to)
+    {
+        std::swap(lower_to, upper_to);
+    }
+    float difference_from = upper_from - lower_from;
+    float difference_to = upper_to - lower_to;
+
+    float difference_from_percent = (x - lower_from) / difference_from;
+
+    x = lower_to + difference_to * difference_from_percent;
 }
 
 bool sfmlext::UniqueInConvexShape(sf::ConvexShape &convexShape, sf::Vector2f &point)

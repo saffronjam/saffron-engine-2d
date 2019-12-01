@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.hpp"
 #include "CameraController.hpp"
+#include "KeyToggle.hpp"
 
 class Application
 {
@@ -20,6 +21,7 @@ public:
 private:
 	sf::Time &m_dt;
 	sf::Event m_event;
+	KeyToggle m_kt;
 
 	Camera m_camera;
 	CameraController m_camera_controller;

@@ -44,4 +44,6 @@ private:
 public:
 	static constexpr int ScreenWidth = 800;
 	static constexpr int ScreenHeight = 600;
+	static sf::Vector2f HalfScreen() { return sf::Vector2f((float)ScreenWidth / 2.0f, (float)ScreenHeight / 2.0f); }
+	static sf::IntRect ScreenRect() { return sf::IntRect(0, 0, ScreenWidth, ScreenHeight); }
 };

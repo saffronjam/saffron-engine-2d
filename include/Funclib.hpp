@@ -10,6 +10,8 @@ class Funclib
 {
 public:
     static std::vector<sf::Vector2f> WrapPoints(std::vector<sf::Vector2f> *points);
+    static void MapPointToRect(sf::Vector2f &point, sf::FloatRect rect);
+    static void TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to);
 
 private:
     static void ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line, std::vector<sf::Vector2f *> *points, std::vector<sf::Vector2f> *finalPoints);
@@ -36,6 +38,9 @@ class gf
 {
 public:
     static bool IsInBetween(float value, float lower_bound, float upper_bound);
+    static void Constrain(int &x, int lower, int upper);
+    static void Constrain(float &x, float lower, float upper);
+    static void Map(float &x, float lower_from, float upper_from, float lower_to, float upper_to);
 };
 
 class sfmlext
