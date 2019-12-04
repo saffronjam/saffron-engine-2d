@@ -10,12 +10,10 @@ public:
     void Update(sf::Time dt);
 
     void PushChain(const sf::Drawable &drawable);
-    void PushChain(sf::Vector2f point1, sf::Vector2f point2, sf::Color color);
 
     void SetZoom(sf::Vector2f zoom) { m_zoom = zoom; }
     void SetAngle(float angle) { m_angle = angle; }
 
-    sf::Vector2i GetMousePosition();
     sf::Vector2f GetPos() const { return m_pos; }
     sf::Vector2f GetZoom() const { return m_zoom; }
     float GetAngle() const { return m_angle; }

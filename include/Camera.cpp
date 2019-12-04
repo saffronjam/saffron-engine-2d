@@ -35,46 +35,13 @@ void Camera::PushChain(const sf::Drawable &drawable)
     m_gfx.Render(drawable);
 }
 
-void Camera::PushChain(sf::Vector2f point1, sf::Vector2f point2, sf::Color color)
-{
-    const sf::Vector2f offset(Graphics::HalfScreen());
-    sf::Transform t = sf::Transform::Identity;
-    t.translate(offset);
-    t.rotate(m_angle);
-    t.scale(m_zoom);
-    t.translate(-m_pos);
-    m_gfx.ApplyTransformation(t);
-    m_gfx.Render(point1, point2, color);
-}
-
 sf::Rect<float> Camera::GetViewportRect() const
 {
     const sf::Vector2f zoom = sf::Vector2f(1.0f / m_zoom.x, 1.0f / m_zoom.y);
-    // do a pessimistic viewport rect that works regardless of the viewport rotation
     const float diagonal = sqrt(
         pow(float(Graphics::ScreenWidth / 2) * zoom.x, 2) +
         pow(float(Graphics::ScreenHeight / 2) * zoom.y, 2));
     return sfmlext::RectFromCenter(m_pos, diagonal, diagonal);
-}
-
-sf::Vector2i Camera::GetMousePosition()
-{
-    sf::Vector2i final = sf::Mouse::getPosition(m_gfx.GetRenderWindow());
-
-    final -= GetOffset();
-
-    const float cosTheta = cos((-m_angle * PI) / 180);
-    const float sinTheta = sin((-m_angle * PI) / 180);
-    const float new_x = final.x * cosTheta - final.y * sinTheta;
-    final.y = final.x * sinTheta + final.y * cosTheta;
-    final.x = new_x;
-
-    final.x /= m_zoom.x;
-    final.y /= m_zoom.y;
-
-    final += (sf::Vector2i)m_pos;
-
-    return final;
 }
 
 void Camera::CapZoomLevel()

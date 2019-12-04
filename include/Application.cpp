@@ -3,8 +3,9 @@
 Application::Application(sf::Time &dt)
 	: m_gfx(m_camera),
 	  m_dt(dt),
+	  m_iu(m_gfx),
 	  m_camera(m_gfx, m_camera_follow, m_camera_controller),
-	  m_camera_controller(m_gfx, m_camera),
+	  m_camera_controller(m_gfx, m_camera, m_iu),
 	  m_camera_follow(0.0f, 0.0f)
 {
 }
@@ -38,7 +39,7 @@ void Application::HandleEvents()
 
 void Application::UpdateLogic()
 {
-	m_kt.Update();
+	m_iu.Update();
 	m_camera_controller.Update(m_dt);
 	m_camera.Update(m_dt);
 }

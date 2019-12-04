@@ -5,13 +5,7 @@
 class CameraController
 {
 public:
-    CameraController(Graphics &gfx, Camera &camera)
-        : m_gfx(gfx),
-          m_camera(camera),
-          m_zoomFactor(1.05f),
-          m_rotationSpeed(30)
-    {
-    }
+    CameraController(Graphics &gfx, Camera &camera, class InputUtility &iu);
 
     void Update(sf::Time dt);
 
@@ -20,8 +14,8 @@ public:
 private:
     Graphics &m_gfx;
     Camera &m_camera;
+    InputUtility &m_iu;
 
-    sf::Vector2f m_lastPos;
     bool m_engaged;
 
     float m_zoomFactor;

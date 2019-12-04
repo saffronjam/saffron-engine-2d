@@ -51,7 +51,7 @@ void Funclib::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line,
     int biggestIndex = -1;
     for (size_t i = 0; i < points->size(); i++)
     {
-        float currentCheck = vf::GetDistanceFromLine(line.first, line.second, *(*points)[i]);
+        float currentCheck = vf::DistanceFromLine(line.first, line.second, *(*points)[i]);
         if (currentCheck > biggestDistance)
         {
             biggestDistance = currentCheck;
@@ -128,7 +128,7 @@ void Funclib::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect fr
 }
 
 //Vector functions
-sf::Vector2f vf::GetLineMiddlePoint(sf::Vector2f point1, sf::Vector2f point2)
+sf::Vector2f vf::LineMiddlePoint(sf::Vector2f point1, sf::Vector2f point2)
 {
     sf::Vector2f delta = point2 - point1;
     delta.x /= 2.0f;
@@ -136,30 +136,30 @@ sf::Vector2f vf::GetLineMiddlePoint(sf::Vector2f point1, sf::Vector2f point2)
     return point1 + delta;
 }
 
-sf::Vector2f vf::GetDirectionVector(sf::Vector2f point1, sf::Vector2f point2)
+sf::Vector2f vf::Direction(sf::Vector2f point1, sf::Vector2f point2)
 {
-    return vf::GetUnitVector(point2 - point1);
+    return vf::Unit(point2 - point1);
 }
 
-sf::Vector2f vf::GetUnitVector(sf::Vector2f vector)
+sf::Vector2f vf::Unit(sf::Vector2f vector)
 {
-    return vector / vf::GetVectorLength(vector);
+    return vector / vf::Length(vector);
 }
 
-sf::Vector2f vf::NullVector()
+sf::Vector2f vf::Null()
 {
     return sf::Vector2f(0, 0);
 }
 
-sf::Vector2f vf::GetPerpendicularVector(sf::Vector2f vector)
+sf::Vector2f vf::Perpendicular(sf::Vector2f vector)
 {
     return sf::Vector2f(-vector.y, vector.x);
 }
 
 sf::Vector2f vf::InDefIntersection(std::pair<sf::Vector2f, sf::Vector2f> line1, std::pair<sf::Vector2f, sf::Vector2f> line2)
 {
-    float line1_k = GetSlope(line1.first, line1.second);
-    float line2_k = GetSlope(line2.first, line2.second);
+    float line1_k = Slope(line1.first, line1.second);
+    float line2_k = Slope(line2.first, line2.second);
     if (line1_k == line2_k)
     {
         //Parallell lines have none or unlimited intersections
@@ -176,19 +176,24 @@ sf::Vector2f vf::InDefIntersection(std::pair<sf::Vector2f, sf::Vector2f> line1, 
     return intersection;
 }
 
-float vf::GetVectorLength(sf::Vector2f vector)
+float vf::Length(sf::Vector2f vector)
 {
-    return sqrt(vf::GetVectorLengthSq(vector));
+    return sqrt(vf::LengthSq(vector));
 }
 
-float vf::GetVectorLengthSq(sf::Vector2f vector)
+float vf::LengthSq(sf::Vector2f vector)
 {
     return vector.x * vector.x + vector.y * vector.y;
 }
 
-void vf::NormalizeVector(sf::Vector2f &vector)
+float vf::Distance(sf::Vector2f const &u, sf::Vector2f const &v)
 {
-    float length = vf::GetVectorLength(vector);
+    return sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2));
+}
+
+void vf::Normalize(sf::Vector2f &vector)
+{
+    float length = vf::Length(vector);
     if (length != 0.0f)
     {
         vector.x /= length;
@@ -196,7 +201,7 @@ void vf::NormalizeVector(sf::Vector2f &vector)
     }
 }
 
-float vf::GetSlope(sf::Vector2f point1, sf::Vector2f point2)
+float vf::Slope(sf::Vector2f point1, sf::Vector2f point2)
 {
     if (point1.x > point2.x)
     {
@@ -210,60 +215,70 @@ bool vf::isLeft(sf::Vector2f line_point1, sf::Vector2f line_point2, sf::Vector2f
     return ((line_point2.x - line_point1.x) * (point.y - line_point1.y) - (line_point2.y - line_point1.y) * (point.x - line_point1.x)) > 0.0f;
 }
 
-float vf::GetDistanceFromLine(sf::Vector2f line_point1, sf::Vector2f line_point2, sf::Vector2f point)
+float vf::DistanceFromLine(sf::Vector2f line_point1, sf::Vector2f line_point2, sf::Vector2f point)
 {
-    return abs(((line_point2.x - line_point1.x) * (point.y - line_point1.y) - (line_point2.y - line_point1.y) * (point.x - line_point1.x)) / vf::GetVectorLength(line_point2 - line_point1));
+    return abs(((line_point2.x - line_point1.x) * (point.y - line_point1.y) - (line_point2.y - line_point1.y) * (point.x - line_point1.x)) / vf::Length(line_point2 - line_point1));
 }
 
-bool gf::IsInBetween(float value, float lower_bound, float upper_bound)
+bool gf::IsInBetween(float const &value, float const &lower_bound, float const &upper_bound)
 {
+    float _low = lower_bound;
+    float _upper = upper_bound;
     if (lower_bound > upper_bound)
     {
-        std::swap(lower_bound, upper_bound);
+        std::swap(_low, _upper);
     }
-    return value >= lower_bound && value <= upper_bound;
+    return value >= _low && value <= _upper;
 }
 
-void gf::Constrain(int &x, int lower, int upper)
+int gf::Constrain(int const &x, int const &lower, int const &upper)
 {
-    if (x < lower)
-    {
-        x = lower;
-    }
-    else if (x > upper)
-    {
-        x = upper;
-    }
+    return (int)gf::Constrain(x, lower, upper);
 }
 
-void gf::Constrain(float &x, float lower, float upper)
+float gf::Constrain(float const &x, float const &lower, float const &upper)
 {
-    if (x < lower)
+    float final = x;
+    if (final < lower)
     {
-        x = lower;
+        final = lower;
     }
-    else if (x > upper)
+    else if (final > upper)
     {
-        x = upper;
+        final = upper;
     }
+    return final;
 }
 
-void gf::Map(float &x, float lower_from, float upper_from, float lower_to, float upper_to)
+float gf::ConstrainLower(float const &x, float const &lower)
 {
-    if (upper_from < lower_from)
-    {
-        std::swap(lower_from, upper_from);
-    }
-    if (upper_to < lower_to)
-    {
-        std::swap(lower_to, upper_to);
-    }
-    float difference_from = upper_from - lower_from;
-    float difference_to = upper_to - lower_to;
+    return gf::Constrain(x, lower, x);
+}
+float gf::ConstrainUpper(float const &x, float const &upper)
+{
+    return gf::Constrain(x, x, upper);
+}
 
-    float difference_from_percent = (x - lower_from) / difference_from;
+float gf::Map(float const &x, float const &lower_from, float const &upper_from, float const &lower_to, float const &upper_to)
+{
+    float _lowFrom = lower_from;
+    float _upperFrom = upper_from;
+    float _lowTo = lower_to;
+    float _upperTo = upper_to;
+    if (_upperFrom < _lowFrom)
+    {
+        std::swap(_lowFrom, _upperFrom);
+    }
+    if (_upperTo < _lowTo)
+    {
+        std::swap(_lowTo, _upperTo);
+    }
+    float difference_from = _upperFrom - _lowFrom;
+    float difference_to = _upperTo - _lowTo;
 
-    x = lower_to + difference_to * difference_from_percent;
+    float difference_from_percent = (x - _lowFrom) / difference_from;
+
+    return _lowTo + difference_to * difference_from_percent;
 }
 
 bool sfmlext::UniqueInConvexShape(sf::ConvexShape &convexShape, sf::Vector2f &point)
@@ -277,6 +292,39 @@ bool sfmlext::UniqueInConvexShape(sf::ConvexShape &convexShape, sf::Vector2f &po
         }
     }
     return unique;
+}
+
+void gf::Interpolation(float &x, float const &y, float const &time, float const &deltaTime)
+{
+    x += (2.f * (y - x) * deltaTime) / time;
+}
+void gf::AngleInterpolation(float &x, float y, float const &time, float const &dt)
+{
+    if (abs(y - x) > 180)
+    {
+        if (x > y)
+            y += 360;
+        else
+            x += 360;
+    }
+    x += (2 * (y - x) * dt) / time;
+
+    if (x > 360)
+        x = (int)x % 360;
+}
+
+int gf::Quo(int a, int b)
+{
+    int q = 0;
+    if (b == 0)
+        return 0;
+    else
+        while (a - b >= 0)
+        {
+            a = a - b;
+            q++;
+        }
+    return q;
 }
 
 sf::ConvexShape sfmlext::CreateConvexShapeFromPointList(std::vector<sf::Vector2f> points)
@@ -327,7 +375,7 @@ sf::Vector2f sfmlext::ClosestPolygonVertex(sf::ConvexShape polygon, sf::Vector2f
 
     for (size_t i = 0; i < polygon.getPointCount(); i++)
     {
-        float dist_sq = vf::GetVectorLengthSq(sf::Vector2f(point - polygon.getPoint(i)));
+        float dist_sq = vf::LengthSq(sf::Vector2f(point - polygon.getPoint(i)));
 
         if (smallest_dist_sq == -1 || dist_sq < smallest_dist_sq)
         {
@@ -336,4 +384,13 @@ sf::Vector2f sfmlext::ClosestPolygonVertex(sf::ConvexShape polygon, sf::Vector2f
         }
     }
     return final;
+}
+
+sf::Color sfmlext::ColorGradient(sf::Image &color, float x)
+{
+    if (x > 0.999)
+        x = 0.999;
+    if (x < 0.001)
+        x = 0.001;
+    return color.getPixel((int)(x * color.getSize().x), 0);
 }

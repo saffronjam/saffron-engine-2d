@@ -1,6 +1,6 @@
 #include "Graphics.hpp"
 
-#include <cmath>
+#include "Math.hpp"
 
 #include "Camera.hpp"
 
@@ -11,7 +11,7 @@ Graphics::Graphics(Camera &camera)
 {
 	m_window.setVerticalSyncEnabled(true);
 
-	allTextures.reserve(EnumSize);
+	allTextures.reserve(TextureMapping::TextureCount);
 
 	// sf::Texture *GrassStandard = new sf::Texture;
 
@@ -44,20 +44,6 @@ void Graphics::Render(const sf::Drawable &drawable)
 	m_transform = sf::Transform::Identity;
 }
 
-void Graphics::Render(sf::Vector2f point1, sf::Vector2f point2, sf::Color color)
-{
-	sf::Vertex line[] =
-		{
-			sf::Vertex(point1),
-			sf::Vertex(point2)};
-	for (auto &vertex : line)
-	{
-		vertex.color = color;
-	}
-	m_window.draw(line, 2, sf::Lines, m_transform);
-	m_transform = sf::Transform::Identity;
-}
-
 void Graphics::Draw(const sf::Drawable &drawable)
 {
 	m_camera.PushChain(drawable);
@@ -73,7 +59,12 @@ void Graphics::Draw(sf::Vector2f point, float radius, sf::Color color)
 
 void Graphics::DrawLine(sf::Vector2f point1, sf::Vector2f point2, sf::Color color)
 {
-	m_camera.PushChain(point1, point2, color);
+	sf::VertexArray lines(sf::Lines, 2);
+	lines[0].position = point1;
+	lines[0].color = color;
+	lines[1].position = point2;
+	lines[1].color = color;
+	m_camera.PushChain(lines);
 }
 
 void Graphics::DrawLine(float x1, float y1, float x2, float y2)
@@ -84,4 +75,24 @@ void Graphics::DrawLine(float x1, float y1, float x2, float y2)
 void Graphics::ApplyTransformation(sf::Transform add)
 {
 	m_transform = m_transform * add;
+}
+
+sf::Vector2i Graphics::GetMousePosition()
+{
+	sf::Vector2i final = sf::Mouse::getPosition(GetRenderWindow());
+
+	final -= m_camera.GetOffset();
+
+	const float cosTheta = cos((-m_camera.GetAngle() * Math::Constants::PI) / 180);
+	const float sinTheta = sin((-m_camera.GetAngle() * Math::Constants::PI) / 180);
+	const float new_x = final.x * cosTheta - final.y * sinTheta;
+	final.y = final.x * sinTheta + final.y * cosTheta;
+	final.x = new_x;
+
+	final.x /= m_camera.GetZoom().x;
+	final.y /= m_camera.GetZoom().y;
+
+	final += (sf::Vector2i)m_camera.GetPos();
+
+	return final;
 }

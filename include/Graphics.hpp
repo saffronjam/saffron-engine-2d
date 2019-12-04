@@ -1,18 +1,14 @@
 #pragma once
-#include <string>
-
 #include <SFML/Graphics.hpp>
 
 #include "Funclib.hpp"
-
-using String = std::string;
 
 class Graphics
 {
 public:
 	enum TextureMapping
 	{
-		EnumSize
+		TextureCount
 	};
 
 public:
@@ -24,7 +20,6 @@ public:
 	void Render(const sf::Drawable &drawable);
 	void Render(sf::Vector2f point1, sf::Vector2f point2, sf::Color color);
 	void Draw(const sf::Drawable &drawable);
-	void Draw(String file_path);
 	void Draw(sf::Vector2f point, float raidus = 1.0f, sf::Color color = sf::Color::White);
 
 	void DrawLine(sf::Vector2f point1, sf::Vector2f point2, sf::Color color = sf::Color::White);
@@ -33,6 +28,8 @@ public:
 	void ApplyTransformation(sf::Transform add);
 
 	sf::RenderWindow &GetRenderWindow() { return m_window; }
+	sf::Vector2i GetMousePosition();
+
 	std::vector<sf::Texture *> allTextures;
 
 private:
