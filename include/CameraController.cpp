@@ -7,7 +7,7 @@ CameraController::CameraController(Graphics &gfx, Camera &camera, InputUtility &
     : m_gfx(gfx),
       m_camera(camera),
       m_iu(iu),
-      m_zoomFactor(1.05f),
+      m_lastPos(sf::Mouse::getPosition(m_gfx.GetRenderWindow())),
       m_rotationSpeed(30)
 {
 }
@@ -23,21 +23,23 @@ void CameraController::Update(sf::Time dt)
         m_camera.SetAngle(m_camera.GetAngle() - m_rotationSpeed * dt.asSeconds());
     }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+    const sf::Vector2i cur_pos = sf::Mouse::getPosition(m_gfx.GetRenderWindow());
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
     {
         m_engaged = true;
-        sf::Vector2f delta = (sf::Vector2f)m_iu.GetLastMouseSweep();
-        delta = -delta;
-        const float cosTheta = cos((-m_camera.GetAngle() * Math::Constants::PI) / 180);
-        const float sinTheta = sin((-m_camera.GetAngle() * Math::Constants::PI) / 180);
-        const float new_x = delta.x * cosTheta - delta.y * sinTheta;
-        delta.y = delta.x * sinTheta + delta.y * cosTheta;
-        delta.x = new_x;
-
-        m_camera.MoveBy(delta / vf::Length(m_camera.GetZoom()));
+        sf::Vector2i delta = cur_pos - m_lastPos;
+        if (vf::LengthSq((sf::Vector2f)delta) > 0.0f)
+        {
+            m_lastPos = cur_pos;
+            delta = (sf::Vector2i)m_gfx.AddDefaultRotation((sf::Vector2f)delta);
+            delta = (sf::Vector2i)m_gfx.AddDefaultScale((sf::Vector2f)delta);
+            delta *= -1;
+            m_camera.MoveBy((sf::Vector2f)delta);
+        }
     }
     else
     {
+        m_lastPos = cur_pos;
         m_engaged = false;
     }
 }

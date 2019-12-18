@@ -17,7 +17,7 @@ private:
     InputUtility &m_iu;
 
     bool m_engaged;
+    sf::Vector2i m_lastPos;
 
-    float m_zoomFactor;
     float m_rotationSpeed;
 };

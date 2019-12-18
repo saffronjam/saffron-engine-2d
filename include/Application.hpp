@@ -2,6 +2,8 @@
 #include "Camera.hpp"
 #include "CameraController.hpp"
 #include "InputUtility.hpp"
+#include "Random.hpp"
+#include "UI.hpp"
 
 class Application
 {
@@ -22,6 +24,7 @@ private:
 	sf::Time &m_dt;
 	sf::Event m_event;
 	InputUtility m_iu;
+	UI m_ui;
 
 	Camera m_camera;
 	CameraController m_camera_controller;

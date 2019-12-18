@@ -14,6 +14,10 @@ public:
     static void MapPointToRect(sf::Vector2f &point, sf::FloatRect rect);
     static void TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to);
 
+    //voronoi
+    static void ApplyLloydsRelaxtion(std::vector<class VEdge> &edges, std::vector<class VoronoiPoint *> &ver, std::vector<sf::ConvexShape> &voronoi_shapes, double minY, double maxY, float k);
+    static std::vector<sf::ConvexShape> CreateShapeListFromVonoroi(std::vector<class VoronoiPoint *> &ver, std::vector<class VEdge> &edges);
+
 private:
     static void ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line, std::vector<sf::Vector2f *> *points, std::vector<sf::Vector2f> *finalPoints);
 };
@@ -59,7 +63,12 @@ public:
     static bool UniqueInConvexShape(sf::ConvexShape &convexShape, sf::Vector2f &point);
     static sf::ConvexShape CreateConvexShapeFromPointList(std::vector<sf::Vector2f> unsorted_list);
     static sf::Vector2f GetCentroidOfPolygon(sf::ConvexShape polygon);
+    static sf::Vector2f GetCentroidOfRectangle(sf::FloatRect polygon);
     static sf::Rect<float> RectFromCenter(sf::Vector2f mid, float half_width, float half_height);
     static sf::Vector2f ClosestPolygonVertex(sf::ConvexShape polygon, sf::Vector2f point);
     static sf::Color ColorGradient(sf::Image &colors, float x);
+    static bool PolygonContains(sf::ConvexShape const &polygon, sf::Vector2f const &point);
+
+private:
+    static std::vector<sf::Vector2f> SortPolygonVerticies(sf::ConvexShape const &polygon);
 };

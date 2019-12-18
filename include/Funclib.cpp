@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "Voronoi.hpp"
+
 std::vector<sf::Vector2f> Funclib::WrapPoints(std::vector<sf::Vector2f> *points)
 {
     std::vector<sf::Vector2f> finalPoints;
@@ -125,6 +127,52 @@ void Funclib::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect fr
 
     x = to.left + to.width * x_percent_diff;
     y = to.top + to.height * y_percent_diff;
+}
+
+void Funclib::ApplyLloydsRelaxtion(std::vector<VEdge> &edges, std::vector<VoronoiPoint *> &ver, std::vector<sf::ConvexShape> &voronoi_shapes, double minY, double maxY, float k)
+{
+    for (int i = 0; i < k; i++)
+    {
+        for (size_t i = 0; i < ver.size(); i++)
+        {
+            ver[i]->x = sfmlext::GetCentroidOfPolygon(voronoi_shapes[i]).x;
+            ver[i]->y = sfmlext::GetCentroidOfPolygon(voronoi_shapes[i]).y;
+        }
+        Voronoi *vdg = new Voronoi();
+        edges = vdg->ComputeVoronoiGraph(ver, minY, maxY);
+        delete vdg;
+        voronoi_shapes = Funclib::CreateShapeListFromVonoroi(ver, edges);
+    }
+}
+
+std::vector<sf::ConvexShape> Funclib::CreateShapeListFromVonoroi(std::vector<VoronoiPoint *> &ver, std::vector<VEdge> &edges)
+{
+    std::vector<sf::ConvexShape> final;
+    for (std::vector<VoronoiPoint *>::iterator i = ver.begin(); i != ver.end(); i++)
+    {
+        std::vector<sf::Vector2f> convexShapeVerticies;
+        for (std::vector<VEdge>::iterator j = edges.begin(); j != edges.end(); j++)
+        {
+            if (((j->Left_Site.x == (*i)->x) && (j->Left_Site.y == (*i)->y)) || ((j->Right_Site.x == (*i)->x) && (j->Right_Site.y == (*i)->y)))
+            {
+                sf::Vector2f VertexA = sf::Vector2f(j->VertexA.x, j->VertexA.y);
+                sf::Vector2f VertexB = sf::Vector2f(j->VertexB.x, j->VertexB.y);
+                if (std::find(convexShapeVerticies.begin(), convexShapeVerticies.end(), VertexA) == convexShapeVerticies.end())
+                {
+                    convexShapeVerticies.push_back(VertexA);
+                }
+                if (std::find(convexShapeVerticies.begin(), convexShapeVerticies.end(), VertexB) == convexShapeVerticies.end())
+                {
+                    convexShapeVerticies.push_back(VertexB);
+                }
+            }
+        }
+        sf::ConvexShape myShape = sfmlext::CreateConvexShapeFromPointList(convexShapeVerticies);
+        myShape.setOutlineColor(sf::Color::Blue);
+        myShape.setOutlineThickness(1);
+        final.push_back(myShape);
+    }
+    return final;
 }
 
 //Vector functions
@@ -358,6 +406,13 @@ sf::Vector2f sfmlext::GetCentroidOfPolygon(sf::ConvexShape polygon)
     return sum_of_verticies;
 }
 
+sf::Vector2f sfmlext::GetCentroidOfRectangle(sf::FloatRect rectangle)
+{
+    float x = rectangle.left + rectangle.width / 2.0f;
+    float y = rectangle.top + rectangle.height / 2.0f;
+    return sf::Vector2f(x, y);
+}
+
 sf::Rect<float> sfmlext::RectFromCenter(sf::Vector2f mid, float half_width, float half_height)
 {
     sf::Rect<float> final;
@@ -393,4 +448,29 @@ sf::Color sfmlext::ColorGradient(sf::Image &color, float x)
     if (x < 0.001)
         x = 0.001;
     return color.getPixel((int)(x * color.getSize().x), 0);
+}
+
+bool sfmlext::PolygonContains(sf::ConvexShape const &polygon, sf::Vector2f const &point)
+{
+    std::vector<sf::Vector2f> allVertices = SortPolygonVerticies(polygon);
+    bool allPointsInPolygon = true;
+    for (size_t i = 0; i < allVertices.size() - 1; i += 2)
+    {
+        if (!vf::isLeft(allVertices[i], allVertices[i + 1], point))
+        {
+            allPointsInPolygon = false;
+            break;
+        }
+    }
+    return allPointsInPolygon;
+}
+
+std::vector<sf::Vector2f> sfmlext::SortPolygonVerticies(sf::ConvexShape const &polygon)
+{
+    std::vector<sf::Vector2f> allVertices;
+    for (size_t i = 0; i < polygon.getPointCount(); i++)
+    {
+        allVertices.push_back(polygon.getPoint(i));
+    }
+    return Funclib::WrapPoints(&allVertices);
 }

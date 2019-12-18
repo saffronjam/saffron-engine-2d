@@ -1,12 +1,17 @@
 #include "InputUtility.hpp"
 
+#include "Math.hpp"
+
+#include <sstream>
+
 using namespace sf;
 
-InputUtility::InputUtility(Graphics &gfx)
+InputUtility::InputUtility(Graphics &gfx, Camera &camera)
     : m_gfx(gfx),
-      m_last_pos(m_gfx.GetMousePosition()),
-      m_last_mouse_sweep(0, 0)
+      m_camera(camera)
 {
+    m_mouseCoordinates.setFont(*m_gfx.allFonts[Graphics::FontMapping::FontArial]);
+    m_mouseCoordinates.setCharacterSize(8);
     for (int i = 0; i < sf::Keyboard::Key::KeyCount; i++)
     {
         m_keys_lastState[i] = false;
@@ -41,14 +46,21 @@ void InputUtility::Update()
             m_buttons_wasReleased[i] = true;
         }
     }
+}
 
-    const sf::Vector2i cur_pos = m_gfx.GetMousePosition();
-    const sf::Vector2i delta = cur_pos - m_last_pos;
-    if (vf::LengthSq((sf::Vector2f)delta) > 0.0f)
-    {
-        m_last_pos = cur_pos;
-        m_last_mouse_sweep = delta;
-    }
+void InputUtility::DrawMouseCoordinates()
+{
+    sf::Vector2i posCamera = GetMousePosition();
+    sf::Vector2i posWindow = sf::Mouse::getPosition(m_gfx.GetRenderWindow());
+    sf::Vector2i posScreen = sf::Mouse::getPosition();
+    std::stringstream stream;
+    stream << "C: ( " << posCamera.x << " | " << posCamera.y << " )" << std::endl
+           << "W: ( " << posWindow.x << " | " << posWindow.y << " )" << std::endl
+           << "S: ( " << posScreen.x << " | " << posScreen.y << " )";
+    std::string coords = stream.str();
+    m_mouseCoordinates.setString(coords);
+    m_mouseCoordinates.setPosition(sf::Vector2f(Graphics::ScreenWidth - m_mouseCoordinates.getLocalBounds().width - 3, 3));
+    m_gfx.Render(m_mouseCoordinates);
 }
 
 bool InputUtility::IsToggled(const sf::Keyboard::Key key)
@@ -61,7 +73,11 @@ bool InputUtility::IsToggled(const sf::Mouse::Button button)
     return m_buttons_lastState[button];
 }
 
-sf::Vector2i InputUtility::GetLastMouseSweep()
+sf::Vector2i InputUtility::GetMousePosition()
 {
-    return m_last_mouse_sweep;
+    sf::Vector2i final = sf::Mouse::getPosition(m_gfx.GetRenderWindow());
+    final = (sf::Vector2i)m_gfx.AddDefaultTranslation((sf::Vector2f)final);
+    final = (sf::Vector2i)m_gfx.AddDefaultRotation((sf::Vector2f)final);
+    final = (sf::Vector2i)m_gfx.AddDefaultScale((sf::Vector2f)final);
+    return final;
 }
