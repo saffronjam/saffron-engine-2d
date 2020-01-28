@@ -1,6 +1,6 @@
 #include "Funclib.hpp"
 
-#include <cmath>
+#include "Math.hpp"
 
 #include "Voronoi.hpp"
 
@@ -30,7 +30,7 @@ std::vector<sf::Vector2f> Funclib::WrapPoints(std::vector<sf::Vector2f> *points)
     //Inital removal of center-points
     for (auto &point : *points)
     {
-        if (!vf::isLeft(startLine.first, startLine.second, point))
+        if (vf::isLeft(startLine.first, startLine.second, point))
         {
             topPoints.emplace_back(&point);
         }
@@ -42,7 +42,12 @@ std::vector<sf::Vector2f> Funclib::WrapPoints(std::vector<sf::Vector2f> *points)
 
     ClearPointsRecursively(startLine, &topPoints, &finalPoints);
     ClearPointsRecursively({startLine.second, startLine.first}, &bottomPoints, &finalPoints);
-
+    size_t i = 2;
+    for (size_t j = 1; i <= finalPoints.size() / 2; i++, j++)
+    {
+        std::swap(finalPoints[i], finalPoints[i + j]);
+    }
+    finalPoints.resize(i);
     return finalPoints;
 }
 
@@ -72,11 +77,11 @@ void Funclib::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line,
         std::vector<sf::Vector2f *> consideredPoints2;
         for (auto &point : *points)
         {
-            if (!vf::isLeft(newLine.first, newLine.second, *point))
+            if (vf::isLeft(newLine.first, newLine.second, *point))
             {
                 consideredPoints1.emplace_back(point);
             }
-            else if (!vf::isLeft(line.first, line.second, *point))
+            else if (vf::isLeft(line.first, line.second, *point))
             {
                 consideredPoints2.emplace_back(point);
             }
@@ -224,6 +229,19 @@ sf::Vector2f vf::InDefIntersection(std::pair<sf::Vector2f, sf::Vector2f> line1, 
     return intersection;
 }
 
+sf::Vector2f vf::Rotate(sf::Vector2f vector, float angle, sf::Vector2f around)
+{
+    vector -= around;
+
+    const float cosTheta = cos(angle);
+    const float sinTheta = sin(angle);
+    const float new_x = vector.x * cosTheta - vector.y * sinTheta;
+    vector.y = vector.x * sinTheta + vector.y * cosTheta;
+    vector.x = new_x;
+
+    return vector + around;
+}
+
 float vf::Length(sf::Vector2f vector)
 {
     return sqrt(vf::LengthSq(vector));
@@ -260,7 +278,18 @@ float vf::Slope(sf::Vector2f point1, sf::Vector2f point2)
 
 bool vf::isLeft(sf::Vector2f line_point1, sf::Vector2f line_point2, sf::Vector2f point)
 {
-    return ((line_point2.x - line_point1.x) * (point.y - line_point1.y) - (line_point2.y - line_point1.y) * (point.x - line_point1.x)) > 0.0f;
+    return ((line_point2.x - line_point1.x) * (point.y - line_point1.y) - (line_point2.y - line_point1.y) * (point.x - line_point1.x)) < 0.0f;
+}
+
+bool vf::SimilarDirection(sf::Vector2f const &v1, sf::Vector2f const &v2, float const &percent)
+{
+    sf::Vector2f u1 = vf::Unit(v1);
+    sf::Vector2f u2 = vf::Unit(v2);
+
+    bool similarX = gf::IsInBetween(u1.x, u2.x - u2.x * percent, u2.x + u2.x * percent);
+    bool similarY = gf::IsInBetween(u1.y, u2.y - u2.y * percent, u2.y + u2.y * percent);
+
+    return similarX && similarY;
 }
 
 float vf::DistanceFromLine(sf::Vector2f line_point1, sf::Vector2f line_point2, sf::Vector2f point)
@@ -294,6 +323,21 @@ float gf::Constrain(float const &x, float const &lower, float const &upper)
     else if (final > upper)
     {
         final = upper;
+    }
+    return final;
+}
+
+sf::Vector2f gf::Constrain(sf::Vector2f const &x, float const &lower, float const &upper)
+{
+    sf::Vector2f final = x;
+    float length = vf::Length(final);
+    if (length < lower)
+    {
+        final = vf::Unit(final) * lower;
+    }
+    else if (length > upper)
+    {
+        final = vf::Unit(final) * upper;
     }
     return final;
 }
@@ -456,7 +500,7 @@ bool sfmlext::PolygonContains(sf::ConvexShape const &polygon, sf::Vector2f const
     bool allPointsInPolygon = true;
     for (size_t i = 0; i < allVertices.size() - 1; i += 2)
     {
-        if (!vf::isLeft(allVertices[i], allVertices[i + 1], point))
+        if (vf::isLeft(allVertices[i], allVertices[i + 1], point))
         {
             allPointsInPolygon = false;
             break;

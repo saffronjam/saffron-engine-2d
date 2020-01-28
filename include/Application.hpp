@@ -4,6 +4,7 @@
 #include "InputUtility.hpp"
 #include "Random.hpp"
 #include "UI.hpp"
+#include "Math.hpp"
 
 class Application
 {

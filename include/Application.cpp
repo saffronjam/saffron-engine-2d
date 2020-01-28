@@ -1,4 +1,6 @@
 #include "Application.hpp"
+#include <stdlib.h>
+#include <time.h>
 
 Application::Application(sf::Time &dt)
 	: m_gfx(m_camera),
@@ -9,6 +11,7 @@ Application::Application(sf::Time &dt)
 	  m_camera_controller(m_gfx, m_camera, m_iu),
 	  m_camera_follow(0.0f, 0.0f)
 {
+	srand(time(NULL));
 }
 
 void Application::Go()

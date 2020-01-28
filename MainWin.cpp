@@ -1,8 +1,6 @@
 #include "SFML/System/Clock.hpp"
 #include "include/Application.hpp"
 
-#include "include/Random.hpp"
-
 int main()
 {
 	sf::Clock m_application_clock;
