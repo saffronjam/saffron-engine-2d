@@ -8,8 +8,8 @@ int main()
 {
 
 	Graphics m_gfx;
-	Camera m_camera(m_gfx);
 	Input m_input;
+	Camera m_camera(m_gfx, m_input);
 	EventMgr m_eventMgr(m_gfx.GetRenderWindow(), m_input);
 	sf::Clock m_application_clock;
 	sf::Time m_dt;
@@ -20,7 +20,7 @@ int main()
 	while (m_gfx.GetRenderWindow().isOpen())
 	{
 		m_eventMgr.PollAll();
-		if (m_input.Get(Code::EVENT_QUIT) || m_input.Get(Code::KEY_ESC))
+		if (m_input.Get(Code::EventQuit) || m_input.Get(Code::KeyEsc))
 			m_gfx.GetRenderWindow().close();
 		m_application.Go();
 		m_dt = m_application_clock.getElapsedTime();

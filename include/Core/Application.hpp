@@ -8,7 +8,6 @@
 
 class Application
 {
-
 public:
 	Application(Graphics &gfx, Camera &camera, Input &input, sf::Time &dt);
 	void Go();
@@ -18,14 +17,14 @@ private:
 	void RenderFrame();
 
 private:
-	Graphics &m_gfx;
-	Camera &m_camera;
-	Input &m_input;
-	sf::Time &m_dt;
+	Graphics &gfx;
+	Camera &camera;
+	Input &input;
+	sf::Time &dt;
 
-	AppResources m_resources;
-	UI m_ui;
-	sf::Vector2f m_tofollow;
+	AppResources resources;
+	UI ui;
+	sf::Vector2f tofollow;
 
 public:
 	friend class AppResources;
