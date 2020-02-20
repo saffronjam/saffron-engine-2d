@@ -1,26 +1,19 @@
 #include "Camera.hpp"
 
-#include "CameraController.hpp"
-
 #include "../Arth/Math.hpp"
 
-Camera::Camera(Graphics &gfx, sf::Vector2f &to_follow, CameraController &camera_controller)
+Camera::Camera(Graphics &gfx, sf::Vector2f *toFollow)
     : m_gfx(gfx),
       m_pos(0.0f, 0.0f),
       m_zoom(1.0f, 1.0f),
       m_angle(0.0f),
-      m_to_follow(to_follow),
-      m_camera_controller(camera_controller)
+      m_toFollow(toFollow)
 {
 }
 
 void Camera::Update(sf::Time dt)
 {
     CapZoomLevel();
-    if (!m_camera_controller.GetEngaged())
-    {
-        m_pos = m_to_follow;
-    }
 }
 
 void Camera::PushChain(const sf::Drawable &drawable)

@@ -5,7 +5,7 @@
 #include <map>
 #include <functional>
 
-#include "InputUtility.hpp"
+#include "Graphics.hpp"
 
 class UI
 {
@@ -13,11 +13,11 @@ private:
     class FormBase
     {
     public:
-        FormBase(Graphics &gfx, InputUtility &iu, sf::Vector2f const &position = sf::Vector2f(0.0f, 0.0f));
-        FormBase(Graphics &gfx, InputUtility &iu, std::vector<sf::Vector2f> positions);
+        FormBase(Graphics &gfx, sf::Vector2f const &position);
+        FormBase(Graphics &gfx, std::vector<sf::Vector2f> positions);
 
     private:
-        FormBase(InputUtility &iu, Graphics &gfx);
+        FormBase(Graphics &gfx);
 
     public:
         virtual void Update() = 0;
@@ -31,7 +31,6 @@ private:
 
     protected:
         Graphics &m_gfx;
-        InputUtility &m_iu;
 
         //everything else
         sf::Vector2f m_position;
@@ -59,7 +58,6 @@ private:
     {
     public:
         Button(Graphics &gfx,
-               InputUtility &iu,
                std::function<void()> caller,
                std::string const &description,
                sf::Vector2f const &position = sf::Vector2f(0.0f, 0.0f));
@@ -83,7 +81,6 @@ private:
     {
     public:
         Checkbox(Graphics &gfx,
-                 InputUtility &iu,
                  bool &value,
                  bool const &start,
                  sf::Vector2f const &position = sf::Vector2f(0.0f, 0.0f),
@@ -112,7 +109,6 @@ private:
     {
     public:
         RadioButtonSet(Graphics &gfx,
-                       InputUtility &iu,
                        std::vector<bool *> values,
                        std::vector<bool> start,
                        std::vector<sf::Vector2f> positions,
@@ -139,7 +135,6 @@ private:
     {
     public:
         Slider(Graphics &gfx,
-               InputUtility &iu,
                T &value,
                T const &low = (T)0,
                T const &high = (T)10,
@@ -181,7 +176,7 @@ public:
     };
 
 public:
-    UI(Graphics &gfx, InputUtility &iu);
+    UI(Graphics &gfx);
 
     void Update(sf::Time dt);
     void Draw();
@@ -200,7 +195,6 @@ public:
 
 private:
     Graphics &m_gfx;
-    InputUtility &m_iu;
 
     std::map<int, Button> m_buttons;
     std::map<int, Checkbox> m_checkboxes;

@@ -2,50 +2,29 @@
 #include <stdlib.h>
 #include <time.h>
 
-Application::Application(sf::Time &dt)
-	: m_gfx(m_camera),
+Application::Application(Graphics &gfx, Camera &camera, Input &input, sf::Time &dt)
+	: m_gfx(gfx),
+	  m_camera(camera),
+	  m_input(input),
 	  m_dt(dt),
-	  m_iu(m_gfx, m_camera),
-	  m_ui(m_gfx, m_iu),
-	  m_camera(m_gfx, m_camera_follow, m_camera_controller),
-	  m_camera_controller(m_gfx, m_camera, m_iu),
-	  m_camera_follow(0.0f, 0.0f),
-	  m_resources(*this)
+	  m_resources(*this),
+	  m_ui(m_gfx),
+	  m_tofollow(0.0f, 0.0f)
 {
 	srand(time(NULL));
+	m_camera.SetToFollow(&m_tofollow);
 }
 
 void Application::Go()
 {
-	HandleEvents();
 	m_gfx.ClearFrame();
 	UpdateLogic();
 	RenderFrame();
 	m_gfx.EndFrame();
 }
 
-void Application::HandleEvents()
-{
-	while (m_gfx.GetRenderWindow().pollEvent(m_event))
-	{
-		// Close window: exit
-		if (m_event.type == sf::Event::Closed)
-		{
-			m_gfx.GetRenderWindow().close();
-		}
-		else if (m_event.type == sf::Event::MouseWheelMoved)
-		{
-			float delta_move = m_event.mouseWheel.delta;
-			float zoom_strength = 0.03f;
-			m_camera.SetZoom(m_camera.GetZoom() + sf::Vector2f(delta_move, delta_move) * zoom_strength);
-		}
-	}
-}
-
 void Application::UpdateLogic()
 {
-	m_iu.Update();
-	m_camera_controller.Update(m_dt);
 	m_camera.Update(m_dt);
 	m_ui.Update(m_dt);
 

@@ -17,10 +17,12 @@ public:
 	};
 
 public:
-	Graphics(class Camera &camera);
+	Graphics(class Camera *camera = nullptr);
 	~Graphics();
 	void ClearFrame();
 	void EndFrame();
+
+	void SetCamera(class Camera *camera);
 
 	void Render(const sf::Drawable &drawable);
 	void Render(sf::Vector2f point, float radius = 1.0f, sf::Color color = sf::Color::White);
@@ -56,7 +58,7 @@ private:
 	sf::Transform m_independantPreTransform;
 	sf::Transform m_independantPostTransform;
 
-	class Camera &m_camera;
+	class Camera *m_camera;
 
 public:
 	static constexpr int ScreenWidth = 1000;
