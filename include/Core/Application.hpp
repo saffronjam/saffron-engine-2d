@@ -2,9 +2,10 @@
 #include "Camera.hpp"
 #include "CameraController.hpp"
 #include "InputUtility.hpp"
-#include "Random.hpp"
 #include "UI.hpp"
-#include "Math.hpp"
+#include "../Arth/Random.hpp"
+#include "../Arth/Math.hpp"
+#include "AppResources.hpp"
 
 class Application
 {
@@ -30,4 +31,9 @@ private:
 	Camera m_camera;
 	CameraController m_camera_controller;
 	sf::Vector2f m_camera_follow;
+
+	AppResources m_resources;
+
+public:
+	friend class AppResources;
 };

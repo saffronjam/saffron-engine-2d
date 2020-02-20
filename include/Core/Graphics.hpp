@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include "Funclib.hpp"
+#include "Library.hpp"
 
 class Graphics
 {

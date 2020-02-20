@@ -2,7 +2,7 @@
 
 #include "CameraController.hpp"
 
-#include "Math.hpp"
+#include "../Arth/Math.hpp"
 
 Camera::Camera(Graphics &gfx, sf::Vector2f &to_follow, CameraController &camera_controller)
     : m_gfx(gfx),

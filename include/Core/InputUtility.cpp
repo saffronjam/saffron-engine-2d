@@ -1,6 +1,6 @@
 #include "InputUtility.hpp"
 
-#include "Math.hpp"
+#include "../Arth/Math.hpp"
 
 #include <sstream>
 

@@ -1,10 +1,8 @@
-#include "Funclib.hpp"
+#include "Library.hpp"
 
-#include "Math.hpp"
+#include "../Arth/Math.hpp"
 
-#include "Voronoi.hpp"
-
-std::vector<sf::Vector2f> Funclib::WrapPoints(std::vector<sf::Vector2f> *points)
+std::vector<sf::Vector2f> Library::WrapPoints(std::vector<sf::Vector2f> *points)
 {
     std::vector<sf::Vector2f> finalPoints;
 
@@ -51,7 +49,7 @@ std::vector<sf::Vector2f> Funclib::WrapPoints(std::vector<sf::Vector2f> *points)
     return finalPoints;
 }
 
-void Funclib::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line, std::vector<sf::Vector2f *> *points, std::vector<sf::Vector2f> *finalPoints)
+void Library::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line, std::vector<sf::Vector2f *> *points, std::vector<sf::Vector2f> *finalPoints)
 {
     //Find the point which is the furthest away
     float biggestDistance = 0.0f;
@@ -97,7 +95,7 @@ void Funclib::ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line,
     }
 }
 
-void Funclib::MapPointToRect(sf::Vector2f &point, sf::FloatRect rect)
+void Library::MapPointToRect(sf::Vector2f &point, sf::FloatRect rect)
 {
     float &x = point.x;
     float &y = point.y;
@@ -119,7 +117,7 @@ void Funclib::MapPointToRect(sf::Vector2f &point, sf::FloatRect rect)
     }
 }
 
-void Funclib::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to)
+void Library::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to)
 {
     float &x = point.x;
     float &y = point.y;
@@ -132,52 +130,6 @@ void Funclib::TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect fr
 
     x = to.left + to.width * x_percent_diff;
     y = to.top + to.height * y_percent_diff;
-}
-
-void Funclib::ApplyLloydsRelaxtion(std::vector<VEdge> &edges, std::vector<VoronoiPoint *> &ver, std::vector<sf::ConvexShape> &voronoi_shapes, double minY, double maxY, float k)
-{
-    for (int i = 0; i < k; i++)
-    {
-        for (size_t i = 0; i < ver.size(); i++)
-        {
-            ver[i]->x = sfmlext::GetCentroidOfPolygon(voronoi_shapes[i]).x;
-            ver[i]->y = sfmlext::GetCentroidOfPolygon(voronoi_shapes[i]).y;
-        }
-        Voronoi *vdg = new Voronoi();
-        edges = vdg->ComputeVoronoiGraph(ver, minY, maxY);
-        delete vdg;
-        voronoi_shapes = Funclib::CreateShapeListFromVonoroi(ver, edges);
-    }
-}
-
-std::vector<sf::ConvexShape> Funclib::CreateShapeListFromVonoroi(std::vector<VoronoiPoint *> &ver, std::vector<VEdge> &edges)
-{
-    std::vector<sf::ConvexShape> final;
-    for (std::vector<VoronoiPoint *>::iterator i = ver.begin(); i != ver.end(); i++)
-    {
-        std::vector<sf::Vector2f> convexShapeVerticies;
-        for (std::vector<VEdge>::iterator j = edges.begin(); j != edges.end(); j++)
-        {
-            if (((j->Left_Site.x == (*i)->x) && (j->Left_Site.y == (*i)->y)) || ((j->Right_Site.x == (*i)->x) && (j->Right_Site.y == (*i)->y)))
-            {
-                sf::Vector2f VertexA = sf::Vector2f(j->VertexA.x, j->VertexA.y);
-                sf::Vector2f VertexB = sf::Vector2f(j->VertexB.x, j->VertexB.y);
-                if (std::find(convexShapeVerticies.begin(), convexShapeVerticies.end(), VertexA) == convexShapeVerticies.end())
-                {
-                    convexShapeVerticies.push_back(VertexA);
-                }
-                if (std::find(convexShapeVerticies.begin(), convexShapeVerticies.end(), VertexB) == convexShapeVerticies.end())
-                {
-                    convexShapeVerticies.push_back(VertexB);
-                }
-            }
-        }
-        sf::ConvexShape myShape = sfmlext::CreateConvexShapeFromPointList(convexShapeVerticies);
-        myShape.setOutlineColor(sf::Color::Blue);
-        myShape.setOutlineThickness(1);
-        final.push_back(myShape);
-    }
-    return final;
 }
 
 //Vector functions
@@ -421,7 +373,7 @@ int gf::Quo(int a, int b)
 
 sf::ConvexShape sfmlext::CreateConvexShapeFromPointList(std::vector<sf::Vector2f> points)
 {
-    std::vector<sf::Vector2f> usable_points = Funclib::WrapPoints(&points);
+    std::vector<sf::Vector2f> usable_points = Library::WrapPoints(&points);
 
     sf::ConvexShape finalShape;
     finalShape.setPointCount(usable_points.size() / 2);
@@ -516,5 +468,5 @@ std::vector<sf::Vector2f> sfmlext::SortPolygonVerticies(sf::ConvexShape const &p
     {
         allVertices.push_back(polygon.getPoint(i));
     }
-    return Funclib::WrapPoints(&allVertices);
+    return Library::WrapPoints(&allVertices);
 }

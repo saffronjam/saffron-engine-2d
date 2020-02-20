@@ -7,16 +7,12 @@
 #include <SFML/Graphics/ConvexShape.hpp>
 #include <SFML/Graphics/Image.hpp>
 
-class Funclib
+class Library
 {
 public:
     static std::vector<sf::Vector2f> WrapPoints(std::vector<sf::Vector2f> *points);
     static void MapPointToRect(sf::Vector2f &point, sf::FloatRect rect);
     static void TranslatePointFromRectToRect(sf::Vector2f &point, sf::FloatRect from, sf::FloatRect to);
-
-    //voronoi
-    static void ApplyLloydsRelaxtion(std::vector<class VEdge> &edges, std::vector<class VoronoiPoint *> &ver, std::vector<sf::ConvexShape> &voronoi_shapes, double minY, double maxY, float k);
-    static std::vector<sf::ConvexShape> CreateShapeListFromVonoroi(std::vector<class VoronoiPoint *> &ver, std::vector<class VEdge> &edges);
 
 private:
     static void ClearPointsRecursively(std::pair<sf::Vector2f, sf::Vector2f> line, std::vector<sf::Vector2f *> *points, std::vector<sf::Vector2f> *finalPoints);

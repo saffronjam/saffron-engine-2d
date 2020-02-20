@@ -1,6 +1,6 @@
 #include "Graphics.hpp"
 
-#include "Math.hpp"
+#include "../Arth/Math.hpp"
 
 #include "Camera.hpp"
 
@@ -172,8 +172,8 @@ sf::Vector2f Graphics::AddDefaultTranslation(sf::Vector2f vector)
 
 sf::Vector2f Graphics::AddDefaultRotation(sf::Vector2f vector)
 {
-	const float cosTheta = cos((-m_camera.GetAngle() * Math::Constants::PI) / 180);
-	const float sinTheta = sin((-m_camera.GetAngle() * Math::Constants::PI) / 180);
+	const float cosTheta = cos((-m_camera.GetAngle() * Constants::PI) / 180);
+	const float sinTheta = sin((-m_camera.GetAngle() * Constants::PI) / 180);
 	const float new_x = vector.x * cosTheta - vector.y * sinTheta;
 	vector.y = vector.x * sinTheta + vector.y * cosTheta;
 	vector.x = new_x;

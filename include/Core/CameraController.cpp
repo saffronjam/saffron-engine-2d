@@ -1,6 +1,6 @@
 #include "CameraController.hpp"
 
-#include "Math.hpp"
+#include "../Arth/Math.hpp"
 #include "InputUtility.hpp"
 
 CameraController::CameraController(Graphics &gfx, Camera &camera, InputUtility &iu)

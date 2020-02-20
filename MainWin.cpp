@@ -1,5 +1,5 @@
 #include "SFML/System/Clock.hpp"
-#include "include/Application.hpp"
+#include "include/Core/Application.hpp"
 
 int main()
 {

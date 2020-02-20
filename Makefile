@@ -19,6 +19,8 @@ OUTFLAG := -o
 ENTRY = MainWin.cpp
 SRC := include
 SRCS := $(wildcard $(SRC)/*.cpp)
+SRCSCORE := $(wildcard $(SRC)/Core/*.cpp)
+SRCSARTH := $(wildcard $(SRC)/Arth/*.cpp)
 LIBS := -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
 
 
@@ -26,7 +28,7 @@ myOS:
 	@echo $(detected_OS)
 
 b: $(ENTRY)
-	$(CC) $(ENTRY) $(SRCS) $(OUTFLAG) $(OUTPUT) $(LIBLOC) $(LIBS) $(FLAGS)
+	$(CC) $(ENTRY) $(SRCS) $(SRCSCORE) $(SRCSARTH) $(OUTFLAG) $(OUTPUT) $(LIBLOC) $(LIBS) $(FLAGS)
 
 r: MainWin.cpp
 	./$(OUTPUT)

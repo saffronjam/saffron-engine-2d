@@ -9,7 +9,8 @@ Application::Application(sf::Time &dt)
 	  m_ui(m_gfx, m_iu),
 	  m_camera(m_gfx, m_camera_follow, m_camera_controller),
 	  m_camera_controller(m_gfx, m_camera, m_iu),
-	  m_camera_follow(0.0f, 0.0f)
+	  m_camera_follow(0.0f, 0.0f),
+	  m_resources(*this)
 {
 	srand(time(NULL));
 }
@@ -47,8 +48,11 @@ void Application::UpdateLogic()
 	m_camera_controller.Update(m_dt);
 	m_camera.Update(m_dt);
 	m_ui.Update(m_dt);
+
+	m_resources.Update();
 }
 
 void Application::RenderFrame()
 {
+	m_resources.Draw();
 }
