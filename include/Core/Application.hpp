@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.hpp"
+#include "AudioMgr.hpp"
 #include "Input.hpp"
 #include "UI.hpp"
 #include "../Arth/Random.hpp"
@@ -9,7 +10,7 @@
 class Application
 {
 public:
-	Application(Graphics &gfx, Camera &camera, Input &input, sf::Time &dt);
+	Application(Graphics &gfx, Camera &camera, AudioMgr &audioMgr, Input &input, sf::Time &dt);
 	void Go();
 
 private:
@@ -19,6 +20,7 @@ private:
 private:
 	Graphics &gfx;
 	Camera &camera;
+	AudioMgr &audioMgr;
 	Input &input;
 	sf::Time &dt;
 

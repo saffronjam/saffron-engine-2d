@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-Application::Application(Graphics &gfx, Camera &camera, Input &input, sf::Time &dt)
+Application::Application(Graphics &gfx, Camera &camera, AudioMgr &audioMgr, Input &input, sf::Time &dt)
 	: gfx(gfx),
 	  camera(camera),
+	  audioMgr(audioMgr),
 	  input(input),
 	  dt(dt),
 	  resources(*this),

@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Library.hpp"
+#include "array"
 
 class Graphics
 {
@@ -49,16 +50,18 @@ public:
 
 	sf::RenderWindow &GetRenderWindow() { return m_window; }
 
-	std::vector<sf::Texture *> allTextures;
-	std::vector<sf::Font *> allFonts;
+	sf::Texture *Get(TextureMapping texture) { return m_allTextures[texture]; }
+	sf::Font *Get(FontMapping font) { return m_allFonts[font]; }
 
 private:
 	sf::RenderWindow m_window;
 	sf::Transform m_transform;
 	sf::Transform m_independantPreTransform;
 	sf::Transform m_independantPostTransform;
-
 	class Camera *m_camera;
+
+	std::array<sf::Texture *, TextureCount> m_allTextures;
+	std::array<sf::Font *, FontCount> m_allFonts;
 
 public:
 	static constexpr int ScreenWidth = 1000;

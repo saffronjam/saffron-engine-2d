@@ -1,8 +1,5 @@
 #include "include/Core/Application.hpp"
 #include "include/Core/EventMgr.hpp"
-#include <SFML/System/Clock.hpp>
-
-#include "include/Core/Graphics.hpp"
 
 int main()
 {
@@ -11,9 +8,10 @@ int main()
 	Input m_input;
 	Camera m_camera(m_gfx, m_input);
 	EventMgr m_eventMgr(m_gfx.GetRenderWindow(), m_input);
+	AudioMgr m_audioMgr;
 	sf::Clock m_application_clock;
 	sf::Time m_dt;
-	Application m_application(m_gfx, m_camera, m_input, m_dt);
+	Application m_application(m_gfx, m_camera, m_audioMgr, m_input, m_dt);
 
 	m_gfx.SetCamera(&m_camera);
 

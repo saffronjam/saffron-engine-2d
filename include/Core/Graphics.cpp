@@ -5,37 +5,33 @@
 #include "Camera.hpp"
 
 Graphics::Graphics(Camera *camera)
-	: m_window(sf::VideoMode(Graphics::ScreenWidth, Graphics::ScreenHeight), "Application"),
+	: m_window(sf::VideoMode(Graphics::ScreenWidth, Graphics::ScreenHeight), "Application", 7U, sf::ContextSettings(0U, 0U, 0U)),
 	  m_transform(sf::Transform::Identity),
 	  m_camera(camera)
 {
 	m_window.setVerticalSyncEnabled(true);
 
-	allTextures.reserve(TextureMapping::TextureCount);
-	allFonts.reserve(FontMapping::FontCount);
+	for (auto &t : m_allTextures)
+		t = new sf::Texture;
+	for (auto &f : m_allFonts)
+		f = new sf::Font;
 
-	// sf::Texture *GrassStandard = new sf::Texture;
+	// m_allTextures[TextureMappin::TextureGrass]->loadFromFile("assets/textures/Grass.png");
 
-	// GrassStandard->loadFromFile("assets/Grass.png");
-
-	// allTextures.push_back(GrassStandard);
-
-	sf::Font *FontArial = new sf::Font;
-
-	FontArial->loadFromFile("assets/fonts/arial.ttf");
-
-	allFonts.push_back(FontArial);
+	m_allFonts[FontMapping::FontArial]->loadFromFile("assets/fonts/arial.ttf");
 }
 
 Graphics::~Graphics()
 {
-	for (auto texture : allTextures)
+	for (auto texture : m_allTextures)
 	{
 		delete texture;
+		texture = nullptr;
 	}
-	for (auto font : allFonts)
+	for (auto font : m_allFonts)
 	{
 		delete font;
+		font = nullptr;
 	}
 }
 

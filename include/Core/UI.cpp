@@ -31,7 +31,7 @@ UI::Button::Button(Graphics &gfx, std::function<void()> caller, std::string cons
     : FormBase(gfx, position),
       m_caller(caller),
       m_buttonBox(sf::Vector2f(40.0f, 15.0f)),
-      m_description(description, *m_gfx.allFonts[Graphics::FontMapping::FontArial], 7),
+      m_description(description, *gfx.Get(Graphics::FontArial), 7),
       m_isBeingClicked(false)
 {
     m_buttonBox.setFillColor(m_fillColor);
@@ -313,7 +313,7 @@ UI::Slider<T>::Slider(Graphics &gfx, T &value, T const &low, T const &high, T co
 
     //m_valueText
     UpdateValueText();
-    m_valueText.setFont(*m_gfx.allFonts[Graphics::FontMapping::FontArial]);
+    m_valueText.setFont(*m_gfx.Get(Graphics::FontArial));
     m_valueText.setCharacterSize(16);
     UpdateTextPosition();
 }
