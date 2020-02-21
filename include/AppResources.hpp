@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/AppIncludes.hpp"
+
 class AppResources
 {
 public:
@@ -13,4 +15,6 @@ private:
 
 private:
     //Write here
+    Server m_server;
+    std::array<Client, 5> m_clients;
 };

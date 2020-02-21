@@ -7,11 +7,11 @@ endif
 ifeq ($(detected_OS), Windows)
 OUTPUT := main.exe
 LIBLOC := -Llib
-FLAGS := -Iinclude -Wall -g -pthread
+FLAGS := -std=c++17 -Iinclude -Wall -g -pthread
 else
 OUTPUT := main.out
 LIBLOC := -L/usr/lib/x86_64-linux-gnu
-FLAGS := -Wall -g -pthread
+FLAGS := -std=c++17 -Wall -g -pthread
 endif
 
 CC := g++

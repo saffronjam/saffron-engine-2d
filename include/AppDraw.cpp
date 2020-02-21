@@ -1,6 +1,6 @@
 #include "AppResources.hpp"
 #include "Core/Application.hpp"
-#include "Core/AllSFML.hpp"
+#include "Core/AppIncludes.hpp"
 
 void AppResources::Draw()
 {

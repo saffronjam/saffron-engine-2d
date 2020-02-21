@@ -30,6 +30,7 @@ void EventMgr::PollAll()
             default:
                 break;
             }
+            break;
         }
         case sf::Event::KeyPressed:
         {

@@ -1,12 +1,10 @@
 #include "AppResources.hpp"
 #include "Core/Application.hpp"
-#include "Core/AllSFML.hpp"
+#include "Core/AppIncludes.hpp"
 
 void AppResources::Update()
 {
-    sf::Sound test;
-    test.setBuffer(app.audioMgr.Get(SoundTest));
 
-    if (app.input.Get(KeyP))
-        test.play();
+    if (app.input.Get(KeyA))
+        std::cout << (char *)m_server.PopFront().getData() << std::endl;
 }

@@ -3,9 +3,11 @@
 #include "AudioMgr.hpp"
 #include "Input.hpp"
 #include "UI.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
 #include "../Arth/Random.hpp"
 #include "../Arth/Math.hpp"
-#include "AppResources.hpp"
+#include "../AppResources.hpp"
 
 class Application
 {
