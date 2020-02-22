@@ -6,8 +6,6 @@
 #include <map>
 #include <thread>
 
-#define MAX_SOCKETS 128
-
 class Server
 {
 public:

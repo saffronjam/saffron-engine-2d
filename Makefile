@@ -21,7 +21,7 @@ SRC := include
 SRCS := $(wildcard $(SRC)/*.cpp)
 SRCSCORE := $(wildcard $(SRC)/Core/*.cpp)
 SRCSARTH := $(wildcard $(SRC)/Arth/*.cpp)
-LIBS := -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window
+LIBS := -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -lsfgui-s -lsfgui-s-d
 
 
 myOS:
