@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-Application::Application(Graphics &gfx, Camera &camera, AudioMgr &audioMgr, Input &input, sf::Time &dt)
+Application::Application(Graphics &gfx, Camera &camera, AudioMgr &audioMgr, Input &input, sf::Time &dt, GUI &gui)
 	: gfx(gfx),
 	  camera(camera),
 	  audioMgr(audioMgr),
 	  input(input),
 	  dt(dt),
+	  gui(gui),
 	  resources(*this),
-	  ui(gfx),
 	  tofollow(0.0f, 0.0f)
 {
 	srand(time(NULL));
@@ -27,7 +27,7 @@ void Application::Go()
 void Application::UpdateLogic()
 {
 	camera.Update(dt);
-	ui.Update(dt);
+	gui.Update(dt);
 
 	resources.Update();
 }
@@ -35,4 +35,5 @@ void Application::UpdateLogic()
 void Application::RenderFrame()
 {
 	resources.Draw();
+	gui.Draw();
 }

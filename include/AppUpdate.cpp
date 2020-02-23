@@ -4,7 +4,5 @@
 
 void AppResources::Update()
 {
-
-    if (app.input.Get(KeyA))
-        std::cout << (char *)m_server.PopFront().getData() << std::endl;
+    m_chat.Update(app.dt);
 }

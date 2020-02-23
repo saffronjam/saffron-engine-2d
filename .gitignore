@@ -14,7 +14,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -31,6 +30,3 @@
 *.app
 
 # Folders
-include/SFML
-include/SFGUI
-lib

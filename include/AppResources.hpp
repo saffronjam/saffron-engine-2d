@@ -2,6 +2,8 @@
 
 #include "Core/AppIncludes.hpp"
 
+#include "Chat.hpp"
+
 class AppResources
 {
 public:
@@ -15,6 +17,5 @@ private:
 
 private:
     //Write here
-    Server m_server;
-    std::array<Client, 5> m_clients;
+    Chat m_chat;
 };

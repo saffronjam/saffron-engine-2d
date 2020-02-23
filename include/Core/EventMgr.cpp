@@ -1,8 +1,9 @@
 #include "EventMgr.hpp"
 
-EventMgr::EventMgr(sf::RenderWindow &m_renderWindow, Input &input)
+EventMgr::EventMgr(sf::RenderWindow &m_renderWindow, Input &input, GUI &gui)
     : m_renderWindow(m_renderWindow),
-      m_input(input)
+      m_input(input),
+      m_gui(gui)
 {
     m_input.Reset();
 }
@@ -11,6 +12,7 @@ void EventMgr::PollAll()
 {
     while (m_renderWindow.pollEvent(m_event))
     {
+        m_gui.HandleEvent(m_event);
         switch (m_event.type)
         {
         case sf::Event::Closed:

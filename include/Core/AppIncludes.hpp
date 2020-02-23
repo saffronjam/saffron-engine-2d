@@ -15,6 +15,6 @@
 #include "Camera.hpp"
 #include "AudioMgr.hpp"
 #include "Input.hpp"
-#include "UI.hpp"
+#include "GUI.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
