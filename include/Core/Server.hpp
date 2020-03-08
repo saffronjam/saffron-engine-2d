@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG
+
 #include <SFML/Network.hpp>
 #include <deque>
 #include <vector>
@@ -13,12 +15,15 @@ public:
     Server(int const &port);
     ~Server();
 
-    void AcceptConnections();
+    int AcceptConnections();
     void RejectConnections();
 
     void Send(sf::Packet const &packet, sf::TcpSocket *client);
     void Send(void *data, size_t size, sf::TcpSocket *client);
     void Send(std::string const &string, sf::TcpSocket *client);
+    void Broadcast(sf::Packet const &packet);
+    void Broadcast(void *data, size_t size);
+    void Broadcast(std::string const &string);
 
     sf::Packet PopFront();
     sf::Packet PopBack();

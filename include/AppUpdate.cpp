@@ -4,5 +4,4 @@
 
 void AppResources::Update()
 {
-    m_chat.Update(app.dt);
 }

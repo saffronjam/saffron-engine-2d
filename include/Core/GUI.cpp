@@ -10,7 +10,7 @@ GUI::GUI(sf::RenderWindow &renderWindow)
 
 void GUI::Update(sf::Time dt)
 {
-    //m_desktop.Update(dt.asSeconds());
+    m_desktop.Update(dt.asSeconds());
 }
 
 void GUI::Draw()
@@ -23,12 +23,12 @@ void GUI::HandleEvent(const sf::Event &event)
     m_desktop.HandleEvent(event);
 }
 
-void GUI::AddWindow(std::shared_ptr<sfg::Window> window)
+void GUI::AddWindow(sfg::Window::Ptr window)
 {
     m_desktop.Add(window);
 }
 
-void GUI::RemoveWindow(std::shared_ptr<sfg::Window> window)
+void GUI::RemoveWindow(sfg::Window::Ptr window)
 {
     m_desktop.Remove(window);
 }

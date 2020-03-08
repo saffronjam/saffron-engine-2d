@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEBUG
+
 #include <SFML/Network.hpp>
 
 #include <deque>
@@ -12,7 +14,7 @@ public:
     Client(sf::IpAddress const &hostIp, int const &port);
     ~Client();
 
-    void Connect();
+    int Connect();
     void Disconnect();
 
     void Send(sf::Packet const &packet);

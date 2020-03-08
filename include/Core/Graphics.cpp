@@ -10,6 +10,7 @@ Graphics::Graphics(Camera *camera)
 	  m_camera(camera)
 {
 	m_window.setVerticalSyncEnabled(true);
+	m_window.resetGLStates();
 
 	for (auto &t : m_allTextures)
 		t = new sf::Texture;

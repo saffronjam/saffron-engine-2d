@@ -18,8 +18,8 @@ public:
 
     void HandleEvent(const sf::Event &event);
 
-    void AddWindow(std::shared_ptr<sfg::Window> window);
-    void RemoveWindow(std::shared_ptr<sfg::Window> window);
+    void AddWindow(sfg::Window::Ptr window);
+    void RemoveWindow(sfg::Window::Ptr window);
 
 private:
     sf::RenderWindow &m_renderWindow;

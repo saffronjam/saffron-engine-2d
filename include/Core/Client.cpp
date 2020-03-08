@@ -18,7 +18,6 @@ Client::Client(sf::IpAddress const &ip, int const &port)
       m_connected(false),
       m_worker(&Client::Mgr, this)
 {
-    m_socketSelector.add(*m_socket);
 }
 
 Client::~Client()
@@ -27,9 +26,9 @@ Client::~Client()
     m_receiving = false;
     m_sending = false;
 
-    m_socketSelector.clear();
-
     Disconnect();
+
+    m_socketSelector.clear();
 
     if (m_worker.joinable())
         m_worker.join();
@@ -37,13 +36,18 @@ Client::~Client()
     delete m_socket;
 }
 
-void Client::Connect()
+int Client::Connect()
 {
     if (!m_connected)
     {
         if (m_socket->connect(m_ip, m_port) == sf::Socket::Status::Done)
+        {
+            m_socketSelector.add(*m_socket);
             m_connected = true;
+            return 1;
+        }
     }
+    return 0;
 }
 
 void Client::Disconnect()
@@ -117,15 +121,35 @@ void Client::Mgr()
                 sf::Packet packet;
                 if (m_socket->receive(packet) == sf::Socket::Done)
                 {
+#ifdef DEBUG
+                    std::cout << "Info: Successfully received packet from server! IP: " << m_ip << " Port: " << m_port << std::endl;
+#endif
                     m_pendingReceiving.push_back(packet);
+                }
+                else
+                {
+#ifdef DEBUG
+                    std::cerr << "Error: Failed to receive packet from server! IP: " << m_ip << " Port: " << m_port << std::endl;
+#endif
                 }
             }
         }
         if (m_sending)
             while (m_pendingSending.size() > 0)
             {
-                m_socket->send(m_pendingSending.front());
-                m_pendingSending.pop_front();
+                if (m_socket->send(m_pendingSending.front()) == sf::Socket::Done)
+                {
+#ifdef DEBUG
+                    std::cout << "Info: Successfully sent packet to server! IP: " << m_ip << " Port: " << m_port << std::endl;
+#endif
+                    m_pendingSending.pop_front();
+                }
+                else
+                {
+#ifdef DEBUG
+                    std::cerr << "Error: Failed to send packet to server! IP: " << m_ip << " Port: " << m_port << std::endl;
+#endif
+                }
             }
     }
 }

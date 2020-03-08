@@ -2,7 +2,6 @@
 
 #include "Core/AppIncludes.hpp"
 
-#include "Chat.hpp"
 
 class AppResources
 {
@@ -17,5 +16,4 @@ private:
 
 private:
     //Write here
-    Chat m_chat;
 };
