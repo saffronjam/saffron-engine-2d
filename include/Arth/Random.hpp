@@ -17,6 +17,7 @@ public:
 
 	static double Generate(double lower, double upper)
 	{
+		srand(time(NULL));
 		if (lower > upper)
 		{
 			std::swap(lower, upper);

@@ -1,6 +1,9 @@
 #include "Server.hpp"
 
 #include <iostream>
+#include <cstring>
+
+
 
 Server::Server()
     : Server(4000)
@@ -25,7 +28,7 @@ Server::~Server()
     m_sending = false;
 
     for (auto &client : m_clients)
-        client->disconnect();
+        client.socket->disconnect();
 
     m_socketSelector.clear();
 
@@ -34,13 +37,14 @@ Server::~Server()
 
     for (auto &client : m_clients)
     {
-        delete client;
-        client = nullptr;
+        delete client.socket;
+        client.socket = nullptr;
     }
 }
 
 int Server::AcceptConnections()
 {
+    m_listener.reuse();
     if (m_listener.listen(m_port) == sf::Socket::Done)
     {
 #ifdef DEBUG
@@ -65,72 +69,31 @@ void Server::RejectConnections()
     m_accepting = false;
 }
 
-void Server::Send(sf::Packet const &packet, sf::TcpSocket *client)
-{
-    m_pendingSending.push_back(std::make_pair(client, packet));
-}
-
-void Server::Send(void *data, size_t size, sf::TcpSocket *client)
-{
-    sf::Packet packet;
-    packet.append(data, size);
-    Send(packet, client);
-}
-
-void Server::Send(std::string const &string, sf::TcpSocket *client)
-{
-    sf::Packet packet;
-    packet.append((void *)&string, string.length() + 1);
-    Send(packet, client);
-}
-
-void Server::Broadcast(sf::Packet const &packet)
-{
-    for (auto &client : m_clients)
-        Send(packet, client);
-}
-
-void Server::Broadcast(void *data, size_t size)
-{
-    for (auto &client : m_clients)
-        Send(data, size, client);
-}
-
-void Server::Broadcast(std::string const &string)
-{
-    for (auto &client : m_clients)
-        Send(string, client);
-}
-
-sf::Packet Server::PopFront()
+PacketT Server::PopFront()
 {
     if (m_pendingReceiving.size() > 0)
     {
-        sf::Packet ret = m_pendingReceiving.front().second;
+        PacketT ret(m_pendingReceiving.front().second);
         m_pendingReceiving.pop_front();
         return ret;
     }
     else
     {
-        sf::Packet ret;
-        ret.append("", 1);
-        return ret;
+        return PacketT("EMPTY", nullptr, 0);
     }
 }
 
-sf::Packet Server::PopBack()
+PacketT Server::PopBack()
 {
     if (m_pendingReceiving.size() > 0)
     {
-        sf::Packet ret = m_pendingReceiving.back().second;
+        PacketT ret(m_pendingReceiving.back().second);
         m_pendingReceiving.pop_back();
         return ret;
     }
     else
     {
-        sf::Packet ret;
-        ret.append("", 1);
-        return ret;
+        return PacketT("EMPTY", nullptr, 0);
     }
 }
 
@@ -142,42 +105,57 @@ void Server::Mgr()
         {
             if (m_accepting && m_socketSelector.isReady(m_listener))
             {
-                sf::TcpSocket *client = new sf::TcpSocket;
-                if (m_listener.accept(*client) == sf::Socket::Done)
+                sf::TcpSocket *clientSocket = new sf::TcpSocket;
+                if (m_listener.accept(*clientSocket) == sf::Socket::Done)
                 {
 #ifdef DEBUG
-                    std::cout << "Info: Successfully accepted connection to client! IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                    std::cout << "Info: Successfully accepted connection to client! IP: " << clientSocket->getRemoteAddress() << " Port: " << m_port << std::endl;
 #endif
-                    m_clients.push_back(client);
-                    m_socketSelector.add(*client);
+                    m_clients.push_back(ClientT(clientSocket,""));
+                    m_socketSelector.add(*clientSocket);
                 }
                 else
                 {
 #ifdef DEBUG
-                    std::cerr << "Error: Failed to accept connection to client! IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                    std::cerr << "Error: Failed to accept connection to client! IP: " << clientSocket->getRemoteAddress() << " Port: " << m_port << std::endl;
 #endif
-                    delete client;
+                    delete clientSocket;
                 }
             }
             else if (m_receiving)
             {
                 for (auto &client : m_clients)
                 {
-                    if (m_socketSelector.isReady(*client))
+                    if (m_socketSelector.isReady(*client.socket))
                     {
                         sf::Packet packet;
-                        if (client->receive(packet) == sf::Socket::Done)
+                        if (client.socket->receive(packet) == sf::Socket::Done)
                         {
+                            char* raw_msg = (char*)packet.getData();
 
+                            char header_raw[HEADER_SIZE];
+                            memcpy(header_raw, raw_msg, sizeof(char) * HEADER_SIZE);
+                            header_raw[HEADER_SIZE-1] = '\0';
+                            std::string header(header_raw);
+                            header.erase(std::remove_if(header.begin(), header.end(), isspace), header.end());
+                            int dataSize = std::stoi(header);
+
+                            char query_raw[QUERY_SIZE];
+                            memcpy(query_raw, raw_msg + HEADER_SIZE, sizeof(char) * QUERY_SIZE);
+                            std::string query(query_raw);
+                            query.erase(std::remove_if(query.begin(), query.end(), isspace), query.end());
+
+                            void* data = malloc(dataSize);
+                            memcpy(data, raw_msg + HEADER_SIZE + QUERY_SIZE, sizeof(char) * dataSize);
 #ifdef DEBUG
-                            std::cout << "Info: Successfully received packet from client! IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                            std::cout << "Info: Successfully received packet from client! IP: " << client.socket->getRemoteAddress() << " Port: " << m_port  << " Query: " << query<< std::endl;
 #endif
-                            m_pendingReceiving.push_back(std::make_pair(client, packet));
+                            m_pendingReceiving.push_back(std::make_pair(client, PacketT(query, data, dataSize)));
                         }
                         else
                         {
 #ifdef DEBUG
-                            std::cerr << "Error: Failed to receive packet from client! Did the client disconnect? IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                            std::cerr << "Error: Failed to receive packet from client! Did the client disconnect? IP: " << client.socket->getRemoteAddress() << " Port: " << m_port << std::endl;
 #endif
                         }
                     }
@@ -187,20 +165,20 @@ void Server::Mgr()
         if (m_sending)
             while (m_pendingSending.size() > 0)
             {
-                sf::TcpSocket *client = m_pendingSending.front().first;
+                ClientT client = m_pendingSending.front().first;
                 sf::Packet *packet = &m_pendingSending.front().second;
 
-                if (client->send(*packet) == sf::Socket::Done)
+                if (client.socket->send(*packet) == sf::Socket::Done)
                 {
 #ifdef DEBUG
-                    std::cout << "Info: Successfully sent packet to server! IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                    std::cout << "Info: Successfully sent packet to server! IP: " << client.socket->getRemoteAddress() << " Port: " << m_port << std::endl;
 #endif
                     m_pendingSending.pop_front();
                 }
                 else
                 {
 #ifdef DEBUG
-                    std::cerr << "Error: Failed to send packet to server! IP: " << client->getRemoteAddress() << " Port: " << m_port << std::endl;
+                    std::cerr << "Error: Failed to send packet to server! IP: " << client.socket->getRemoteAddress() << " Port: " << m_port << std::endl;
 #endif
                 }
             }

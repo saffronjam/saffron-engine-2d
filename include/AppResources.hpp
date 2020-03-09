@@ -16,4 +16,7 @@ private:
 
 private:
     //Write here
+    int port;
+    Server m_server;
+    Client m_client;
 };

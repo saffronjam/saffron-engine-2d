@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <array>
+#include <thread>
+#include <chrono>
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/ConvexShape.hpp>
@@ -70,4 +72,13 @@ public:
 
 private:
     static std::vector<sf::Vector2f> SortPolygonVerticies(sf::ConvexShape const &polygon);
+};
+
+class Time
+{
+public:
+    static void sleep(float seconds)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(int64_t(seconds * 1000.0f)));
+    }
 };

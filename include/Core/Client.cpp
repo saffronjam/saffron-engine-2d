@@ -1,5 +1,6 @@
 #include "Client.hpp"
 #include <iostream>
+#include <cstring>
 
 using namespace std::chrono_literals;
 
@@ -11,7 +12,7 @@ Client::Client()
 Client::Client(sf::IpAddress const &ip, int const &port)
     : m_ip(ip),
       m_port(port),
-      m_socket(new sf::TcpSocket),
+      m_server(ServerT(new sf::TcpSocket, "")),
       m_active(true),
       m_receiving(true),
       m_sending(true),
@@ -33,16 +34,16 @@ Client::~Client()
     if (m_worker.joinable())
         m_worker.join();
 
-    delete m_socket;
+    delete m_server.socket;
 }
 
 int Client::Connect()
 {
     if (!m_connected)
     {
-        if (m_socket->connect(m_ip, m_port) == sf::Socket::Status::Done)
+        if (m_server.socket->connect(m_ip, m_port) == sf::Socket::Status::Done)
         {
-            m_socketSelector.add(*m_socket);
+            m_socketSelector.add(*m_server.socket);
             m_connected = true;
             return 1;
         }
@@ -54,59 +55,36 @@ void Client::Disconnect()
 {
     if (m_connected)
     {
-        m_socket->disconnect();
+        m_server.socket->disconnect();
         m_connected = false;
     }
 }
 
-void Client::Send(sf::Packet const &packet)
-{
-    m_pendingSending.push_back(packet);
-}
-
-void Client::Send(void *data, size_t size)
-{
-    sf::Packet packet;
-    packet.append(data, size);
-    Send(packet);
-}
-
-void Client::Send(std::string const &string)
-{
-    sf::Packet packet;
-    packet.append((void *)string.c_str(), string.length() + 1);
-    Send(packet);
-}
-
-sf::Packet Client::PopFront()
+PacketT Client::PopFront()
 {
     if (m_pendingReceiving.size() > 0)
     {
-        sf::Packet ret = m_pendingReceiving.front();
+        PacketT ret(m_pendingReceiving.front());
         m_pendingReceiving.pop_front();
         return ret;
     }
     else
     {
-        sf::Packet ret;
-        ret.append("", 1);
-        return ret;
+        return PacketT("EMPTY", nullptr, 0);
     }
 }
 
-sf::Packet Client::PopBack()
+PacketT Client::PopBack()
 {
     if (m_pendingReceiving.size() > 0)
     {
-        sf::Packet ret = m_pendingReceiving.back();
+        PacketT ret(m_pendingReceiving.back());
         m_pendingReceiving.pop_back();
         return ret;
     }
     else
     {
-        sf::Packet ret;
-        ret.append("", 1);
-        return ret;
+        return PacketT("EMPTY", nullptr, 0);
     }
 }
 
@@ -116,15 +94,31 @@ void Client::Mgr()
     {
         if (m_socketSelector.wait(sf::milliseconds(100)))
         {
-            if (m_receiving && m_socketSelector.isReady(*m_socket))
+            if (m_receiving && m_socketSelector.isReady(*m_server.socket))
             {
                 sf::Packet packet;
-                if (m_socket->receive(packet) == sf::Socket::Done)
+                if (m_server.socket->receive(packet) == sf::Socket::Done)
                 {
+                    char* raw_msg = (char*)packet.getData();
+
+                    char header_raw[HEADER_SIZE];
+                    memcpy(header_raw, raw_msg, sizeof(char) * HEADER_SIZE);
+                    header_raw[HEADER_SIZE-1] = '\0';
+                    std::string header(header_raw);
+                    header.erase(std::remove_if(header.begin(), header.end(), isspace), header.end());
+                    int dataSize = std::stoi(header);
+
+                    char query_raw[QUERY_SIZE];
+                    memcpy(query_raw, raw_msg + HEADER_SIZE, sizeof(char) * QUERY_SIZE);
+                    std::string query(query_raw);
+                    query.erase(std::remove_if(query.begin(), query.end(), isspace), query.end());
+
+                    void* data = malloc(dataSize);
+                    memcpy(data, raw_msg + HEADER_SIZE + QUERY_SIZE, sizeof(char) * dataSize);
 #ifdef DEBUG
-                    std::cout << "Info: Successfully received packet from server! IP: " << m_ip << " Port: " << m_port << std::endl;
+                    std::cout << "Info: Successfully received packet from server! IP: " << m_ip << " Port: " << m_port << " Query: " << query << std::endl;
 #endif
-                    m_pendingReceiving.push_back(packet);
+                    m_pendingReceiving.push_back(PacketT(query, data, dataSize));
                 }
                 else
                 {
@@ -137,7 +131,7 @@ void Client::Mgr()
         if (m_sending)
             while (m_pendingSending.size() > 0)
             {
-                if (m_socket->send(m_pendingSending.front()) == sf::Socket::Done)
+                if (m_server.socket->send(m_pendingSending.front()) == sf::Socket::Done)
                 {
 #ifdef DEBUG
                     std::cout << "Info: Successfully sent packet to server! IP: " << m_ip << " Port: " << m_port << std::endl;
