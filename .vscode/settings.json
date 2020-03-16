@@ -54,6 +54,8 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "list": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     }
 }

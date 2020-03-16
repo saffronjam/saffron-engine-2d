@@ -2,7 +2,6 @@
 
 #include "Core/AppIncludes.hpp"
 
-
 class AppResources
 {
 public:

@@ -1,10 +1,9 @@
 #pragma once
 #include "Camera.hpp"
 #include "AudioMgr.hpp"
+#include "../Net/NetworkMgr.hpp"
 #include "Input.hpp"
 #include "GUI.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
 #include "../Arth/Random.hpp"
 #include "../Arth/Math.hpp"
 #include "../AppResources.hpp"
@@ -23,6 +22,7 @@ private:
 	Graphics &gfx;
 	Camera &camera;
 	AudioMgr &audioMgr;
+	NetworkMgr netMgr;
 	Input &input;
 	sf::Time &dt;
 	GUI &gui;

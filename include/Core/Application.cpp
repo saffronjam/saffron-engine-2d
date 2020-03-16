@@ -26,6 +26,7 @@ void Application::Go()
 
 void Application::UpdateLogic()
 {
+	netMgr.PollAll();
 	camera.Update(dt);
 	gui.Update(dt);
 

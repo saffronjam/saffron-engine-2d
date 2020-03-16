@@ -16,5 +16,6 @@
 #include "AudioMgr.hpp"
 #include "Input.hpp"
 #include "GUI.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
+
+#include "../Net/Server.hpp"
+#include "../Net/Client.hpp"
