@@ -15,7 +15,7 @@ public:
 	void SetLowerBound(int lowerBound_IN) { m_lower = lowerBound_IN; };
 	void SetUpperBound(int upperBound_IN) { m_upper = upperBound_IN; };
 
-	static double Generate(double lower, double upper)
+	static double Number(double lower, double upper)
 	{
 		srand(time(NULL));
 		if (lower > upper)
@@ -23,6 +23,19 @@ public:
 			std::swap(lower, upper);
 		}
 		return (double)((rand() % ((int)upper - (int)lower)) + (int)lower);
+	}
+
+	static char Character(std::string choices)
+	{
+		int index = rand() % (choices.length());
+		return choices[index];
+	}
+
+	template <typename T>
+	static T Choices(std::vector<T> choices)
+	{
+		int index = rand() % (choices.size());
+		return choices[index];
 	}
 
 private:
