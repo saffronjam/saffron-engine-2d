@@ -5,34 +5,64 @@ else
 endif
 
 ifeq ($(detected_OS), Windows)
-OUTPUT := main.exe
-LIBLOC := -Llib
-FLAGS := -std=c++17 -Iinclude -Wall -g -pthread
+APP     := game.exe
+LIB_LOC := -Llib
+WIN_FL := -Iinclude 
 else
-OUTPUT := main.out
-LIBLOC := -L/usr/lib/x86_64-linux-gnu
-FLAGS := -std=c++17 -Wall -g -pthread
+APP     := game.out
+LIB_LOC := -L/usr/lib/x86_64-linux-gnu
 endif
 
-CC := g++
-OUTFLAG := -o
-ENTRY = MainWin.cpp
-SRC := include
-SRCS := $(wildcard $(SRC)/*.cpp)
-SRCSCORE := $(wildcard $(SRC)/Core/*.cpp)
-SRCSNET := $(wildcard $(SRC)/Net/*.cpp)
-SRCSARTH := $(wildcard $(SRC)/Arth/*.cpp)
-LIBS := -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -lSFGUI
+CC 		:= g++
+ENTRY 	:= MainWin.cpp
 
+SRCDIR  := ./include
+SRCDIRS := ./ ./Core ./Net ./Arth
+OBJDIR  := ./bin
 
-myOS:
+# Files and folders
+SRCS    := $(shell find $(SRCDIR) -name '*.cpp')
+OBJS    := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
+
+# Flags
+CFLAGS  := -Wall -pedantic -ansi -g -pthread -std=c++17 -g $(WIN_FL)
+LDFLAGS := -std=c++17
+
+# Libraries
+LIBS := $(LIB_LOC) -lsfml-audio -lsfml-graphics -lsfml-network -lsfml-system -lsfml-window -lSFGUI
+
+# Targets
+help:
+	@echo Usage: make \<option\>
+	@echo Options:
+	@echo -b Builds app
+	@echo -r Runs app
+	@echo -br Builds and runs app
+os:
 	@echo $(detected_OS)
-
-b: $(ENTRY)
-	$(CC) $(ENTRY) $(SRCS) $(SRCSCORE) $(SRCSNET) $(SRCSARTH) $(OUTFLAG) $(OUTPUT) $(LIBLOC) $(LIBS) $(FLAGS)
-
-r: MainWin.cpp
-	./$(OUTPUT)
-
-br: MainWin.cpp
+b: $(APP)
+r: $(ENTRY)
+	./$(APP)
+br:	
 	make b && make r
+
+$(APP): buildrepo $(OBJS)
+	$(CC) $(ENTRY) $(OBJS) $(LIBS) $(CFLAGS) -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CC) $(LDFLAGS) -c $< -o $@
+	
+clean:
+	rm $(OBJDIR) -Rf
+	
+buildrepo:
+	@$(call make-repo)
+
+# Create obj directory structure
+define make-repo
+	mkdir -p $(OBJDIR)
+	for dir in $(SRCDIRS); \
+	do \
+		mkdir -p $(OBJDIR)/$$dir; \
+	done
+endef
