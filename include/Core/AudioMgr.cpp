@@ -1,5 +1,5 @@
 #include "AudioMgr.hpp"
-#include <iostream>
+#include "Log.hpp"
 
 AudioMgr::AudioMgr()
 {
@@ -10,10 +10,10 @@ AudioMgr::AudioMgr()
         soundBuffer = new sf::SoundBuffer;
 
     if (!m_allMusic[MusicTest]->openFromFile("assets/audio/testMusic.wav"))
-        std::cerr << "Error: Could not open testMusic.wave!" << std::endl;
+        Log::warning("Could not open testMusic.wav");
 
     if (!m_allSoundBuffers[SoundTest]->loadFromFile("assets/audio/testSound.wav"))
-        std::cerr << "Error: Could not open testSound.wave!" << std::endl;
+        Log::warning("Could not open testSound.wave");
 }
 
 AudioMgr::~AudioMgr()

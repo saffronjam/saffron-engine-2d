@@ -1,16 +1,10 @@
 #pragma once
 
 #include <SFML/Network.hpp>
-#include <deque>
 #include <vector>
-#include <map>
 #include <thread>
-#include <iomanip>
-#include <iostream>
 
 #include "PacketMgr.hpp"
-
-#include "../Core/Flags.hpp"
 
 #ifdef SFML_SYSTEM_WINDOWS
 #include <winsock2.h>
@@ -42,14 +36,16 @@ public:
     void Broadcast(Query query, T *data, size_t size)
     {
 #ifdef DEBUG
-        std::cout << "Info: Broadcasting packet..." << std::endl;
+        Log::info("Broadcast started");
+        Log::AddPrefix(" ->");
 #endif
         for (auto &client : m_clients)
         {
             Send<T>(query, data, size, client);
         }
 #ifdef DEBUG
-        std::cout << "Info: Broadcast finished..." << std::endl;
+        Log::ClearPrefix();
+        Log::info("Broadcast finished");
 #endif
     }
 

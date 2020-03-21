@@ -11,11 +11,12 @@
 #include <map>
 #include <functional>
 #include <iostream>
+#include <cstring>
 
-#include "Camera.hpp"
-#include "AudioMgr.hpp"
-#include "Input.hpp"
-#include "GUI.hpp"
-
-#include "../Net/Server.hpp"
-#include "../Net/Client.hpp"
+#include "Core/Camera.hpp"
+#include "Core/AudioMgr.hpp"
+#include "Core/Input.hpp"
+#include "Core/GUI.hpp"
+#include "Core/Log.hpp"
+#include "Net/Server.hpp"
+#include "Net/Client.hpp"

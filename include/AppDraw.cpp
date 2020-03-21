@@ -1,6 +1,6 @@
 #include "AppResources.hpp"
 #include "Core/Application.hpp"
-#include "Core/AppIncludes.hpp"
+#include "AppIncludes.hpp"
 
 void AppResources::Draw()
 {

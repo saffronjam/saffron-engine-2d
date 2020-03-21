@@ -1,7 +1,6 @@
 #include "AppResources.hpp"
 #include "Core/Application.hpp"
-#include "Core/AppIncludes.hpp"
-#include <cstring>
+#include "AppIncludes.hpp"
 
 AppResources::AppResources(Application &app)
     : app(app),
@@ -17,7 +16,7 @@ AppResources::AppResources(Application &app)
     m_client.Connect();
     Time::sleep(0.5f);
     std::string send = "THIS IS A TEST";
-    m_server.Broadcast<const char>(Query::Test, send.c_str(), send.size());
+    m_server.Broadcast<const char>(Query::Test, send.c_str(), send.size() + 1);
     m_client.Send<const char>(Query::Test, send.c_str(), send.size() + 1);
     Time::sleep(0.5f);
 }

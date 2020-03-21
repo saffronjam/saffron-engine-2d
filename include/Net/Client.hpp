@@ -1,11 +1,8 @@
 #pragma once
 
-#include <deque>
 #include <thread>
 
 #include "PacketMgr.hpp"
-
-#include "../Core/Flags.hpp"
 
 class Client : public PacketMgr
 {

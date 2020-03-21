@@ -48,7 +48,7 @@ int Server::AcceptConnections()
     if (m_listener.listen(m_port) == sf::Socket::Done)
     {
 #ifdef DEBUG
-        std::cout << "Info: Successfully started listener on server! Port: " << m_port << std::endl;
+        Log::info("Successfully started listener on server. Port:", m_port);
 #endif
         m_socketSelector.add(m_listener);
         m_accepting = true;
@@ -57,7 +57,7 @@ int Server::AcceptConnections()
     else
     {
 #ifdef DEBUG
-        std::cerr << "Error: Failed to start listener on server! Port: " << m_port << std::endl;
+        Log::error("Failed to start listener on server. Port:", m_port);
 #endif
         return 0;
     }
@@ -102,7 +102,7 @@ void Server::TryAcceptNewClient()
     if (m_listener.accept(*clientSocket) == sf::Socket::Done)
     {
 #ifdef DEBUG
-        std::cout << "Info: Successfully accepted connection to client! IP: " << clientSocket->getRemoteAddress() << " Port: " << m_port << std::endl;
+        Log::info("Successfully accepted connection to client! IP:", clientSocket->getRemoteAddress(), "Port:", m_port);
 #endif
         std::string token = GenerateToken(TOKEN_SIZE);
         m_clients.push_back(Connection(clientSocket, token));
@@ -112,7 +112,7 @@ void Server::TryAcceptNewClient()
     else
     {
 #ifdef DEBUG
-        std::cerr << "Error: Failed to accept connection to client! IP: " << clientSocket->getRemoteAddress() << " Port: " << m_port << std::endl;
+        Log::warning("Failed to accept connection to client. IP:", clientSocket->getRemoteAddress(), "Port:", m_port);
 #endif
         delete clientSocket;
     }

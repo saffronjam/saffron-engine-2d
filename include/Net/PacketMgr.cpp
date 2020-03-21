@@ -8,6 +8,7 @@ PacketMgr::PacketMgr()
 
 std::shared_ptr<Payload> PacketMgr::PopFront()
 {
+    std::scoped_lock scoped(m_recvLock);
     if (m_incoming.size() > 0)
     {
         AddInUse(m_incoming.front().payload);
@@ -22,6 +23,7 @@ std::shared_ptr<Payload> PacketMgr::PopFront()
 
 std::shared_ptr<Payload> PacketMgr::PopBack()
 {
+    std::scoped_lock scoped(m_recvLock);
     if (m_incoming.size() > 0)
     {
         AddInUse(m_incoming.back().payload);
@@ -53,8 +55,7 @@ void PacketMgr::ReceivePackage(Connection &connection)
         if (token != connection.token && connection.token != "")
         {
 #ifdef DEBUG
-            std::cout << "Info: Wrong token! Throwing packet... IP: " << ip << " Port: " << port << std::endl;
-            std::cout << "Expected: " << connection.token << " Got: " << token << std::endl;
+            Log::info("Wrong token! Throwing packet... IP:", ip, "Port:", port);
 #endif
         }
         else
@@ -75,7 +76,7 @@ void PacketMgr::ReceivePackage(Connection &connection)
             memcpy(data, raw_msg + TOKEN_SIZE + HEADER_SIZE + QUERY_SIZE, sizeof(char) * dataSize);
 
 #ifdef DEBUG
-            std::cout << "Info: Successfully received packet from IP: " << ip << " Port: " << port << " Query: " << query << std::endl;
+            Log::info("Successfully received packet from IP:", ip, "Port:", port, "Query:", query);
 #endif
             AddIncoming(Packet(connection, Payload(query, data, dataSize)));
         }
@@ -83,13 +84,14 @@ void PacketMgr::ReceivePackage(Connection &connection)
     else
     {
 #ifdef DEBUG
-        std::cerr << "Error: Failed to receive packet from IP: " << socket->getRemoteAddress() << " Port: " << port << std::endl;
+        Log::warning("Failed to receive packet from IP:", ip, "Port:", port);
 #endif
     }
 }
 
 void PacketMgr::SendAllPackages()
 {
+    std::scoped_lock scoped(m_sendLock);
     for (auto outgoing = m_outgoing.begin(); outgoing != m_outgoing.end(); outgoing++)
     {
         SendPackage(*outgoing);
@@ -98,6 +100,7 @@ void PacketMgr::SendAllPackages()
     auto sent = std::remove_if(m_outgoing.begin(), m_outgoing.end(), [](auto packet) { return packet.sent; });
     std::for_each(sent, m_outgoing.end(), [](auto packet) { free(packet.payload.data); });
     m_outgoing.erase(sent, m_outgoing.end());
+    m_sendLock.unlock();
 }
 
 void PacketMgr::CleanUnusedPackages()
@@ -113,7 +116,6 @@ void PacketMgr::CleanUnusedPackages()
 
 void PacketMgr::SendPackage(Packet &packet)
 {
-
     auto &socket = packet.connection.socket;
     auto &token = packet.connection.token;
 #ifdef DEBUG
@@ -129,14 +131,14 @@ void PacketMgr::SendPackage(Packet &packet)
     if (socket->send(outgoing) == sf::Socket::Done)
     {
 #ifdef DEBUG
-        std::cout << "Info: Successfully sent packet to IP: " << ip << " Port: " << port << std::endl;
+        Log::info("Successfully sent packet to IP:", ip, "Port:", port);
 #endif
         packet.sent = true;
     }
     else
     {
 #ifdef DEBUG
-        std::cerr << "Error: Failed to send packet to IP: " << ip << " Port: " << port << std::endl;
+        Log::warning("Failed to send packet to IP:", ip, "Port:", port);
 #endif
     }
 }
@@ -165,4 +167,15 @@ sf::Packet PacketMgr::PreparePacket(Packet const &packet)
     outgoing.append((void *)packet.payload.data, packet.payload.dataSize);
 
     return outgoing;
+}
+
+void PacketMgr::AddOutgoing(Packet const &packet)
+{
+    std::scoped_lock scoped(m_sendLock);
+    m_outgoing.push_back(packet);
+}
+void PacketMgr::AddIncoming(Packet const &packet)
+{
+    std::scoped_lock scoped(m_recvLock);
+    m_incoming.push_back(packet);
 }

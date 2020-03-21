@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/AppIncludes.hpp"
+#include "AppIncludes.hpp"
 
 class AppResources
 {

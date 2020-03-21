@@ -4,11 +4,12 @@
 #include <memory>
 #include <string>
 #include <sstream>
-#include <iostream>
 #include <cstring>
 #include <iomanip>
+#include <mutex>
 #include <SFML/Network.hpp>
 
+#include "../Core/Log.hpp"
 #include "../Core/Flags.hpp"
 
 #define HEADER_SIZE 10
@@ -78,7 +79,7 @@ public:
     void Send(Query query, T *data, size_t size, Connection &connection)
     {
 #ifdef DEBUG
-        std::cout << "Info: Adding packet to sending list. IP: " << connection.socket->getRemoteAddress() << std::endl;
+        Log::info("Adding packet to sending list. IP:", connection.socket->getRemoteAddress());
 #endif
         void *data_raw = malloc(size);
         memcpy(data_raw, data, size);
@@ -99,8 +100,8 @@ private:
     void SendPackage(Packet &packet);
     sf::Packet PreparePacket(Packet const &packet);
 
-    void AddOutgoing(Packet const &packet) { m_outgoing.push_back(packet); }
-    void AddIncoming(Packet const &packet) { m_incoming.push_back(packet); }
+    void AddOutgoing(Packet const &packet);
+    void AddIncoming(Packet const &packet);
     void AddInUse(Payload payload) { m_inUse.push_back(std::shared_ptr<Payload>(new Payload(payload))); }
 
 private:
@@ -108,4 +109,7 @@ private:
     std::deque<Packet> m_outgoing;
     std::vector<std::shared_ptr<Payload>> m_inUse;
     std::shared_ptr<Payload> m_fallback;
+
+    std::mutex m_sendLock;
+    std::mutex m_recvLock;
 };
