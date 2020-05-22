@@ -3,15 +3,17 @@
 #include <string>
 #include <cassert>
 
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_hints.h>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Err.hpp>
 
 #include "WindowThrowMacros.h"
 #include "VeException.h"
-#include "Vec2.h"
+#include "Log.h"
 
 class Window
 {
+    friend class Draw;
+
 public:
     Window() = default;
     ~Window();
@@ -23,7 +25,11 @@ public:
     static void Clear();
     static void Present() noexcept;
 
-    static Vec2i GetPosition() noexcept;
+    static void PositionCenter() noexcept;
+
+    static sf::RenderWindow *GetSFWindow() noexcept;
+    static sf::Vector2i GetPosition() noexcept;
+    static sf::Vector2u GetSize() noexcept;
     static int GetWidth() noexcept;
     static int GetHeight() noexcept;
     static const std::string &GetTitle() noexcept;
@@ -31,18 +37,24 @@ public:
     static bool IsFullscreen() noexcept;
     static bool IsVSyncEnabled() noexcept;
 
-    static void SetPosition(int x, int y) noexcept;
-    static void SetSize(int width, int height) noexcept;
+    static void SetPosition(const sf::Vector2i &pos) noexcept;
+    static void SetSize(const sf::Vector2u &size) noexcept;
     static void SetTitle(const std::string &title) noexcept;
     static void SetIcon(const std::string &icon) noexcept;
     static void SetFullscreen(bool toggle) noexcept;
     static void SetVSync(bool toggle) noexcept;
-
-    static void MoveToCenter() noexcept;
+    static void SetView(const sf::View &view) noexcept;
 
 private:
-    static SDL_Window *m_sdlWindow;
-    static SDL_Renderer *m_sdlRenderer;
+    static sf::RenderWindow *m_sfWindow;
+    static std::string m_title;
+    // Used after exiting fullscreen
+    static sf::VideoMode m_videomode;
+    // Used after exiting fullscreen
+    static sf::Uint32 m_style;
+    static sf::Vector2i m_nonFullscreenPosition;
+
+    static bool m_fullscreen;
 
 public:
     class Exception : public VeException

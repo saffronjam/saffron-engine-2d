@@ -7,24 +7,8 @@ IApp::IApp()
       m_isRunning(true)
 {
     EventMgr::AddOnEventFunction(this);
-
-    SDL_DisplayMode target,
-        closest;
-
-    target.w = 1024;
-    target.h = 768;
-    target.format = 0;
-    target.refresh_rate = 0;
-    target.driverdata = 0;
-
-    if (!SDL_GetClosestDisplayMode(0, &target, &closest))
-    {
-        VEAPP_LAST_EXCEPT();
-    }
-    else
-    {
-        m_window.Create("V-2DEngine", closest.w, closest.h);
-    }
+    sf::VideoMode mode = sf::VideoMode::getDesktopMode();
+    m_window.Create("V-2DEngine", mode.width * 0.7f, mode.height * 0.7f);
 }
 
 IApp::~IApp()
@@ -36,8 +20,8 @@ void IApp::Run()
     Init();
     while (m_isRunning)
     {
-        Keyboard::UpdateKeyMaps();
-        Mouse::UpdateButtonMaps();
+        Keyboard::Update();
+        Mouse::Update();
         EventMgr::PollAll();
         Window::Clear();
         Update();
@@ -110,11 +94,11 @@ bool IApp::Init()
     return true;
 }
 
-void IApp::OnEvent(const SDL_Event &event)
+void IApp::OnEvent(const sf::Event &event)
 {
     switch (event.type)
     {
-    case SDL_QUIT:
+    case sf::Event::EventType::Closed:
         Exit();
         break;
     }

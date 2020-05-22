@@ -26,4 +26,6 @@ public:
 
 private:
     void CheckInput();
+
+    float scroll = 0.0f;
 };

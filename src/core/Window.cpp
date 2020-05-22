@@ -1,81 +1,132 @@
 #include "Window.h"
 
-SDL_Window *Window::m_sdlWindow = nullptr;
-SDL_Renderer *Window::m_sdlRenderer = nullptr;
+sf::RenderWindow *Window::m_sfWindow = nullptr;
+std::string Window::m_title("Unnamed window");
+sf::VideoMode Window::m_videomode;
+sf::Uint32 Window::m_style;
+sf::Vector2i Window::m_nonFullscreenPosition;
+bool Window::m_fullscreen;
 
 Window::~Window()
 {
-    SDL_DestroyRenderer(m_sdlRenderer);
-    SDL_DestroyWindow(m_sdlWindow);
+    delete m_sfWindow;
+    m_sfWindow = nullptr;
 }
 
 void Window::Create(const std::string &title, int width, int height)
 {
-    if (!SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl"))
-    {
-        VEWND_LAST_EXCEPT();
-    }
+    m_videomode = sf::VideoMode(width, height);
+    m_style = sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close;
 
-    m_sdlWindow = SDL_CreateWindow(title.c_str(),
-                                   SDL_WINDOWPOS_CENTERED,
-                                   SDL_WINDOWPOS_CENTERED,
-                                   800, 600,
-                                   SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    if (!m_sdlWindow)
-        VEWND_LAST_EXCEPT();
-
-    m_sdlRenderer = SDL_CreateRenderer(Window::m_sdlWindow,
-                                       -1,
-                                       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!m_sdlRenderer)
-        VEWND_LAST_EXCEPT();
-
-    if (SDL_SetRenderDrawBlendMode(m_sdlRenderer, SDL_BLENDMODE_BLEND) == -1 ||
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == -1 ||
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24) == -1 ||
-        SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) == -1)
-    {
-        VEWND_LAST_EXCEPT();
-    }
+    m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, sf::ContextSettings());
+    SetTitle(title);
+    PositionCenter();
 }
 
 void Window::Clear()
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    if (SDL_RenderClear(m_sdlRenderer) == -1)
-    {
-        VEWND_LAST_EXCEPT();
-    }
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->clear();
 }
 
 void Window::Present() noexcept
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    SDL_RenderPresent(m_sdlRenderer);
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->display();
 }
 
-void Window::SetPosition(int x, int y) noexcept
+void Window::PositionCenter() noexcept
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    SDL_SetWindowPosition(m_sdlWindow, x, y);
+    sf::VideoMode max = sf::VideoMode::getDesktopMode();
+    sf::Vector2i halfSize = sf::Vector2i(m_sfWindow->getSize().x / 2u, m_sfWindow->getSize().y / 2u);
+    m_sfWindow->setPosition(sf::Vector2i(max.width, max.height) / 2 - halfSize);
 }
 
-void Window::SetSize(int width, int height) noexcept
+sf::RenderWindow *Window::GetSFWindow() noexcept
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    SDL_SetWindowSize(m_sdlWindow, width, height);
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_sfWindow;
+}
+
+sf::Vector2i Window::GetPosition() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_sfWindow->getPosition();
+}
+
+sf::Vector2u Window::GetSize() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_sfWindow->getSize();
+}
+
+int Window::GetWidth() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return GetSize().y;
+}
+
+int Window::GetHeight() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return GetSize().x;
+}
+
+const std::string &Window::GetTitle() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_title;
+}
+
+void Window::SetPosition(const sf::Vector2i &pos) noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->setPosition(pos);
+}
+
+void Window::SetSize(const sf::Vector2u &size) noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->setSize(size);
 }
 
 void Window::SetTitle(const std::string &title) noexcept
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    SDL_SetWindowTitle(m_sdlWindow, title.c_str());
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->setTitle(title);
 }
 
-void Window::MoveToCenter() noexcept
+void Window::SetIcon(const std::string &icon) noexcept
 {
-    assert("Attempted to handle the window without creating it" && m_sdlWindow && m_sdlRenderer);
-    Window::SetPosition(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+    sf::Image image;
+    image.loadFromFile(icon);
+    m_sfWindow->setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
+}
+
+void Window::SetFullscreen(bool toggle) noexcept
+{
+    if (toggle && !m_fullscreen)
+    {
+        m_fullscreen = true;
+        m_videomode.width = GetSize().x;
+        m_videomode.height = GetSize().y;
+        m_nonFullscreenPosition = GetPosition();
+        m_sfWindow->create(sf::VideoMode::getFullscreenModes()[0], GetTitle(), sf::Style::Fullscreen);
+    }
+    else if (!toggle && m_fullscreen)
+    {
+        m_fullscreen = false;
+        m_sfWindow->create(m_videomode, GetTitle(), m_style);
+        SetPosition(m_nonFullscreenPosition);
+    }
+}
+
+void Window::SetVSync(bool toggle) noexcept
+{
+}
+
+void Window::SetView(const sf::View &view) noexcept
+{
 }
 
 Window::Exception::Exception(int line, const char *file, const char *errorString) noexcept

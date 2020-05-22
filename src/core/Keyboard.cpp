@@ -1,7 +1,7 @@
 #include "Keyboard.h"
 
-std::unordered_map<SDL_Keycode, bool> Keyboard::m_keymap;
-std::unordered_map<SDL_Keycode, bool> Keyboard::m_prevKeymap;
+std::unordered_map<sf::Keyboard::Key, bool> Keyboard::m_keymap;
+std::unordered_map<sf::Keyboard::Key, bool> Keyboard::m_prevKeymap;
 std::string Keyboard::m_textInputBuffer;
 
 Keyboard::Keyboard()
@@ -13,23 +13,24 @@ Keyboard::~Keyboard()
 {
 }
 
-void Keyboard::UpdateKeyMaps() noexcept
+void Keyboard::Update() noexcept
 {
     for (auto &[key, state] : m_keymap)
         m_prevKeymap[key] = state;
+    m_textInputBuffer.clear();
 }
 
-bool Keyboard::IsDown(const SDL_Keycode &key) noexcept
+bool Keyboard::IsDown(const sf::Keyboard::Key &key) noexcept
 {
     return m_keymap[key];
 }
 
-bool Keyboard::IsPressed(const SDL_Keycode &key) noexcept
+bool Keyboard::IsPressed(const sf::Keyboard::Key &key) noexcept
 {
     return m_keymap[key] && !m_prevKeymap[key];
 }
 
-bool Keyboard::IsReleased(const SDL_Keycode &key) noexcept
+bool Keyboard::IsReleased(const sf::Keyboard::Key &key) noexcept
 {
     return !m_keymap[key] && m_prevKeymap[key];
 }
@@ -44,40 +45,39 @@ bool Keyboard::IsAnyDown() noexcept
     return false;
 }
 
-void Keyboard::OnEvent(const SDL_Event &event) noexcept
+void Keyboard::OnEvent(const sf::Event &event) noexcept
 {
     switch (event.type)
     {
-    case SDL_KEYDOWN:
+    case sf::Event::EventType::KeyPressed:
     {
-        OnPress(event.key.keysym.sym);
+        OnPress(event.key.code);
         break;
     }
-    case SDL_KEYUP:
+    case sf::Event::EventType::KeyReleased:
     {
-        OnRelease(event.key.keysym.sym);
+        OnRelease(event.key.code);
         break;
     }
-    case SDL_TEXTINPUT:
+    case sf::Event::EventType::TextEntered:
     {
-        OnTextInput(event.text.text);
+        OnTextInput(event.text.unicode);
         break;
     }
     }
 }
 
-void Keyboard::OnPress(const SDL_Keycode &key) noexcept
+void Keyboard::OnPress(const sf::Keyboard::Key &key) noexcept
 {
     m_keymap[key] = true;
 }
 
-void Keyboard::OnRelease(const SDL_Keycode &key) noexcept
+void Keyboard::OnRelease(const sf::Keyboard::Key &key) noexcept
 {
     m_keymap[key] = false;
 }
 
-void Keyboard::OnTextInput(const std::string &text) noexcept
+void Keyboard::OnTextInput(unsigned char character) noexcept
 {
-    m_textInputBuffer.clear();
-    m_textInputBuffer = text;
+    m_textInputBuffer += character;
 }

@@ -2,21 +2,12 @@
 
 #include <bitset>
 
+#include <SFML/Window/Mouse.hpp>
+
 #include "EventMgr.h"
-#include "Vec2.h"
 
 class Mouse : public OnEventComponent
 {
-public:
-    enum class Button : unsigned char
-    {
-        Left,
-        Middle,
-        Right,
-        X1,
-        X2,
-        Count,
-    };
 
 public:
     // Set up call-back function in eventMgr
@@ -26,22 +17,34 @@ public:
     Mouse &operator=(const Mouse &) = delete;
 
     // Move buttonMap into prev-buttonMap
-    static void UpdateButtonMaps() noexcept;
+    static void Update() noexcept;
 
-    static bool IsDown(const Button &button) noexcept;
-    static bool IsPressed(const Button &button) noexcept;
-    static bool IsReleased(const Button &button) noexcept;
-    static Vec2i GetPos() noexcept { return m_mousePos; }
+    static bool IsDown(const sf::Mouse::Button &button) noexcept;
+    static bool IsPressed(const sf::Mouse::Button &button) noexcept;
+    static bool IsReleased(const sf::Mouse::Button &button) noexcept;
+    static bool AnyButtonDown() noexcept;
 
-private:
-    virtual void OnEvent(const SDL_Event &event) noexcept override;
-
-    static void OnPress(const Button &button) noexcept;
-    static void OnRelease(const Button &button) noexcept;
+    static sf::Vector2i GetPos() noexcept { return m_mousePos; }
+    static float GetVerticalScroll() noexcept { return m_verticalScrollBuffer; }
+    static float GetHorizontalScroll() noexcept { return m_horizontalScrollBuffer; }
 
 private:
-    static std::unordered_map<Button, bool> m_buttonmap;
-    static std::unordered_map<Button, bool> m_prevButtonmap;
+    virtual void OnEvent(const sf::Event &event) noexcept override;
 
-    static Vec2i m_mousePos;
+    static void OnPress(const sf::Mouse::Button &button) noexcept;
+    static void OnRelease(const sf::Mouse::Button &button) noexcept;
+    static void OnMove(int x, int y) noexcept;
+    static void OnEnter() noexcept;
+    static void OnLeave() noexcept;
+    static void OnScroll(sf::Mouse::Wheel wheel, float delta) noexcept;
+
+private:
+    static std::unordered_map<sf::Mouse::Button, bool> m_buttonmap;
+    static std::unordered_map<sf::Mouse::Button, bool> m_prevButtonmap;
+
+    static sf::Vector2i m_mousePos;
+    static bool m_inWindow;
+
+    static float m_verticalScrollBuffer;
+    static float m_horizontalScrollBuffer;
 };

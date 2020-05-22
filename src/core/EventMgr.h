@@ -3,11 +3,13 @@
 #include <functional>
 #include <vector>
 
-#include <SDL2/SDL_events.h>
+#include <SFML/Window/Event.hpp>
+
+#include "Window.h"
 
 struct OnEventComponent
 {
-    virtual void OnEvent(const SDL_Event &) = 0;
+    virtual void OnEvent(const sf::Event &) = 0;
 };
 
 class EventMgr

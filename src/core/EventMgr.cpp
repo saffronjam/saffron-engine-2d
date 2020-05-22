@@ -4,8 +4,8 @@ std::vector<OnEventComponent *> EventMgr::m_callbacks;
 
 void EventMgr::PollAll() noexcept
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
+    sf::Event event;
+    while (Window::GetSFWindow()->pollEvent(event))
     {
         for (auto &callback : m_callbacks)
         {

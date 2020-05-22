@@ -29,7 +29,7 @@ protected:
 
     bool Init();
 
-    virtual void OnEvent(const SDL_Event &event) override;
+    virtual void OnEvent(const sf::Event &event) override;
 
 protected:
     std::unique_ptr<ScreenList> m_screenList;

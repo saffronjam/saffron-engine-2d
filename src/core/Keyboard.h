@@ -24,23 +24,23 @@ public:
     Keyboard &operator=(const Keyboard &) = delete;
 
     // Move keymap into prev-keymap
-    static void UpdateKeyMaps() noexcept;
+    static void Update() noexcept;
 
-    static bool IsDown(const SDL_Keycode &key) noexcept;
-    static bool IsPressed(const SDL_Keycode &key) noexcept;
-    static bool IsReleased(const SDL_Keycode &key) noexcept;
+    static bool IsDown(const sf::Keyboard::Key &key) noexcept;
+    static bool IsPressed(const sf::Keyboard::Key &key) noexcept;
+    static bool IsReleased(const sf::Keyboard::Key &key) noexcept;
     static bool IsAnyDown() noexcept;
     static std::string GetTextInput() noexcept { return m_textInputBuffer; }
 
 private:
-    virtual void OnEvent(const SDL_Event &event) noexcept override;
+    virtual void OnEvent(const sf::Event &event) noexcept override;
 
-    static void OnPress(const SDL_Keycode &key) noexcept;
-    static void OnRelease(const SDL_Keycode &key) noexcept;
-    static void OnTextInput(const std::string &text) noexcept;
+    static void OnPress(const sf::Keyboard::Key &key) noexcept;
+    static void OnRelease(const sf::Keyboard::Key &key) noexcept;
+    static void OnTextInput(unsigned char character) noexcept;
 
 private:
-    static std::unordered_map<SDL_Keycode, bool> m_keymap;
-    static std::unordered_map<SDL_Keycode, bool> m_prevKeymap;
+    static std::unordered_map<sf::Keyboard::Key, bool> m_keymap;
+    static std::unordered_map<sf::Keyboard::Key, bool> m_prevKeymap;
     static std::string m_textInputBuffer;
 };
