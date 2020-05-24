@@ -15,6 +15,11 @@ else()
   find_package(SFML REQUIRED network audio graphics window system)
 endif()
 
+add_definitions(
+  -DSFML_STATIC
+)
+
+
 file(GLOB_RECURSE SRC "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(V-Engine2D "${SRC}")
@@ -31,13 +36,26 @@ target_include_directories(V-Engine2D PRIVATE
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(${PROJECT_NAME} PRIVATE
-    # deps/SDL2/include
+    deps/SFML/include
   )
   target_link_directories(${PROJECT_NAME} PRIVATE
-    # deps/SDL2/lib/x64
+    deps/SFML/lib
   )
   target_link_libraries(${PROJECT_NAME} PRIVATE
-    # SDL2
+    FLAC
+    freetype
+    ogg
+    sfml-audio-s
+    sfml-graphics-s
+    sfml-network-s
+    sfml-window-s
+    sfml-system-s
+    vorbis
+    vorbisenc
+    vorbisfile
+    opengl32
+    winmm
+    gdi32
   )
 else() 
   target_include_directories(${PROJECT_NAME} PRIVATE
