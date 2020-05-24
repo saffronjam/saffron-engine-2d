@@ -22,6 +22,7 @@ public:
 
     void Create(const std::string &title, int width, int height);
 
+    static void Draw(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
     static void Clear();
     static void Present() noexcept;
 
@@ -33,6 +34,9 @@ public:
     static int GetWidth() noexcept;
     static int GetHeight() noexcept;
     static const std::string &GetTitle() noexcept;
+    static sf::View GetCurrentView() noexcept;
+    static sf::View GetDefaultView() noexcept;
+    static sf::IntRect GetScreenRect() noexcept;
 
     static bool IsFullscreen() noexcept;
     static bool IsVSyncEnabled() noexcept;

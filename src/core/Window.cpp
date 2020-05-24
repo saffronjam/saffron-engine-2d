@@ -23,6 +23,12 @@ void Window::Create(const std::string &title, int width, int height)
     PositionCenter();
 }
 
+void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->draw(drawable, renderStates);
+}
+
 void Window::Clear()
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
@@ -63,19 +69,37 @@ sf::Vector2u Window::GetSize() noexcept
 int Window::GetWidth() noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return GetSize().y;
+    return GetSize().x;
 }
 
 int Window::GetHeight() noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return GetSize().x;
+    return GetSize().y;
 }
 
 const std::string &Window::GetTitle() noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
     return m_title;
+}
+
+sf::View Window::GetCurrentView() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_sfWindow->getView();
+}
+
+sf::View Window::GetDefaultView() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return m_sfWindow->getDefaultView();
+}
+
+sf::IntRect Window::GetScreenRect() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return sf::IntRect(0, 0, GetWidth(), GetHeight());
 }
 
 void Window::SetPosition(const sf::Vector2i &pos) noexcept
@@ -98,6 +122,7 @@ void Window::SetTitle(const std::string &title) noexcept
 
 void Window::SetIcon(const std::string &icon) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
     sf::Image image;
     image.loadFromFile(icon);
     m_sfWindow->setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
@@ -105,6 +130,7 @@ void Window::SetIcon(const std::string &icon) noexcept
 
 void Window::SetFullscreen(bool toggle) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
     if (toggle && !m_fullscreen)
     {
         m_fullscreen = true;
@@ -123,10 +149,14 @@ void Window::SetFullscreen(bool toggle) noexcept
 
 void Window::SetVSync(bool toggle) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->setVerticalSyncEnabled(toggle);
 }
 
 void Window::SetView(const sf::View &view) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->setView(view);
 }
 
 Window::Exception::Exception(int line, const char *file, const char *errorString) noexcept

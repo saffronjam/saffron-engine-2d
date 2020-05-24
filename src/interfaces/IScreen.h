@@ -5,7 +5,6 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Log.h"
-#include "Draw.h"
 #include "Lib.h"
 
 #include <SFML/Graphics.hpp>

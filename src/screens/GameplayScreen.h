@@ -2,6 +2,8 @@
 
 #include "IScreen.h"
 
+#include "Camera.h"
+
 class GameplayScreen : public IScreen
 {
 public:
@@ -27,5 +29,6 @@ public:
 private:
     void CheckInput();
 
-    float scroll = 0.0f;
+private:
+    Camera m_camera;
 };
