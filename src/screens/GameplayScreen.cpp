@@ -1,5 +1,7 @@
 #include "GameplayScreen.h"
 
+#include "IApp.h"
+
 GameplayScreen::GameplayScreen()
 {
 }

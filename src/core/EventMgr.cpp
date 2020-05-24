@@ -1,6 +1,6 @@
 #include "EventMgr.h"
 
-std::vector<OnEventComponent *> EventMgr::m_callbacks;
+std::vector<EventHandler *> EventMgr::m_callbacks;
 
 void EventMgr::PollAll() noexcept
 {
@@ -14,7 +14,7 @@ void EventMgr::PollAll() noexcept
     }
 }
 
-void EventMgr::AddOnEventFunction(OnEventComponent *callback) noexcept
+void EventMgr::AddOnEventFunction(EventHandler *callback) noexcept
 {
     m_callbacks.push_back(callback);
 }

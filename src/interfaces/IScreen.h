@@ -56,6 +56,7 @@ public:
 
     ScreenState GetState() const { return m_currentState; }
 
+    IApp *GetParentApp() { return m_parentApp; };
     void SetParentApp(IApp *app) { m_parentApp = app; }
 
 protected:

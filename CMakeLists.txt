@@ -56,6 +56,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     opengl32
     winmm
     gdi32
+    freetype
   )
 else() 
   target_include_directories(${PROJECT_NAME} PRIVATE

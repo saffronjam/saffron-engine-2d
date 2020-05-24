@@ -6,7 +6,7 @@
 
 #include "EventMgr.h"
 
-class Mouse : public OnEventComponent
+class Mouse : public EventHandler
 {
 
 public:

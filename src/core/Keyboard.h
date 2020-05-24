@@ -4,7 +4,7 @@
 
 #include "EventMgr.h"
 
-class Keyboard : public OnEventComponent
+class Keyboard : public EventHandler
 {
     enum class Button : unsigned char
     {
