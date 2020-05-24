@@ -3,11 +3,11 @@
 #include <map>
 
 template <class T>
-class ResourceMgr
+class IResourceMgr
 {
 public:
-    ResourceMgr() = default;
-    // Get resource from cache, if not existing, call Load();
+    IResourceMgr() = default;
+    // Returns pointer resource from cache, if not existing, call Load();
     virtual T *Get(const std::string &filepath) noexcept
     {
         if (m_resources.find(filepath) == m_resources.end())
@@ -16,13 +16,17 @@ public:
         }
         return &m_resources[filepath];
     }
-    // Load resource into memory
-    virtual void Load(const std::string &filepath) noexcept
+    // Returns copy of resource from cache, if not existing, call Load();
+    virtual const T &GetCopy(const std::string &filepath) noexcept
     {
-        T resource;
-        resource.loadFromFile(filepath);
-        m_resources.emplace(std::make_pair(filepath, resource));
+        if (m_resources.find(filepath) == m_resources.end())
+        {
+            Load(filepath);
+        }
+        return m_resources[filepath];
     }
+    // Load resource into memory
+    virtual void Load(const std::string &filepath) noexcept = 0;
 
 protected:
     std::map<std::string, T> m_resources;

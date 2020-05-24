@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IScreen.h"
+#include "IApp.h"
 
 #include "Camera.h"
 
@@ -31,4 +32,5 @@ private:
 
 private:
     Camera m_camera;
+    sf::Sound sound;
 };

@@ -10,6 +10,8 @@
 #include "ScreenList.h"
 #include "TextureMgr.h"
 #include "FontMgr.h"
+#include "MusicMgr.h"
+#include "SoundBufferMgr.h"
 #include "IScreen.h"
 
 class IApp : public EventHandler
@@ -27,6 +29,8 @@ public:
 
     TextureMgr &GetTextureMgr() { return m_textureMgr; };
     FontMgr &GetFontMgr() { return m_fontMgr; };
+    MusicMgr &GetMusicMgr() { return m_musicMgr; };
+    SoundBufferMgr &GetSoundBufferMgr() { return m_soundBufferMgr; };
 
 protected:
     virtual void Update();
@@ -46,6 +50,8 @@ protected:
 
     TextureMgr m_textureMgr;
     FontMgr m_fontMgr;
+    MusicMgr m_musicMgr;
+    SoundBufferMgr m_soundBufferMgr;
 
 private:
     bool m_isRunning;
