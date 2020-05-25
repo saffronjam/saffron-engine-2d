@@ -16,7 +16,7 @@ class EventMgr
 {
 public:
     static void PollAll() noexcept;
-    static void AddOnEventFunction(EventHandler *callback) noexcept;
+    static void AddOnEventCallback(EventHandler *callback) noexcept;
 
 private:
     static std::vector<EventHandler *> m_callbacks;

@@ -6,7 +6,7 @@ IApp::IApp()
       m_currentScreen(nullptr),
       m_isRunning(true)
 {
-    EventMgr::AddOnEventFunction(this);
+    EventMgr::AddOnEventCallback(this);
     sf::VideoMode mode = sf::VideoMode::getDesktopMode();
     m_window.Create("V-2DEngine", mode.width * 0.7f, mode.height * 0.7f);
 }

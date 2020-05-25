@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bitset>
+#include <map>
 
 #include <SFML/Window/Mouse.hpp>
 
@@ -8,6 +8,21 @@
 
 class Mouse : public EventHandler
 {
+public:
+    using ButtonCallback = std::function<void(const sf::Event::MouseButtonEvent &)>;
+    using ScrollCallback = std::function<void(const sf::Event::MouseWheelScrollEvent &)>;
+    using MoveCallback = std::function<void(const sf::Event::MouseMoveEvent &)>;
+    using EnterLeaveCallback = std::function<void()>;
+
+    enum class CallbackEvent
+    {
+        MouseWheelScrolled,
+        MouseButtonPressed,
+        MouseButtonReleased,
+        MouseMoved,
+        MouseEntered,
+        MouseLeft
+    };
 
 public:
     // Set up call-back function in eventMgr
@@ -18,6 +33,27 @@ public:
 
     // Move buttonMap into prev-buttonMap
     static void Update() noexcept;
+
+    template <Mouse::CallbackEvent EventType, typename T>
+    static void AddCallback(T callback) noexcept
+    {
+        if constexpr (EventType == CallbackEvent::MouseWheelScrolled)
+        {
+            m_scrollCallbacks[EventType].push_back(callback);
+        }
+        else if constexpr (EventType == CallbackEvent::MouseButtonPressed || EventType == CallbackEvent::MouseButtonReleased)
+        {
+            m_buttonCallbacks[EventType].push_back(callback);
+        }
+        else if constexpr (EventType == CallbackEvent::MouseMoved)
+        {
+            m_moveCallbacks[EventType].push_back(callback);
+        }
+        else if constexpr (EventType == CallbackEvent::MouseEntered || EventType == CallbackEvent::MouseLeft)
+        {
+            m_enterLeaveCallbacks[EventType].push_back(callback);
+        }
+    }
 
     static bool IsDown(const sf::Mouse::Button &button) noexcept;
     static bool IsPressed(const sf::Mouse::Button &button) noexcept;
@@ -31,16 +67,20 @@ public:
 private:
     virtual void OnEvent(const sf::Event &event) noexcept override;
 
-    static void OnPress(const sf::Mouse::Button &button) noexcept;
-    static void OnRelease(const sf::Mouse::Button &button) noexcept;
-    static void OnMove(int x, int y) noexcept;
+    static void OnPress(const sf::Event::MouseButtonEvent &event) noexcept;
+    static void OnRelease(const sf::Event::MouseButtonEvent &event) noexcept;
+    static void OnMove(const sf::Event::MouseMoveEvent &event) noexcept;
     static void OnEnter() noexcept;
     static void OnLeave() noexcept;
-    static void OnScroll(sf::Mouse::Wheel wheel, float delta) noexcept;
+    static void OnScroll(const sf::Event::MouseWheelScrollEvent &event) noexcept;
 
 private:
-    static std::unordered_map<sf::Mouse::Button, bool> m_buttonmap;
-    static std::unordered_map<sf::Mouse::Button, bool> m_prevButtonmap;
+    static std::map<sf::Mouse::Button, bool> m_buttonmap;
+    static std::map<sf::Mouse::Button, bool> m_prevButtonmap;
+    static std::map<CallbackEvent, std::vector<ButtonCallback>> m_buttonCallbacks;
+    static std::map<CallbackEvent, std::vector<ScrollCallback>> m_scrollCallbacks;
+    static std::map<CallbackEvent, std::vector<MoveCallback>> m_moveCallbacks;
+    static std::map<CallbackEvent, std::vector<EnterLeaveCallback>> m_enterLeaveCallbacks;
 
     static sf::Vector2i m_mousePos;
     static bool m_inWindow;

@@ -11,15 +11,15 @@ int main(int, char **)
     }
     catch (const VeException &e)
     {
-        Log_fatal("Type: ", e.GetType(), "What: ", e.what());
+        log_fatal("Type: %s What: %s", e.GetType(), e.what());
     }
     catch (const std::exception &e)
     {
-        Log_fatal("Type: ", "Standard Exception", "What: ", e.what());
+        log_fatal("Type: %s What: %s", "Standard Exception", e.what());
     }
     catch (...)
     {
-        Log_fatal("Type: ", "Standard Exception", "What: ", "No details available");
+        log_fatal("Type: %s What: %s", "Standard Exception", "No details available");
     }
     return EXIT_SUCCESS;
 }

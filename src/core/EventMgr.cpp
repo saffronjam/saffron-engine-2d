@@ -14,7 +14,7 @@ void EventMgr::PollAll() noexcept
     }
 }
 
-void EventMgr::AddOnEventFunction(EventHandler *callback) noexcept
+void EventMgr::AddOnEventCallback(EventHandler *callback) noexcept
 {
     m_callbacks.push_back(callback);
 }

@@ -1,92 +1,49 @@
-#pragma once
-#include <sstream>
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <map>
+/**
+ * Copyright (c) 2017 rxi
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the MIT license. See `log.c` for details.
+ */
 
-#define Log_info(args...) Log::info(__LINE__, __FILE__, args)
-#define Log_warning(args...) Log::warning(__LINE__, __FILE__, args)
-#define Log_error(args...) Log::error(__LINE__, __FILE__, args)
-#define Log_fatal(args...) Log::fatal(__LINE__, __FILE__, args)
+/*
 
-class Log
+IMPORTED FROM https://github.com/rxi/log.c
+
+*/
+
+#ifndef LOG_H
+#define LOG_H
+
+#include <stdio.h>
+#include <stdarg.h>
+
+#define LOG_VERSION "0.1.0"
+
+typedef void (*log_LockFn)(void *udata, int lock);
+
+enum
 {
-public:
-    enum Color
-    {
-        Red = 0,
-        Green,
-        Yellow,
-        Blue,
-        Magenta,
-        Cyan,
-        White,
-        DarkGrey,
-        Count
-    };
-
-public:
-    static void Init();
-
-    template <typename T, typename... Types>
-    static void info(int line, const char *file, T var1, Types... var2)
-    {
-        custom(line, file, "INFO", Color::Green, var1, var2...);
-    }
-    template <typename T, typename... Types>
-    static void warning(int line, const char *file, T var1, Types... var2)
-    {
-        custom(line, file, "WARNING", Color::Yellow, var1, var2...);
-    }
-    template <typename T, typename... Types>
-    static void error(int line, const char *file, T var1, Types... var2)
-    {
-        custom(line, file, "ERROR", Color::Red, var1, var2...);
-    }
-    template <typename T, typename... Types>
-    static void fatal(int line, const char *file, T var1, Types... var2)
-    {
-        custom(line, file, "FATAL", Color::Magenta, var1, var2...);
-    }
-    template <typename T, typename... Types>
-    static void custom(int line, const char *file, std::string type, Color color, T var1, Types... var2)
-    {
-        std::scoped_lock scoped(m_printLock);
-        if (m_colorsEnabled)
-        {
-            std::cout << "[\033[1;" + m_colors[color] + "m" << type << "\033[0m] \033[2m" << file << "(" << line << ")\033[0m:";
-        }
-        else
-        {
-            std::cout << "[" + type + "] " << file << "(" << line << "):";
-        }
-
-        if (m_prefix.length())
-            std::cout << m_prefix << " ";
-        rec(var1, var2...);
-    }
-
-    static void EnableColors() { m_colorsEnabled = true; }
-    static void DisableColors() { m_colorsEnabled = false; }
-    static void AddPrefix(std::string prefix) { m_prefix += prefix; }
-    static void ClearPrefix() { m_prefix.clear(); }
-
-private:
-    template <typename T, typename... Types>
-    static void rec(T var1, Types... var2)
-    {
-        std::cout << var1 << " ";
-        rec(var2...);
-    }
-    static void rec()
-    {
-        std::cout << std::endl;
-    }
-
-private:
-    static std::mutex m_printLock;
-    static bool m_colorsEnabled;
-    static std::string m_prefix;
-    static std::map<Color, std::string> m_colors;
+    LOG_TRACE,
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARN,
+    LOG_ERROR,
+    LOG_FATAL
 };
+
+#define log_trace(...) log_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
+#define log_debug(...) log_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
+#define log_info(...) log_log(LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
+#define log_warn(...) log_log(LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
+#define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
+
+void log_set_udata(void *udata);
+void log_set_lock(log_LockFn fn);
+void log_set_fp(FILE *fp);
+void log_set_level(int level);
+void log_set_quiet(int enable);
+
+void log_log(int level, const char *file, int line, const char *fmt, ...);
+
+#endif

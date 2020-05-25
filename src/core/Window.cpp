@@ -19,6 +19,7 @@ void Window::Create(const std::string &title, int width, int height)
     m_style = sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close;
 
     m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, sf::ContextSettings());
+    m_sfWindow->setKeyRepeatEnabled(false);
     SetTitle(title);
     PositionCenter();
 }

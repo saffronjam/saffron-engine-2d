@@ -1,7 +1,11 @@
 #include "Mouse.h"
 
-std::unordered_map<sf::Mouse::Button, bool> Mouse::m_buttonmap;
-std::unordered_map<sf::Mouse::Button, bool> Mouse::m_prevButtonmap;
+std::map<sf::Mouse::Button, bool> Mouse::m_buttonmap;
+std::map<sf::Mouse::Button, bool> Mouse::m_prevButtonmap;
+std::map<Mouse::CallbackEvent, std::vector<Mouse::ButtonCallback>> Mouse::m_buttonCallbacks;
+std::map<Mouse::CallbackEvent, std::vector<Mouse::ScrollCallback>> Mouse::m_scrollCallbacks;
+std::map<Mouse::CallbackEvent, std::vector<Mouse::MoveCallback>> Mouse::m_moveCallbacks;
+std::map<Mouse::CallbackEvent, std::vector<Mouse::EnterLeaveCallback>> Mouse::m_enterLeaveCallbacks;
 sf::Vector2i Mouse::m_mousePos = sf::Vector2i(0, 0);
 bool Mouse::m_inWindow = true;
 float Mouse::m_verticalScrollBuffer = 0.0f;
@@ -9,7 +13,7 @@ float Mouse::m_horizontalScrollBuffer = 0.0f;
 
 Mouse::Mouse() noexcept
 {
-    EventMgr::AddOnEventFunction(this);
+    EventMgr::AddOnEventCallback(this);
 }
 
 Mouse::~Mouse() noexcept
@@ -53,15 +57,15 @@ void Mouse::OnEvent(const sf::Event &event) noexcept
     switch (event.type)
     {
     case sf::Event::EventType::MouseButtonPressed:
-        OnPress(event.mouseButton.button);
+        OnPress(event.mouseButton);
         break;
 
     case sf::Event::EventType::MouseButtonReleased:
-        OnRelease(event.mouseButton.button);
+        OnRelease(event.mouseButton);
         break;
 
     case sf::Event::EventType::MouseMoved:
-        OnMove(event.mouseMove.x, event.mouseMove.y);
+        OnMove(event.mouseMove);
         break;
 
     case sf::Event::EventType::MouseEntered:
@@ -73,48 +77,66 @@ void Mouse::OnEvent(const sf::Event &event) noexcept
         break;
 
     case sf::Event::EventType::MouseWheelScrolled:
-        OnScroll(event.mouseWheelScroll.wheel, event.mouseWheelScroll.delta);
+        OnScroll(event.mouseWheelScroll);
         break;
     }
 }
 
-void Mouse::OnPress(const sf::Mouse::Button &button) noexcept
+void Mouse::OnPress(const sf::Event::MouseButtonEvent &event) noexcept
 {
-    m_buttonmap[button] = true;
+    auto &vector = m_buttonCallbacks[CallbackEvent::MouseButtonPressed];
+    for (auto &callback : vector)
+        callback(event);
+    m_buttonmap[event.button] = true;
 }
 
-void Mouse::OnRelease(const sf::Mouse::Button &button) noexcept
+void Mouse::OnRelease(const sf::Event::MouseButtonEvent &event) noexcept
 {
-    m_buttonmap[button] = false;
+    auto &vector = m_buttonCallbacks[CallbackEvent::MouseButtonReleased];
+    for (auto &callback : vector)
+        callback(event);
+    m_buttonmap[event.button] = false;
 }
 
-void Mouse::OnMove(int x, int y) noexcept
+void Mouse::OnMove(const sf::Event::MouseMoveEvent &event) noexcept
 {
+    auto &vector = m_moveCallbacks[CallbackEvent::MouseMoved];
+    for (auto &callback : vector)
+        callback(event);
     if (!m_inWindow && AnyButtonDown() || m_inWindow)
     {
-        m_mousePos.x = x;
-        m_mousePos.y = y;
+        m_mousePos.x = event.x;
+        m_mousePos.y = event.y;
     }
 }
 
 void Mouse::OnEnter() noexcept
 {
+    auto &vector = m_enterLeaveCallbacks[CallbackEvent::MouseEntered];
+    for (auto &callback : vector)
+        callback();
     m_inWindow = true;
 }
 
 void Mouse::OnLeave() noexcept
 {
+    auto &vector = m_enterLeaveCallbacks[CallbackEvent::MouseLeft];
+    for (auto &callback : vector)
+        callback();
     m_inWindow = false;
 }
 
-void Mouse::OnScroll(sf::Mouse::Wheel wheel, float delta) noexcept
+void Mouse::OnScroll(const sf::Event::MouseWheelScrollEvent &event) noexcept
 {
-    if (wheel == sf::Mouse::Wheel::HorizontalWheel)
+    auto &vector = m_scrollCallbacks[CallbackEvent::MouseWheelScrolled];
+    for (auto &callback : vector)
+        callback(event);
+    if (event.wheel == sf::Mouse::Wheel::HorizontalWheel)
     {
-        m_horizontalScrollBuffer += delta;
+        m_horizontalScrollBuffer += event.delta;
     }
-    else if (wheel == sf::Mouse::Wheel::VerticalWheel)
+    else if (event.wheel == sf::Mouse::Wheel::VerticalWheel)
     {
-        m_verticalScrollBuffer += delta;
+        m_verticalScrollBuffer += event.delta;
     }
 }

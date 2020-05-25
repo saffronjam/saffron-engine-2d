@@ -1,15 +1,16 @@
 #include "Keyboard.h"
 
-std::unordered_map<sf::Keyboard::Key, bool> Keyboard::m_keymap;
-std::unordered_map<sf::Keyboard::Key, bool> Keyboard::m_prevKeymap;
+std::map<sf::Keyboard::Key, bool> Keyboard::m_keymap;
+std::map<sf::Keyboard::Key, bool> Keyboard::m_prevKeymap;
+std::map<Keyboard::CallbackEvent, std::vector<Keyboard::Callback>> Keyboard::m_callbacks;
 std::string Keyboard::m_textInputBuffer;
 
-Keyboard::Keyboard()
+Keyboard::Keyboard() noexcept
 {
-    EventMgr::AddOnEventFunction(this);
+    EventMgr::AddOnEventCallback(this);
 }
 
-Keyboard::~Keyboard()
+Keyboard::~Keyboard() noexcept
 {
 }
 
@@ -51,12 +52,12 @@ void Keyboard::OnEvent(const sf::Event &event) noexcept
     {
     case sf::Event::EventType::KeyPressed:
     {
-        OnPress(event.key.code);
+        OnPress(event.key);
         break;
     }
     case sf::Event::EventType::KeyReleased:
     {
-        OnRelease(event.key.code);
+        OnRelease(event.key);
         break;
     }
     case sf::Event::EventType::TextEntered:
@@ -67,14 +68,20 @@ void Keyboard::OnEvent(const sf::Event &event) noexcept
     }
 }
 
-void Keyboard::OnPress(const sf::Keyboard::Key &key) noexcept
+void Keyboard::OnPress(const sf::Event::KeyEvent &event) noexcept
 {
-    m_keymap[key] = true;
+    auto &vector = m_callbacks[CallbackEvent::KeyPressed];
+    for (auto &callback : vector)
+        callback(event);
+    m_keymap[event.code] = true;
 }
 
-void Keyboard::OnRelease(const sf::Keyboard::Key &key) noexcept
+void Keyboard::OnRelease(const sf::Event::KeyEvent &event) noexcept
 {
-    m_keymap[key] = false;
+    auto &vector = m_callbacks[CallbackEvent::KeyReleased];
+    for (auto &callback : vector)
+        callback(event);
+    m_keymap[event.code] = false;
 }
 
 void Keyboard::OnTextInput(unsigned char character) noexcept
