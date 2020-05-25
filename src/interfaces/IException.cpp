@@ -1,11 +1,11 @@
-#include "VeException.h"
+#include "IException.h"
 
-VeException::VeException(int line, const char *file) noexcept
+IException::IException(int line, const char *file) noexcept
     : m_line(line), m_file(file)
 {
 }
 
-const char *VeException::what() const noexcept
+const char *IException::what() const noexcept
 {
     std::ostringstream oss;
     oss << "[Type] " << GetType() << std::endl
@@ -14,12 +14,12 @@ const char *VeException::what() const noexcept
     return whatBuffer.c_str();
 }
 
-const char *VeException::GetType() const noexcept
+const char *IException::GetType() const noexcept
 {
-    return "VeException";
+    return "IException";
 }
 
-std::string VeException::GetOriginString() const noexcept
+std::string IException::GetOriginString() const noexcept
 {
     std::ostringstream oss;
     oss << "[File] " << m_file << std::endl

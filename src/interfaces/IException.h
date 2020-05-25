@@ -3,10 +3,10 @@
 #include <exception>
 #include <sstream>
 
-class VeException : public std::exception
+class IException : public std::exception
 {
 public:
-    VeException(int line, const char *file) noexcept;
+    IException(int line, const char *file) noexcept;
     const char *what() const noexcept override;
     virtual const char *GetType() const noexcept;
     int GetLine() const noexcept { return m_line; }

@@ -105,7 +105,7 @@ void IApp::OnEvent(const sf::Event &event)
 }
 
 IApp::Exception::Exception(int line, const char *file, const char *errorString) noexcept
-    : VeException(line, file),
+    : IException(line, file),
       errorString(errorString)
 {
 }

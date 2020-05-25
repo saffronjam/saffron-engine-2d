@@ -20,7 +20,10 @@ public:
     virtual void Load(const std::string &filepath) noexcept override
     {
         std::shared_ptr<sf::Music> resource = std::make_shared<sf::Music>();
-        resource->openFromFile(filepath);
+        if (!resource->openFromFile(filepath))
+        {
+            THROW(Exception, "Failed to open music: %s", filepath.c_str());
+        }
         m_resources.emplace(std::make_pair(filepath, resource));
     }
 };

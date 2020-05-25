@@ -7,7 +7,7 @@
 #include <SFML/System/Err.hpp>
 
 #include "WindowThrowMacros.h"
-#include "VeException.h"
+#include "IException.h"
 #include "Log.h"
 
 class Window
@@ -61,7 +61,7 @@ private:
     static bool m_fullscreen;
 
 public:
-    class Exception : public VeException
+    class Exception : public IException
     {
     public:
         Exception(int line, const char *file, const char *errorString) noexcept;

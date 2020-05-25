@@ -9,7 +9,7 @@ int main(int, char **)
         App app;
         app.Run();
     }
-    catch (const VeException &e)
+    catch (const IException &e)
     {
         log_fatal("Type: %s What: %s", e.GetType(), e.what());
     }

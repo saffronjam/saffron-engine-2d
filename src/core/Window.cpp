@@ -161,7 +161,7 @@ void Window::SetView(const sf::View &view) noexcept
 }
 
 Window::Exception::Exception(int line, const char *file, const char *errorString) noexcept
-    : VeException(line, file),
+    : IException(line, file),
       errorString(errorString)
 {
 }

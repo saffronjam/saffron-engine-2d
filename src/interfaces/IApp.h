@@ -57,7 +57,7 @@ private:
     bool m_isRunning;
 
 public:
-    class Exception : public VeException
+    class Exception : public IException
     {
     public:
         Exception(int line, const char *file, const char *errorString) noexcept;

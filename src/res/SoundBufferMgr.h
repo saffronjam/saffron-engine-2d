@@ -15,7 +15,10 @@ public:
     virtual void Load(const std::string &filepath) noexcept override
     {
         sf::SoundBuffer resource;
-        resource.loadFromFile(filepath);
+        if (!resource.loadFromFile(filepath))
+        {
+            THROW(Exception, "Failed to load soundbuffer: %s", filepath.c_str());
+        }
         m_resources.emplace(std::make_pair(filepath, resource));
     }
 };

@@ -28,7 +28,11 @@ target_include_directories(V-Engine2D PRIVATE
   src
   src/apps
   src/core
+  src/etc
+  src/input
   src/interfaces
+  src/net
+  src/res
   src/screens
   src/primitives
   src/throwmacros

@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "IResourceMgr.h"
+#include "GeneralThrowMacros.h"
 
 class TextureMgr : public IResourceMgr<sf::Texture>
 {
@@ -14,7 +15,10 @@ public:
     virtual void Load(const std::string &filepath) noexcept override
     {
         sf::Texture resource;
-        resource.loadFromFile(filepath);
+        if (!resource.loadFromFile(filepath))
+        {
+            THROW(Exception, "Failed to load texture: %s", filepath.c_str());
+        }
         m_resources.emplace(std::make_pair(filepath, resource));
     }
 };
