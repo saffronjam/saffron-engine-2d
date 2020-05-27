@@ -8,7 +8,7 @@
 
 struct ParsedPacket
 {
-    PacketType type = PacketType::None;
+    PacketType type = PacketType::Invalid;
     sf::Uint8 *data = nullptr;
     size_t dataSize = 0;
     size_t fullSize = 0;

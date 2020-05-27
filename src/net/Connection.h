@@ -44,7 +44,7 @@ public:
     {
         if constexpr (std::is_same<S, sf::TcpSocket>::value)
         {
-            return m_socket->getRemoteAddress();
+            return m_socket.value()->getRemoteAddress();
         }
         else if constexpr (std::is_same<S, sf::UdpSocket>::value)
         {
@@ -58,13 +58,19 @@ public:
     {
         if constexpr (std::is_same<S, sf::TcpSocket>::value)
         {
-            return m_socket->getRemotePort();
+            return m_socket.value()->getRemotePort();
         }
         else if constexpr (std::is_same<S, sf::UdpSocket>::value)
         {
             return m_remotePort;
         }
         return 0u;
+    }
+
+    template <class Q = S>
+    typename std::enable_if<std::is_same<Q, sf::TcpSocket>::value || std::is_same<Q, sf::UdpSocket>::value, sf::Uint16>::type GetLocalPort() const
+    {
+        return m_socket->getLocalPort();
     }
 
     template <class Q = S>

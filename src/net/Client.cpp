@@ -3,8 +3,6 @@
 Client::Client(sf::IpAddress ip, sf::Uint16 port) noexcept
     : m_connState(ConnState::Disconnected)
 {
-    // AddToSocketSelector(&m_tcpConnection);
-    // AddToSocketSelector(&m_udpConnection);
     PacketMgr::AddHandler(this);
     PacketMgr::AddPacketBuffer(&m_inBuffer, &m_inBufferLock);
 }
@@ -20,12 +18,10 @@ void Client::Connect()
     if (m_connState == ConnState::Connected)
     {
         THROW(Exception, "Tried to connect an already connected client", 0);
-        return;
     }
     if (m_cachedIP == sf::IpAddress::None || m_cachedPort == 0)
     {
         THROW(Exception, "Tried to connect a non-configured client", 0);
-        return;
     }
 
     m_connState == ConnState::Disconnected;
@@ -42,15 +38,15 @@ void Client::Disconnect()
     if (m_connState == ConnState::Disconnected)
     {
         THROW(Exception, "Tried to disconnect an already disconnected client", 0);
-        return;
     }
-    StopListening();
     m_connState = ConnState::Disconnected;
     m_tryConnectDelay = sf::seconds(0.0f);
     m_tcpConnection.GetSocket().disconnect();
     m_udpConnection.GetSocket().unbind();
+    ClearSocketSelector();
     if (m_connector.joinable())
         m_connector.join();
+    StopListening();
 }
 
 void Client::SetNet(sf::IpAddress ip, sf::Uint16 port) noexcept
@@ -70,14 +66,14 @@ void Client::ConnectThreadFn()
                 return;
             if (m_tcpConnection.GetSocket().connect(m_cachedIP, m_cachedPort) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not connect TCP-socket to remote host", 0);
-                return;
+                THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_tcpConnection.GetRemoteAddress().toString().c_str(), m_tcpConnection.GetRemotePort());
             }
             if (m_udpConnection.GetSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not bind UDP-socket", 0);
-                return;
+                THROW(Exception, "Could not bind UDP-socket. Port: %u", m_udpConnection.GetRemotePort());
             }
+            AddToSocketSelector(&m_tcpConnection);
+            AddToSocketSelector(&m_udpConnection);
             StartListening();
             m_connState = ConnState::Connected;
             m_tryConnectDelay = sf::seconds(0.0f);

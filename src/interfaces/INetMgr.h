@@ -149,23 +149,38 @@ void INetMgr::Receive(const Connection<S> *conn)
     static constexpr Protocol protocol = GetProtocolFromSocketType<S>();
     if constexpr (protocol == Protocol::TCP)
     {
-        conn->GetSocket().receive(incoming);
-        m_inBufferLock.lock();
-        m_inBuffer.push_back(Packager::Parse<Protocol::TCP>(incoming));
-        m_inBufferLock.unlock();
+        if (conn->GetSocket().receive(incoming) != sf::Socket::Socket::Done)
+        {
+            return;
+        }
+        if (incoming.getDataSize() < sizeof(PacketType))
+        {
+            return;
+        }
     }
     else if constexpr (protocol == Protocol::UDP)
     {
         sf::IpAddress ip = conn->GetRemoteAddress();
         sf::Uint16 port = conn->GetRemotePort();
-        conn->GetSocket().receive(incoming, ip, port);
-        m_inBufferLock.lock();
-        m_inBuffer.push_back(Packager::Parse<Protocol::TCP>(incoming));
-        m_inBufferLock.unlock();
+        if (conn->GetSocket().receive(incoming, ip, port) != sf::Socket::Socket::Done)
+        {
+            return;
+        }
+        if (incoming.getDataSize() < sizeof(PacketType))
+        {
+            return;
+        }
     }
     else
     {
         THROW(Exception, "Tried to receive data on non-socket type:  %s", typeid(S).name());
+    }
+    auto parseAttempt = Packager::Parse(incoming);
+    if (parseAttempt.has_value())
+    {
+        m_inBufferLock.lock();
+        m_inBuffer.push_back(parseAttempt.value());
+        m_inBufferLock.unlock();
     }
     return;
 }

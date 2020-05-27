@@ -2,8 +2,9 @@
 
 enum PacketType
 {
+    Invalid,
     Text,
     AreYouAlive,
     IAmAlive,
-    None
+    Count
 };
