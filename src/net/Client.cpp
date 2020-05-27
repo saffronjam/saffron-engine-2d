@@ -17,11 +17,11 @@ void Client::Connect()
 {
     if (m_connState == ConnState::Connected)
     {
-        THROW(Exception, "Tried to connect an already connected client", 0);
+        THROW(Exception, "Tried to connect an already connected client: %s", "Try to disconnect before connecting");
     }
     if (m_cachedIP == sf::IpAddress::None || m_cachedPort == 0)
     {
-        THROW(Exception, "Tried to connect a non-configured client", 0);
+        THROW(Exception, "Tried to connect a non-configured client: %s", "IP and port must be configured with SetNet()");
     }
 
     m_connState == ConnState::Disconnected;
@@ -37,7 +37,7 @@ void Client::Disconnect()
 {
     if (m_connState == ConnState::Disconnected)
     {
-        THROW(Exception, "Tried to disconnect an already disconnected client", 0);
+        THROW(Exception, "Tried to disconnect an already disconnected client: %s", "Try to connect before disconnecting");
     }
     m_connState = ConnState::Disconnected;
     m_tryConnectDelay = sf::seconds(0.0f);
@@ -66,11 +66,11 @@ void Client::ConnectThreadFn()
                 return;
             if (m_tcpConnection.GetSocket().connect(m_cachedIP, m_cachedPort) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_tcpConnection.GetRemoteAddress().toString().c_str(), m_tcpConnection.GetRemotePort());
+                THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_cachedIP.toString().c_str(), m_cachedPort);
             }
             if (m_udpConnection.GetSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not bind UDP-socket. Port: %u", m_udpConnection.GetRemotePort());
+                THROW(Exception, "Could not bind UDP-socket. Port: %s", "Any available port");
             }
             AddToSocketSelector(&m_tcpConnection);
             AddToSocketSelector(&m_udpConnection);

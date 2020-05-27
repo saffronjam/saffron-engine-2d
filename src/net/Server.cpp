@@ -18,7 +18,7 @@ void Server::Open()
 {
     if (m_connState == ConnState::Opened)
     {
-        THROW(Exception, "Tried to open an already opened server", 0);
+        THROW(Exception, "Tried to open an already opened server: %s", "Try to close before opening the server");
     }
     if (m_port == 0)
     {
@@ -38,7 +38,7 @@ void Server::Close()
 {
     if (m_connState == ConnState::Closed)
     {
-        THROW(Exception, "Tried to close an already closed server", 0);
+        THROW(Exception, "Tried to close an already closed server: %s", "Try to open before closing the server");
     }
     m_connState = ConnState::Closed;
     m_tryOpenDelay = sf::seconds(0.0f);
@@ -72,11 +72,11 @@ void Server::OpenThreadFn()
                 return;
             if (m_tcpListener.GetSocket().listen(m_port) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Failed to start listener on server. Port: %d", m_port);
+                THROW(Exception, "Failed to start listener on server. Port: %u", m_port);
             }
             if (m_udpConnection.GetSocket().bind(m_port) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not bind UDP-socket", 0);
+                THROW(Exception, "Could not bind UDP-socket. Port: %u", m_port);
             }
             AddToSocketSelector(&m_tcpListener);
             AddToSocketSelector(&m_udpConnection);
