@@ -45,20 +45,20 @@ void Server::Close()
     }
     m_connState = ConnState::Closed;
     m_tryOpenDelay = sf::seconds(0.0f);
+    m_tcpListener.GetSocket().setBlocking(false);
     m_tcpListener.GetSocket().close();
+    m_udpConnection.GetSocket().unbind();
     for (auto &[conn, info] : m_clientTcpConnections)
     {
-        RemoveFromSocketSelector(&conn);
         if (!conn.IsParent())
             const_cast<Connection<sf::TcpSocket> &>(conn).GetSocket().disconnect();
     }
     for (auto &[conn, info] : m_clientUdpConnections)
     {
-        RemoveFromSocketSelector(&conn);
         if (!conn.IsParent())
             const_cast<Connection<sf::UdpSocket> &>(conn).GetSocket().unbind();
     }
-    m_udpConnection.GetSocket().unbind();
+    ClearSocketSelector();
     if (m_opener.joinable())
         m_opener.join();
 

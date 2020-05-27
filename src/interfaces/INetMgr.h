@@ -29,6 +29,7 @@ public:
     void AddToSocketSelector(const Connection<S> *conn);
     template <typename S>
     void RemoveFromSocketSelector(const Connection<S> *conn);
+    void ClearSocketSelector() noexcept { m_socketSelector.clear(); }
 
     template <Protocol P, typename T, typename S>
     void Send(PacketType type, const T &data, const Connection<S> &conn);

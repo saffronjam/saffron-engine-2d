@@ -35,7 +35,7 @@ void INetMgr::ListenerThreadFn()
 {
     while (m_listening)
     {
-        bool anySocketReady = m_socketSelector.wait();
+        bool anySocketReady = m_socketSelector.wait(sf::milliseconds(100));
         if (anySocketReady)
         {
             for (auto &conn : m_allTcpListenerRefs)
