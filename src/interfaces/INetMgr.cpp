@@ -20,7 +20,7 @@ INetMgr::~INetMgr()
 
 void INetMgr::StartListening()
 {
-    m_listenerThread = std::thread(&ListenerThreadFn, this);
+    m_listenerThread = std::thread(&INetMgr::ListenerThreadFn, this);
     m_listening = true;
 }
 

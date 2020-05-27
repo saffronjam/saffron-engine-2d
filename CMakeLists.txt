@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   file(GLOB SDL2_SHARED_BINARIES
@@ -15,6 +16,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
   find_package(SFML REQUIRED network audio graphics window system)
 endif()
+
+find_package(Threads REQUIRED)
 
 add_definitions(
   -DSFML_STATIC
@@ -90,6 +93,7 @@ else()
   )
   target_link_libraries(Client PRIVATE
     ${SFML_LIBRARIES}
+    Threads::Threads
   )
 endif()
 
@@ -126,6 +130,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     deps/SFML/lib
   )
   target_link_libraries(Server PRIVATE
+    Threads::Threads
     sfml-graphics-s
     sfml-window-s
     sfml-audio-s
@@ -149,5 +154,6 @@ else()
   )
   target_link_libraries(Server PRIVATE
     ${SFML_LIBRARIES}
+    Threads::Threads
   )
 endif()

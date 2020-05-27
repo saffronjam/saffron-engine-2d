@@ -95,7 +95,7 @@ void INetMgr::AddToSocketSelector(const Connection<S> *conn)
     }
     else
     {
-        THROW(Exception, "Tried to add a non-socket type to socket selector:  %s", typeid(S).name);
+        THROW(Exception, "Tried to add a non-socket type to socket selector:  %s", typeid(S).name());
     }
 }
 
@@ -119,7 +119,7 @@ void INetMgr::RemoveFromSocketSelector(const Connection<S> *conn)
     }
     else
     {
-        THROW(Exception, "Tried to remove a non-socket type from socket selector:  %s", typeid(S).name);
+        THROW(Exception, "Tried to remove a non-socket type from socket selector:  %s", typeid(S).name());
     }
 }
 template <Protocol P, typename T, typename S>
@@ -164,7 +164,7 @@ void INetMgr::Receive(const Connection<S> *conn)
     }
     else
     {
-        THROW(Exception, "Tried to receive data on non-socket type:  %s", typeid(S).name);
+        THROW(Exception, "Tried to receive data on non-socket type:  %s", typeid(S).name());
     }
     return;
 }

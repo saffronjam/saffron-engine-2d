@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include <SFML/Network/Packet.hpp>
 
 #include "Connection.h"

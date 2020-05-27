@@ -34,7 +34,7 @@ void Client::Connect()
         m_connector.join();
 
     m_tryConnectDelay = sf::seconds(2.0f);
-    m_connector = std::thread(&ConnectThreadFn, this);
+    m_connector = std::thread(&Client::ConnectThreadFn, this);
 }
 
 void Client::Disconnect()

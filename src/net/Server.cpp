@@ -33,7 +33,7 @@ void Server::Open()
         m_opener.join();
 
     m_tryOpenDelay = sf::seconds(2.0f);
-    m_opener = std::thread(&OpenThreadFn, this);
+    m_opener = std::thread(&Server::OpenThreadFn, this);
 }
 
 void Server::Close()
