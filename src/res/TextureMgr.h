@@ -3,7 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "IResourceMgr.h"
-#include "GeneralThrowMacros.h"
+#include "GenericThrowMacros.h"
 
 class TextureMgr : public IResourceMgr<sf::Texture>
 {
@@ -12,7 +12,7 @@ public:
     TextureMgr(const TextureMgr &) = delete;
     const TextureMgr &operator()(const TextureMgr &) = delete;
 
-    virtual void Load(const std::string &filepath) noexcept override
+    virtual void Load(const std::string &filepath) override
     {
         sf::Texture resource;
         if (!resource.loadFromFile(filepath))

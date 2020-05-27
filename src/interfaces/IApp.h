@@ -12,6 +12,7 @@
 #include "FontMgr.h"
 #include "MusicMgr.h"
 #include "SoundBufferMgr.h"
+#include "PacketMgr.h"
 #include "IScreen.h"
 
 class IApp : public EventHandler

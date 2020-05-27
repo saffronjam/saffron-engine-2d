@@ -39,7 +39,7 @@ void ScreenList::AddScreen(IScreen *screen)
     screen->m_screenIndex = m_screens.size();
     m_screens.push_back(screen);
     screen->Build();
-    screen->SetParentApp(m_app);
+    screen->SetParentIApp(m_app);
 }
 
 IScreen *ScreenList::GetCurrent()

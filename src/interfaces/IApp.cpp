@@ -8,7 +8,7 @@ IApp::IApp()
 {
     EventMgr::AddOnEventCallback(this);
     sf::VideoMode mode = sf::VideoMode::getDesktopMode();
-    m_window.Create("V-2DEngine", mode.width * 0.7f, mode.height * 0.7f);
+    Window::Create("V-2DFramework", mode.width * 0.7f, mode.height * 0.7f);
 }
 
 IApp::~IApp()
@@ -17,15 +17,26 @@ IApp::~IApp()
 
 void IApp::Run()
 {
-    Init();
+    try
+    {
+        Init();
+    }
+    LogCatch;
+
     while (m_isRunning)
     {
+        PacketMgr::HandleAllPackets();
         Keyboard::Update();
         Mouse::Update();
         EventMgr::PollAll();
         Window::Clear();
-        Update();
-        Draw();
+        try
+        {
+            Update();
+            Draw();
+        }
+        LogCatch;
+
         Window::Present();
     }
 }

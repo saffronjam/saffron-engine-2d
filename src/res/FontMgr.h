@@ -11,7 +11,7 @@ public:
     FontMgr(const FontMgr &) = delete;
     const FontMgr &operator()(const FontMgr &) = delete;
 
-    virtual void Load(const std::string &filepath) noexcept override
+    virtual void Load(const std::string &filepath) override
     {
         sf::Font resource;
         if (!resource.loadFromFile(filepath))

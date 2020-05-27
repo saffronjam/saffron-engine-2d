@@ -1,15 +1,16 @@
 #pragma once
 
 #include "IScreen.h"
-#include "IApp.h"
 
 #include "Camera.h"
 
-class GameplayScreen : public IScreen
+class AppClient;
+
+class ClientMainScreen : public IScreen
 {
 public:
-    GameplayScreen();
-    ~GameplayScreen();
+    ClientMainScreen(AppClient &parent);
+    ~ClientMainScreen();
 
     virtual void Build() override;
 
@@ -31,6 +32,6 @@ private:
     void CheckInput();
 
 private:
+    AppClient &m_parent;
     Camera m_camera;
-    sf::Sound sound;
 };

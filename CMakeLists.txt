@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.1.0)
-project(V-Engine2D VERSION 0.1.0)
+project(V-2DFramework VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   file(GLOB SDL2_SHARED_BINARIES
@@ -17,14 +18,28 @@ endif()
 
 add_definitions(
   -DSFML_STATIC
+  -DLOG_EXCEPTION
 )
 
 
-file(GLOB_RECURSE SRC "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE ALL_SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")
 
-add_executable(V-Engine2D "${SRC}")
 
-target_include_directories(V-Engine2D PRIVATE
+set(ClientSRC "${ALL_SOURCES}")
+list(REMOVE_ITEM ClientSRC "${CMAKE_SOURCE_DIR}/MainServer.cpp")
+
+set(ServerSRC "${ALL_SOURCES}")
+list(REMOVE_ITEM ServerSRC "${CMAKE_SOURCE_DIR}/MainClient.cpp")
+
+add_executable(Client "${ClientSRC}")
+add_executable(Server "${ServerSRC}")
+
+
+############
+## CLIENT ##
+############
+
+target_include_directories(Client PRIVATE
   src
   src/apps
   src/core
@@ -38,20 +53,20 @@ target_include_directories(V-Engine2D PRIVATE
   src/throwmacros
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(Client PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
   )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  target_include_directories(${PROJECT_NAME} PRIVATE
+  target_include_directories(Client PRIVATE
     deps/SFML/include
   )
-  target_link_directories(${PROJECT_NAME} PRIVATE
+  target_link_directories(Client PRIVATE
     deps/SFML/lib
   )
-  target_link_libraries(${PROJECT_NAME} PRIVATE
+  target_link_libraries(Client PRIVATE
     sfml-graphics-s
     sfml-window-s
     sfml-audio-s
@@ -70,10 +85,69 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     ws2_32
   )
 else() 
-  target_include_directories(${PROJECT_NAME} PRIVATE
+  target_include_directories(Client PRIVATE
     ${SFML_INCLUDE_DIR}
   )
-  target_link_libraries(${PROJECT_NAME} PRIVATE
+  target_link_libraries(Client PRIVATE
+    ${SFML_LIBRARIES}
+  )
+endif()
+
+
+############
+## SERVER ##
+############
+
+target_include_directories(Server PRIVATE
+  src
+  src/apps
+  src/core
+  src/etc
+  src/input
+  src/interfaces
+  src/net
+  src/res
+  src/screens
+  src/primitives
+  src/throwmacros
+)
+
+set_target_properties(Server PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+  )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  target_include_directories(Server PRIVATE
+    deps/SFML/include
+  )
+  target_link_directories(Server PRIVATE
+    deps/SFML/lib
+  )
+  target_link_libraries(Server PRIVATE
+    sfml-graphics-s
+    sfml-window-s
+    sfml-audio-s
+    sfml-network-s
+    sfml-system-s
+    opengl32
+    freetype
+    winmm
+    gdi32
+    openal32
+    flac
+    vorbisenc
+    vorbisfile
+    vorbis
+    ogg
+    ws2_32
+  )
+else() 
+  target_include_directories(Server PRIVATE
+    ${SFML_INCLUDE_DIR}
+  )
+  target_link_libraries(Server PRIVATE
     ${SFML_LIBRARIES}
   )
 endif()

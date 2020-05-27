@@ -12,7 +12,7 @@ public:
     SoundBufferMgr(const SoundBufferMgr &) = delete;
     const SoundBufferMgr &operator()(const SoundBufferMgr &) = delete;
 
-    virtual void Load(const std::string &filepath) noexcept override
+    virtual void Load(const std::string &filepath) override
     {
         sf::SoundBuffer resource;
         if (!resource.loadFromFile(filepath))

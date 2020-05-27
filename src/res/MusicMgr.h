@@ -17,7 +17,7 @@ private:
     using IResourceMgr<std::shared_ptr<sf::Music>>::Get;
 
 public:
-    virtual void Load(const std::string &filepath) noexcept override
+    virtual void Load(const std::string &filepath) override
     {
         std::shared_ptr<sf::Music> resource = std::make_shared<sf::Music>();
         if (!resource->openFromFile(filepath))

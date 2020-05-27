@@ -28,7 +28,7 @@ public:
         return m_resources[filepath];
     }
     // Load resource into memory
-    virtual void Load(const std::string &filepath) noexcept = 0;
+    virtual void Load(const std::string &filepath) = 0;
 
 protected:
     std::map<std::string, T> m_resources;

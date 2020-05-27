@@ -30,7 +30,7 @@ public:
 
     IScreen()
         : m_currentState(ScreenState::None),
-          m_parentApp(nullptr),
+          m_parentIApp(nullptr),
           m_screenIndex(SCREENINDEX_NO_SCREEN)
     {
     }
@@ -56,11 +56,11 @@ public:
 
     ScreenState GetState() const { return m_currentState; }
 
-    IApp *GetParentApp() { return m_parentApp; };
-    void SetParentApp(IApp *app) { m_parentApp = app; }
+    IApp *GetParentIApp() { return m_parentIApp; };
+    void SetParentIApp(IApp *app) { m_parentIApp = app; }
 
 protected:
     ScreenState m_currentState;
-    IApp *m_parentApp;
+    IApp *m_parentIApp;
     int m_screenIndex;
 };

@@ -1,12 +1,10 @@
-#include "App.h"
-
-class InitException;
+#include "AppClient.h"
 
 int main(int, char **)
 {
     try
     {
-        App app;
+        AppClient app;
         app.Run();
     }
     catch (const IException &e)
@@ -21,5 +19,6 @@ int main(int, char **)
     {
         log_fatal("Type: %s What: %s", "Standard Exception", "No details available");
     }
+
     return EXIT_SUCCESS;
 }

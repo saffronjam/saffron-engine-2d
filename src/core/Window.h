@@ -20,7 +20,7 @@ public:
     Window(const Window &) = delete;
     Window &operator=(const Window &) = delete;
 
-    void Create(const std::string &title, int width, int height);
+    static void Create(const std::string &title, int width, int height);
 
     static void Draw(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
     static void Clear();
