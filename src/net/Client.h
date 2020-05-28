@@ -10,6 +10,7 @@
 #include "IPacketHandler.h"
 #include "PacketMgr.h"
 #include "GenericThrowMacros.h"
+#include "PingModule.h"
 
 class Client : public INetMgr, public IPacketHandler
 {

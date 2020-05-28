@@ -5,6 +5,7 @@ Client::Client(sf::IpAddress ip, sf::Uint16 port) noexcept
 {
     PacketMgr::AddHandler(this);
     PacketMgr::AddPacketBuffer(&m_inBuffer, &m_inBufferLock);
+    AddNetModule(std::make_unique<PingModule>(this));
 }
 
 Client::~Client()

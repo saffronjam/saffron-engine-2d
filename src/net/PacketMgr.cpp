@@ -1,10 +1,5 @@
 #include "PacketMgr.h"
 
-#define SwitchHandle(type, packet)             \
-    case type:                                 \
-        handler->Handle##type##Packet(packet); \
-        break;
-
 std::set<std::pair<PacketBuffer *, std::mutex *>> PacketMgr::m_packetBuffers;
 std::set<IPacketHandler *> PacketMgr::m_handlers;
 
@@ -44,14 +39,18 @@ void PacketMgr::HandleAllPackets()
         {
             for (auto &handler : m_handlers)
             {
-                log_info("Do i fail here?");
                 switch (packet.type)
                 {
-                    SwitchHandle(Text, packet);
-                    SwitchHandle(AreYouAlive, packet);
-                    SwitchHandle(IAmAlive, packet);
+                case Text:
+                    handler->HandlePacket(Text, packet);
+                    break;
+                case AreYouAlive:
+                    handler->HandlePacket(AreYouAlive, packet);
+                    break;
+                case IAmAlive:
+                    handler->HandlePacket(IAmAlive, packet);
+                    break;
                 }
-                log_info("Nope!");
             }
         }
         packetBuffer->clear();

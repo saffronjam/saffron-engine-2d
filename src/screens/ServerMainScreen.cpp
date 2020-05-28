@@ -30,6 +30,11 @@ void ServerMainScreen::OnExit()
 
 void ServerMainScreen::Update()
 {
+    if (Keyboard::IsPressed(sf::Keyboard::P))
+    {
+        log_info("Asking client if he is alive...");
+        m_parent.GetServer().BroadcastEmpty<TCP>(AreYouAlive);
+    }
 }
 
 void ServerMainScreen::Draw()

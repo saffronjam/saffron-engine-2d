@@ -28,6 +28,8 @@ public:
 
     template <Protocol P, typename T>
     void Broadcast(PacketType type, const T &data);
+    template <Protocol P>
+    void BroadcastEmpty(PacketType type);
     template <Protocol P, typename T>
     void BroadcastArray(PacketType type, const T *data, int nElements);
     template <Protocol P>
@@ -70,18 +72,32 @@ void Server::Broadcast(PacketType type, const T &data)
             INetMgr::Send<P>(type, data, conn);
     }
 }
+template <Protocol P>
+void Server::BroadcastEmpty(PacketType type)
+{
+    if constexpr (P == Protocol::TCP)
+    {
+        for (auto &conn : m_clientTcpConnections)
+            INetMgr::SendEmpty<P>(type, &conn.first);
+    }
+    else if constexpr (P == Protocol::UDP)
+    {
+        for (auto &conn : m_clientUdpConnections)
+            INetMgr::SendEmpty<P>(type, &conn.first);
+    }
+}
 template <Protocol P, typename T>
 void Server::BroadcastArray(PacketType type, const T *data, int nElements)
 {
     if constexpr (P == Protocol::TCP)
     {
         for (auto &conn : m_clientTcpConnections)
-            INetMgr::SendArray<P>(type, data, nElements, conn);
+            INetMgr::SendArray<P>(type, data, nElements, &conn.first);
     }
     else if constexpr (P == Protocol::UDP)
     {
         for (auto &conn : m_clientUdpConnections)
-            INetMgr::SendArray<P>(type, data, nElements, conn);
+            INetMgr::SendArray<P>(type, data, nElements, &conn.first);
     }
 }
 template <Protocol P>
@@ -90,11 +106,11 @@ void Server::BroadcastRaw(PacketType type, const sf::Uint8 *data, size_t size)
     if constexpr (P == Protocol::TCP)
     {
         for (auto &conn : m_clientTcpConnections)
-            INetMgr::SendRaw<P>(type, data, size, conn);
+            INetMgr::SendRaw<P>(type, data, size, &conn.first);
     }
     else if constexpr (P == Protocol::UDP)
     {
         for (auto &conn : m_clientUdpConnections)
-            INetMgr::SendRaw<P>(type, data, size, conn);
+            INetMgr::SendRaw<P>(type, data, size, &conn.first);
     }
 }
