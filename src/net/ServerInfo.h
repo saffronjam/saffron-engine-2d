@@ -2,10 +2,10 @@
 
 #include "IConnInfo.h"
 
-class ClientInfo : public IConnInfo
+class ServerInfo : public IConnInfo
 {
 public:
-    ClientInfo(sf::Uint64 uid)
+    ServerInfo(sf::Uint64 uid)
         : IConnInfo(uid)
     {
     }

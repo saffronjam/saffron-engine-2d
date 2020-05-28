@@ -1,6 +1,9 @@
 #pragma once
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Rect.hpp>
+
+#define GET_VARIABLE_NAME(Variable) (#Variable)
 
 class Lib
 {

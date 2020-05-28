@@ -21,7 +21,7 @@ void IApp::Run()
     {
         Init();
     }
-    LogCatch;
+    LogOnly;
 
     while (m_isRunning)
     {
@@ -36,7 +36,7 @@ void IApp::Run()
             Update();
             Draw();
         }
-        LogCatch;
+        LogOnly;
 
         Window::Present();
         Clock::Mark();

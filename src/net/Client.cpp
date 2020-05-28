@@ -1,11 +1,14 @@
 #include "Client.h"
 
-Client::Client(sf::IpAddress ip, sf::Uint16 port) noexcept
-    : m_connState(ConnState::Disconnected)
+Client::Client(sf::IpAddress address, sf::Uint16 port)
+    : m_serverInfo(1),
+      m_cachedAddress(address),
+      m_cachedPort(port),
+      m_connState(ConnState::Disconnected)
 {
     PacketMgr::AddHandler(this);
-    PacketMgr::AddPacketBuffer(&m_inBuffer, &m_inBufferLock);
     AddNetModule(std::make_unique<PingModule>(this));
+    AddNetModule(std::make_unique<SetupModule>(this));
 }
 
 Client::~Client()
@@ -20,9 +23,9 @@ void Client::Connect()
     {
         THROW(Exception, "Tried to connect an already connected client: %s", "Try to disconnect before connecting");
     }
-    if (m_cachedIP == sf::IpAddress::None || m_cachedPort == 0)
+    if (m_cachedAddress == sf::IpAddress::None || m_cachedPort == 0)
     {
-        THROW(Exception, "Tried to connect a non-configured client: %s", "IP and port must be configured with SetNet()");
+        THROW(Exception, "Tried to connect a non-configured client: %s", "IP-address and port must be configured with SetNet()");
     }
 
     m_connState == ConnState::Disconnected;
@@ -42,17 +45,19 @@ void Client::Disconnect()
     }
     m_connState = ConnState::Disconnected;
     m_tryConnectDelay = sf::seconds(0.0f);
-    m_tcpConnection.GetSocket().disconnect();
-    m_udpConnection.GetSocket().unbind();
+    m_connection.GetTcpSocket().disconnect();
+    m_connection.GetUdpSocket().unbind();
     ClearSocketSelector();
     if (m_connector.joinable())
         m_connector.join();
+
     StopListening();
+    ClearInBuffer();
 }
 
-void Client::SetNet(sf::IpAddress ip, sf::Uint16 port) noexcept
+void Client::SetNet(sf::IpAddress address, sf::Uint16 port) noexcept
 {
-    m_cachedIP = ip;
+    m_cachedAddress = address;
     m_cachedPort = port;
 }
 
@@ -65,41 +70,75 @@ void Client::ConnectThreadFn()
         {
             if (!m_connectMutex.try_lock())
                 return;
-            if (m_tcpConnection.GetSocket().connect(m_cachedIP, m_cachedPort) != sf::Socket::Status::Done)
+            if (m_connection.GetTcpSocket().connect(m_cachedAddress, m_cachedPort) != sf::Socket::Status::Done)
             {
-                THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_cachedIP.toString().c_str(), m_cachedPort);
+                THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_cachedAddress.toString().c_str(), m_cachedPort);
             }
-            if (m_udpConnection.GetSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
+            if (m_connection.GetUdpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
             {
                 THROW(Exception, "Could not bind UDP-socket. Port: %s", "Any available port");
             }
-            AddToSocketSelector(&m_tcpConnection);
-            AddToSocketSelector(&m_udpConnection);
+            m_connection.SetUdpRemoteAddress(m_cachedAddress);
+            m_connection.SetUdpRemotePort(m_cachedPort);
+
+            AddToSocketSelector(&m_connection);
             StartListening();
             m_connState = ConnState::Connected;
             m_tryConnectDelay = sf::seconds(0.0f);
+            m_serverInfo.Reset();
             m_connectMutex.unlock();
         }
         catch (const IException &e)
         {
-            m_tcpConnection.GetSocket().disconnect();
-            m_udpConnection.GetSocket().unbind();
-            m_connectMutex.unlock();
 #ifdef LOG_EXCEPTION
             log_fatal("\n%s", e.what());
 #endif
+            m_connection.GetTcpSocket().disconnect();
+            m_connection.GetUdpSocket().unbind();
+            m_connectMutex.unlock();
         }
         catch (const std::exception &e)
         {
 #ifdef LOG_EXCEPTION
             log_fatal("\n%s", e.what());
 #endif
+            m_connection.GetTcpSocket().disconnect();
+            m_connection.GetUdpSocket().unbind();
+            m_connectMutex.unlock();
         }
         catch (...)
         {
 #ifdef LOG_EXCEPTION
             log_fatal("\n%s", "No details available");
 #endif
+            m_connection.GetTcpSocket().disconnect();
+            m_connection.GetUdpSocket().unbind();
+            m_connectMutex.unlock();
         }
     };
+}
+
+void Client::NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port)
+{
+    if (uid == 1)
+    {
+        m_connection.SetUdpRemoteAddress(address);
+        m_connection.SetUdpRemotePort(port);
+    }
+}
+
+std::optional<const Connection *> Client::GetConnectionByUID(sf::Uint64 uid)
+{
+    if (uid == 1)
+        return &m_connection;
+    else
+        return std::nullopt;
+}
+
+std::optional<const IConnInfo *> Client::GetConnInfoByUID(sf::Uint64 uid)
+{
+    if (uid == 1)
+        return &m_serverInfo;
+    else
+        return std::nullopt;
 }

@@ -9,13 +9,15 @@
 #include "INetMgr.h"
 #include "IPacketHandler.h"
 #include "PacketMgr.h"
-#include "GenericThrowMacros.h"
+#include "ServerInfo.h"
 #include "PingModule.h"
+#include "SetupModule.h"
+#include "GenericThrowMacros.h"
 
 class Client : public INetMgr, public IPacketHandler
 {
 public:
-    Client(sf::IpAddress ip = sf::IpAddress::None, sf::Uint16 port = 0) noexcept;
+    Client(sf::IpAddress address = sf::IpAddress::None, sf::Uint16 port = 0);
     ~Client();
     Client(const Client &) = delete;
     const Client &operator()(const Client &) = delete;
@@ -36,12 +38,15 @@ public:
 
 private:
     void ConnectThreadFn();
+    void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
+    std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
+    std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
 
 private:
-    Connection<sf::TcpSocket> m_tcpConnection;
-    Connection<sf::UdpSocket> m_udpConnection;
+    ServerInfo m_serverInfo;
+    Connection m_connection;
 
-    sf::IpAddress m_cachedIP;
+    sf::IpAddress m_cachedAddress;
     sf::Uint16 m_cachedPort;
 
     std::thread m_connector;
@@ -60,11 +65,11 @@ void Client::Send(PacketType type, const T &data)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::Send<P>(type, data, &m_tcpConnection);
+        INetMgr::Send<P>(type, data, &m_connection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::Send<P>(type, data, &m_udpConnection);
+        INetMgr::Send<P>(type, data, &m_connection);
     }
 }
 template <Protocol P>
@@ -72,11 +77,11 @@ void Client::SendEmpty(PacketType type)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::SendEmpty<P>(type, &m_tcpConnection);
+        INetMgr::SendEmpty<P>(type, &m_connection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::SendEmpty<P>(type, &m_udpConnection);
+        INetMgr::SendEmpty<P>(type, &m_connection);
     }
 }
 template <Protocol P, typename T>
@@ -84,11 +89,11 @@ void Client::SendArray(PacketType type, const T *data, int nElements)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::SendArray<P>(type, data, nElements, &m_tcpConnection);
+        INetMgr::SendArray<P>(type, data, nElements, &m_connection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::SendArray<P>(type, data, nElements, &m_udpConnection);
+        INetMgr::SendArray<P>(type, data, nElements, &m_connection);
     }
 }
 template <Protocol P>
@@ -96,10 +101,10 @@ void Client::SendRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::SendRaw<P>(type, data, size, &m_tcpConnection);
+        INetMgr::SendRaw<P>(type, data, size, &m_connection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::SendRaw<P>(type, data, size, &m_udpConnection);
+        INetMgr::SendRaw<P>(type, data, size, &m_connection);
     }
 }

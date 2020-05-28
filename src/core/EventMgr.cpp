@@ -2,7 +2,7 @@
 
 std::vector<EventHandler *> EventMgr::m_callbacks;
 
-void EventMgr::PollAll() noexcept
+void EventMgr::PollAll()
 {
     sf::Event event;
     while (Window::GetSFWindow()->pollEvent(event))
@@ -14,7 +14,7 @@ void EventMgr::PollAll() noexcept
     }
 }
 
-void EventMgr::AddOnEventCallback(EventHandler *callback) noexcept
+void EventMgr::AddOnEventCallback(EventHandler *callback)
 {
     m_callbacks.push_back(callback);
 }

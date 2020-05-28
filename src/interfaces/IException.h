@@ -3,20 +3,6 @@
 #include <exception>
 #include <sstream>
 
-#define LogCatch                                   \
-    catch (const IException &e)                    \
-    {                                              \
-        log_fatal("\n%s", e.what());               \
-    }                                              \
-    catch (const std::exception &e)                \
-    {                                              \
-        log_fatal("\n%s", e.what());               \
-    }                                              \
-    catch (...)                                    \
-    {                                              \
-        log_fatal("\n%s", "No details available"); \
-    }
-
 class IException : public std::exception
 {
 public:

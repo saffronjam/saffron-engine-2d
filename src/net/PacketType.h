@@ -3,8 +3,9 @@
 enum PacketType
 {
     Invalid,
-    Text,
     AreYouAlive,
     IAmAlive,
+    UID,
+    UDPSync,
     Count
 };

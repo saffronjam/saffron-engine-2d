@@ -10,7 +10,7 @@ class FPSLimiter
 {
 public:
     static void Start() noexcept;
-    static void Adjust() noexcept;
+    static void Adjust();
 
     static float GetDesiredFPS() noexcept { return m_desiredFPS; }
     static void SetDesiredFPS(float fps) noexcept { m_desiredFPS = fps; }

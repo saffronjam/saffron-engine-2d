@@ -12,7 +12,7 @@ void FPSLimiter::Start() noexcept
     m_last = steady_clock::now();
 }
 
-void FPSLimiter::Adjust() noexcept
+void FPSLimiter::Adjust()
 {
     if (m_desiredFPS != 0.0f)
     {

@@ -1,126 +1,39 @@
 #pragma once
 
-#include <string>
-#include <memory>
 #include <optional>
-#include <string>
-#include <cassert>
 
-#include "Protocol.h"
-#include "IConnection.h"
+#include <SFML/Network/TcpSocket.hpp>
+#include <SFML/Network/UdpSocket.hpp>
+#include <SFML/Network/IpAddress.hpp>
+
 #include "Log.h"
 
-template <typename S>
-class Connection : public IConnection
+// A wrapper around TCP- and UDP-socket
+class Connection
 {
 public:
-    Connection() noexcept
-        : m_socket(new S),
-          m_remoteAddress(sf::IpAddress::None),
-          m_remotePort(0)
-    {
-    }
-    Connection(sf::Socket *ref) noexcept
-        : m_socketRef(ref),
-          m_remoteAddress(sf::IpAddress::None),
-          m_remotePort(0)
-    {
-    }
+    Connection(const sf::IpAddress &udpRemoteAddress = sf::IpAddress::None, const sf::Uint16 &udpRemotePort = 0);
+    Connection(sf::UdpSocket *udpSocket, const sf::IpAddress &udpRemoteAddress = sf::IpAddress::None, const sf::Uint16 &udpRemotePort = 0);
+    ~Connection();
+    bool operator<(const Connection &rhs) const;
 
-    S &GetSocket() const noexcept
-    {
-        return m_socket.has_value() ? *m_socket.value() : *m_socketRef.value();
-    }
+    sf::TcpSocket &GetTcpSocket() const { return *m_tcpSocket; }
+    sf::UdpSocket &GetUdpSocket() const { return m_udpSocket.has_value() ? *m_udpSocket.value() : *m_udpSocketChild.value(); }
+    sf::IpAddress GetUdpRemoteAddress() const noexcept { return m_udpRemoteAddress; }
+    sf::Uint16 GetUdpRemotePort() const noexcept { return m_udpRemotePort; }
 
-    sf::Socket &GetISocket() const noexcept override
-    {
-        return m_socket.has_value() ? *m_socket.value() : *m_socketRef.value();
-    }
+    void SetUdpRemoteAddress(const sf::IpAddress &address) noexcept { m_udpRemoteAddress = address; }
+    void SetUdpRemotePort(const sf::Uint16 &port) noexcept { m_udpRemotePort = port; }
 
-    bool IsParent() const noexcept override { return m_socketRef.has_value(); }
+    bool IsUdpParent() const noexcept { return m_udpSocketChild.has_value(); }
 
-    sf::IpAddress GetRemoteAddress() const override
-    {
-        assert((std::is_same<S, sf::UdpSocket>::value || std::is_same<S, sf::TcpSocket>::value) && (std::string(__PRETTY_FUNCTION__) + "Function is only valid for UDP- and TCP-sockets").c_str());
-        if constexpr (std::is_same<S, sf::TcpSocket>::value)
-        {
-            return m_socket.value()->getRemoteAddress();
-        }
-        else
-        {
-            return m_remoteAddress;
-        }
-    }
-
-    sf::Uint16 GetRemotePort() const override
-    {
-        assert((std::is_same<S, sf::UdpSocket>::value || std::is_same<S, sf::TcpSocket>::value) && (std::string(__PRETTY_FUNCTION__) + "Function is only valid for UDP- and TCP-sockets").c_str());
-        if constexpr (std::is_same<S, sf::TcpSocket>::value)
-        {
-            return m_socket.value()->getRemotePort();
-        }
-        else
-        {
-            return m_remotePort;
-        }
-    }
-
-    sf::Uint16 GetLocalPort() const override
-    {
-        assert((std::is_same<S, sf::UdpSocket>::value || std::is_same<S, sf::TcpSocket>::value) && (std::string(__PRETTY_FUNCTION__) + "Function is only valid for UDP- and TCP-sockets").c_str());
-        return m_socket.value()->getLocalPort();
-    }
-
-    void SetRemoteAddress(const sf::IpAddress &address) noexcept override
-    {
-        assert((std::is_same<S, sf::UdpSocket>::value) && (std::string(__PRETTY_FUNCTION__) + "Function is only valid for UDP-sockets").c_str());
-        m_remoteAddress = address;
-    }
-
-    void SetRemotePort(const sf::Uint16 &port) noexcept override
-    {
-        assert((std::is_same<S, sf::UdpSocket>::value) && (std::string(__PRETTY_FUNCTION__) + "Function is only valid for UDP-sockets").c_str());
-        m_remotePort = port;
-    }
+    void Close();
 
 private:
-    std::optional<S *> m_socket;
-    std::optional<S *> m_socketRef;
-    sf::IpAddress m_remoteAddress;
-    sf::Uint16 m_remotePort;
-};
+    sf::TcpSocket *m_tcpSocket;
+    std::optional<sf::UdpSocket *> m_udpSocket;
+    std::optional<sf::UdpSocket *> m_udpSocketChild;
 
-template <Protocol>
-struct socketReturn
-{
-    using type = int;
+    sf::IpAddress m_udpRemoteAddress;
+    sf::Uint16 m_udpRemotePort;
 };
-
-template <>
-struct socketReturn<Protocol::TCP>
-{
-    using type = const Connection<sf::TcpSocket> *;
-};
-
-template <>
-struct socketReturn<Protocol::UDP>
-{
-    using type = const Connection<sf::UdpSocket> *;
-};
-
-template <Protocol P>
-typename socketReturn<P>::type ConnCast(const IConnection *conn)
-{
-    if constexpr (P == Protocol::TCP)
-    {
-        return dynamic_cast<const Connection<sf::TcpSocket> *>(conn);
-    }
-    else if constexpr (P == Protocol::TCP)
-    {
-        return dynamic_cast<const Connection<sf::UdpSocket> *>(conn);
-    }
-    else
-    {
-        return 0;
-    }
-}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <SFML/Config.hpp>
 #include <SFML/Network/TcpListener.hpp>
 #include <SFML/Network/TcpSocket.hpp>
@@ -13,7 +15,7 @@ enum Protocol : sf::Uint8
 };
 
 template <typename S>
-static constexpr Protocol ProtocolFrom() noexcept
+static constexpr std::optional<Protocol> ProtocolFrom() noexcept
 {
     if constexpr (std::is_same<S, sf::TcpListener>::value)
     {
@@ -27,5 +29,5 @@ static constexpr Protocol ProtocolFrom() noexcept
     {
         return Protocol::UDP;
     }
-    return Protocol::None;
+    return std::nullopt;
 }

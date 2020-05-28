@@ -41,14 +41,17 @@ void PacketMgr::HandleAllPackets()
             {
                 switch (packet.type)
                 {
-                case Text:
-                    handler->HandlePacket(Text, packet);
-                    break;
                 case AreYouAlive:
                     handler->HandlePacket(AreYouAlive, packet);
                     break;
                 case IAmAlive:
                     handler->HandlePacket(IAmAlive, packet);
+                    break;
+                case UID:
+                    handler->HandlePacket(UID, packet);
+                    break;
+                case UDPSync:
+                    handler->HandlePacket(UDPSync, packet);
                     break;
                 }
             }

@@ -15,8 +15,8 @@ struct EventHandler
 class EventMgr
 {
 public:
-    static void PollAll() noexcept;
-    static void AddOnEventCallback(EventHandler *callback) noexcept;
+    static void PollAll();
+    static void AddOnEventCallback(EventHandler *callback);
 
 private:
     static std::vector<EventHandler *> m_callbacks;

@@ -37,14 +37,17 @@ public:
 
 private:
     void OpenThreadFn();
-    void NewConnection(const Connection<sf::TcpListener> *listener) override;
+    void NewTcpConnection(sf::TcpListener *listener) override;
+    void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
+    std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
+    std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
+
+    sf::Uint64 GenerateUID() noexcept;
 
 private:
-    Connection<sf::TcpListener> m_tcpListener;
-    std::map<Connection<sf::TcpSocket>, std::set<ClientInfo>::iterator> m_clientTcpConnections;
-    std::map<Connection<sf::UdpSocket>, std::set<ClientInfo>::iterator> m_clientUdpConnections;
-    Connection<sf::UdpSocket> m_udpConnection;
-    std::set<ClientInfo> m_clientInfoSet;
+    sf::TcpListener m_tcpListener;
+    std::map<Connection, ClientInfo> m_clientConnections;
+    Connection m_udpConnection;
     sf::Uint16 m_port;
 
     std::thread m_opener;
@@ -56,61 +59,31 @@ private:
         Closed,
         TryingToOpen
     } m_connState;
+
+    sf::Uint64 m_nextUID;
 };
 
 template <Protocol P, typename T>
 void Server::Broadcast(PacketType type, const T &data)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        for (auto &conn : m_clientTcpConnections)
-            INetMgr::Send<P>(type, data, conn);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        for (auto &conn : m_clientUdpConnections)
-            INetMgr::Send<P>(type, data, conn);
-    }
+    for (auto &[conn, info] : m_clientConnections)
+        INetMgr::Send<P>(type, data, conn);
 }
 template <Protocol P>
 void Server::BroadcastEmpty(PacketType type)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        for (auto &conn : m_clientTcpConnections)
-            INetMgr::SendEmpty<P>(type, &conn.first);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        for (auto &conn : m_clientUdpConnections)
-            INetMgr::SendEmpty<P>(type, &conn.first);
-    }
+    for (auto &[conn, info] : m_clientConnections)
+        INetMgr::SendEmpty<P>(type, &conn);
 }
 template <Protocol P, typename T>
 void Server::BroadcastArray(PacketType type, const T *data, int nElements)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        for (auto &conn : m_clientTcpConnections)
-            INetMgr::SendArray<P>(type, data, nElements, &conn.first);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        for (auto &conn : m_clientUdpConnections)
-            INetMgr::SendArray<P>(type, data, nElements, &conn.first);
-    }
+    for (auto &[conn, info] : m_clientConnections)
+        INetMgr::SendArray<P>(type, data, nElements, &conn);
 }
 template <Protocol P>
 void Server::BroadcastRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        for (auto &conn : m_clientTcpConnections)
-            INetMgr::SendRaw<P>(type, data, size, &conn.first);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        for (auto &conn : m_clientUdpConnections)
-            INetMgr::SendRaw<P>(type, data, size, &conn.first);
-    }
+    for (auto &[conn, info] : m_clientConnections)
+        INetMgr::SendRaw<P>(type, data, size, &conn);
 }
