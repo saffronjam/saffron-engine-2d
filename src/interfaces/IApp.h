@@ -14,6 +14,8 @@
 #include "SoundBufferMgr.h"
 #include "PacketMgr.h"
 #include "IScreen.h"
+#include "Clock.h"
+#include "FPSLimiter.h"
 
 class IApp : public EventHandler
 {
@@ -48,6 +50,8 @@ protected:
     EventMgr m_eventMgr;
     Keyboard m_keyboard;
     Mouse m_mouse;
+    Clock m_clock;
+    FPSLimiter m_fpsLimiter;
 
     TextureMgr m_textureMgr;
     FontMgr m_fontMgr;

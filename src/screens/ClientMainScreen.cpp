@@ -20,6 +20,7 @@ void ClientMainScreen::Destroy()
 
 void ClientMainScreen::OnEntry()
 {
+    FPSLimiter::SetDesiredFPS(60.0f);
     m_parent.GetClient().SetNet("localhost", 1330);
     m_parent.GetClient().Connect();
 }

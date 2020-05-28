@@ -25,6 +25,7 @@ void IApp::Run()
 
     while (m_isRunning)
     {
+        FPSLimiter::Start();
         PacketMgr::HandleAllPackets();
         Keyboard::Update();
         Mouse::Update();
@@ -38,6 +39,9 @@ void IApp::Run()
         LogCatch;
 
         Window::Present();
+        Clock::Mark();
+        Clock::Reset();
+        FPSLimiter::Adjust();
     }
 }
 void IApp::Exit()
