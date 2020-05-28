@@ -38,8 +38,8 @@ void INetMgr::RemoveFromSocketSelector(const IConnection *iconn)
 
 void INetMgr::AddNetModule(std::unique_ptr<INetModule> netModule)
 {
-    m_netModules.emplace(std::move(netModule));
-    PacketMgr::AddHandler(netModule.get());
+    auto res = m_netModules.emplace(std::move(netModule));
+    PacketMgr::AddHandler(res.first->get());
 }
 
 void INetMgr::Receive(const IConnection *iconn)
