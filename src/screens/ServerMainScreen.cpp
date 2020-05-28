@@ -20,7 +20,7 @@ void ServerMainScreen::Destroy()
 
 void ServerMainScreen::OnEntry()
 {
-    m_parent.GetServer().SetPort(1337);
+    m_parent.GetServer().SetPort(1330);
     m_parent.GetServer().Open();
 }
 

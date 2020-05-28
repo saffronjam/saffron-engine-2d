@@ -8,10 +8,10 @@
 
 #include "INetMgr.h"
 #include "IPacketHandler.h"
-#include "PacketMgr.h"
 #include "ClientInfo.h"
 #include "GenericThrowMacros.h"
 #include "Log.h"
+#include "PingModule.h"
 
 class Server : public INetMgr, public IPacketHandler
 {
@@ -54,11 +54,6 @@ private:
         Closed,
         TryingToOpen
     } m_connState;
-
-private:
-    void HandlePacket(Text, ParsedPacket &packet) override;
-    void HandlePacket(AreYouAlive, ParsedPacket &packet) override;
-    void HandlePacket(IAmAlive, ParsedPacket &packet) override;
 };
 
 template <Protocol P, typename T>

@@ -50,9 +50,9 @@ target_include_directories(Client PRIVATE
   src/input
   src/interfaces
   src/net
+  src/netmodules
   src/res
   src/screens
-  src/primitives
   src/throwmacros
 )
 
@@ -110,6 +110,7 @@ target_include_directories(Server PRIVATE
   src/input
   src/interfaces
   src/net
+  src/netmodules
   src/res
   src/screens
   src/primitives

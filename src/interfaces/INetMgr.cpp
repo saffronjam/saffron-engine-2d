@@ -8,14 +8,7 @@ INetMgr::INetMgr()
 INetMgr::~INetMgr()
 {
     StopListening();
-    for (auto &parsedPacket : m_inBuffer)
-    {
-        parsedPacket.type = PacketType::Text;
-        if (parsedPacket.data)
-            delete parsedPacket.data;
-        parsedPacket.dataSize = 0;
-        parsedPacket.fullSize = 0;
-    }
+    m_inBuffer.clear();
 }
 
 void INetMgr::StartListening()
@@ -31,6 +24,81 @@ void INetMgr::StopListening()
         m_listenerThread.join();
 }
 
+void INetMgr::AddToSocketSelector(const IConnection *iconn)
+{
+    m_connectionRefs.emplace(iconn);
+    m_socketSelector.add(iconn->GetISocket());
+}
+
+void INetMgr::RemoveFromSocketSelector(const IConnection *iconn)
+{
+    m_connectionRefs.emplace(iconn);
+    m_socketSelector.remove(iconn->GetISocket());
+}
+
+void INetMgr::AddNetModule(std::unique_ptr<INetModule> netModule)
+{
+    m_netModules.emplace(std::move(netModule));
+    PacketMgr::AddHandler(netModule.get());
+}
+
+void INetMgr::Receive(const IConnection *iconn)
+{
+    sf::Packet incoming;
+    const Connection<sf::TcpSocket> *tcpConn;
+    const Connection<sf::UdpSocket> *udpConn;
+    if ((tcpConn = dynamic_cast<const Connection<sf::TcpSocket> *>(iconn)))
+    {
+        sf::Socket::Status status;
+        while ((status = tcpConn->GetSocket().receive(incoming)) != sf::Socket::Done)
+        {
+            if (status != sf::Socket::Partial)
+            {
+                return;
+            }
+        }
+
+        if (incoming.getDataSize() < sizeof(PacketType))
+        {
+            return;
+        }
+    }
+    else if ((udpConn = dynamic_cast<const Connection<sf::UdpSocket> *>(iconn)))
+    {
+        sf::IpAddress ip = udpConn->GetRemoteAddress();
+        sf::Uint16 port = udpConn->GetRemotePort();
+        sf::Socket::Status status;
+        while ((status = udpConn->GetSocket().receive(incoming, ip, port)) != sf::Socket::Done)
+        {
+            if (status != sf::Socket::Partial)
+            {
+                return;
+            }
+        }
+        if (incoming.getDataSize() < sizeof(PacketType))
+        {
+            return;
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    std::optional<ParsedPacket> parseAttempt;
+    if (tcpConn)
+        parseAttempt = Packager::Parse(incoming, tcpConn);
+    else
+        parseAttempt = Packager::Parse(incoming, udpConn);
+    if (parseAttempt.has_value())
+    {
+        m_inBufferLock.lock();
+        m_inBuffer.push_back(parseAttempt.value());
+        m_inBufferLock.unlock();
+    }
+    return;
+}
+
 void INetMgr::ListenerThreadFn()
 {
     while (m_listening)
@@ -38,20 +106,15 @@ void INetMgr::ListenerThreadFn()
         bool anySocketReady = m_socketSelector.wait(sf::milliseconds(100));
         if (anySocketReady)
         {
-            for (auto &conn : m_allTcpListenerRefs)
+            for (auto &iconn : m_connectionRefs)
             {
-                if (m_socketSelector.isReady(conn->GetSocket()))
-                    NewConnection(conn);
-            }
-            for (auto &conn : m_allTcpSocketRefs)
-            {
-                if (m_socketSelector.isReady(conn->GetSocket()))
-                    Receive(conn);
-            }
-            for (auto &conn : m_allUdpSocketRefs)
-            {
-                if (m_socketSelector.isReady(conn->GetSocket()))
-                    Receive(conn);
+                if (m_socketSelector.isReady(iconn->GetISocket()))
+                {
+                    if (dynamic_cast<const Connection<sf::TcpListener> *>(iconn))
+                        NewConnection(dynamic_cast<const Connection<sf::TcpListener> *>(iconn));
+                    else
+                        Receive(iconn);
+                }
             }
         }
     }

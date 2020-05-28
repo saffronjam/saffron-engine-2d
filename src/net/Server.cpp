@@ -6,6 +6,7 @@ Server::Server(sf::Uint16 port)
 {
     PacketMgr::AddHandler(this);
     PacketMgr::AddPacketBuffer(&m_inBuffer, &m_inBufferLock);
+    AddNetModule(std::unique_ptr<PingModule>(new PingModule(this)));
 }
 
 Server::~Server()
@@ -119,17 +120,4 @@ void Server::NewConnection(const Connection<sf::TcpListener> *listener)
     auto clientConnRes = m_clientTcpConnections.emplace(std::make_pair(newConn, clientInfoRes.first));
 
     AddToSocketSelector(&clientConnRes.first->first);
-}
-
-void Server::HandlePacket(Text, ParsedPacket &packet)
-{
-    log_info("Received: %s", packet.data);
-}
-
-void Server::HandlePacket(AreYouAlive, ParsedPacket &packet)
-{
-}
-
-void Server::HandlePacket(IAmAlive, ParsedPacket &packet)
-{
 }

@@ -102,16 +102,3 @@ void Client::ConnectThreadFn()
         }
     };
 }
-
-void Client::HandlePacket(Text, ParsedPacket &packet)
-{
-    log_info("Contents: %s", packet.data);
-}
-
-void Client::HandlePacket(AreYouAlive, ParsedPacket &packet)
-{
-}
-
-void Client::HandlePacket(IAmAlive, ParsedPacket &packet)
-{
-}

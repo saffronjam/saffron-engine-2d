@@ -44,12 +44,14 @@ void PacketMgr::HandleAllPackets()
         {
             for (auto &handler : m_handlers)
             {
+                log_info("Do i fail here?");
                 switch (packet.type)
                 {
                     SwitchHandle(Text, packet);
                     SwitchHandle(AreYouAlive, packet);
                     SwitchHandle(IAmAlive, packet);
                 }
+                log_info("Nope!");
             }
         }
         packetBuffer->clear();

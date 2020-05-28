@@ -26,6 +26,8 @@ public:
 
     template <Protocol P, typename T>
     void Send(PacketType type, const T &data);
+    template <Protocol P>
+    void SendEmpty(PacketType type);
     template <Protocol P, typename T>
     void SendArray(PacketType type, const T *data, int nElements);
     template <Protocol P>
@@ -50,11 +52,6 @@ private:
         Connected,
         TryingToConnect
     } m_connState;
-
-private:
-    void HandlePacket(Text, ParsedPacket &packet) override;
-    void HandlePacket(AreYouAlive, ParsedPacket &packet) override;
-    void HandlePacket(IAmAlive, ParsedPacket &packet) override;
 };
 
 template <Protocol P, typename T>
@@ -62,11 +59,23 @@ void Client::Send(PacketType type, const T &data)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::Send<P>(type, data, m_tcpConnection);
+        INetMgr::Send<P>(type, data, &m_tcpConnection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::Send<P>(type, data, m_udpConnection);
+        INetMgr::Send<P>(type, data, &m_udpConnection);
+    }
+}
+template <Protocol P>
+void Client::SendEmpty(PacketType type)
+{
+    if constexpr (P == Protocol::TCP)
+    {
+        INetMgr::SendEmpty<P>(type, &m_tcpConnection);
+    }
+    else if constexpr (P == Protocol::UDP)
+    {
+        INetMgr::SendEmpty<P>(type, &m_udpConnection);
     }
 }
 template <Protocol P, typename T>
@@ -74,11 +83,11 @@ void Client::SendArray(PacketType type, const T *data, int nElements)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::SendArray<P>(type, data, nElements, m_tcpConnection);
+        INetMgr::SendArray<P>(type, data, nElements, &m_tcpConnection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::SendArray<P>(type, data, nElements, m_udpConnection);
+        INetMgr::SendArray<P>(type, data, nElements, &m_udpConnection);
     }
 }
 template <Protocol P>
@@ -86,10 +95,10 @@ void Client::SendRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
     if constexpr (P == Protocol::TCP)
     {
-        INetMgr::SendRaw<P>(type, data, size, m_tcpConnection);
+        INetMgr::SendRaw<P>(type, data, size, &m_tcpConnection);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        INetMgr::SendRaw<P>(type, data, size, m_udpConnection);
+        INetMgr::SendRaw<P>(type, data, size, &m_udpConnection);
     }
 }

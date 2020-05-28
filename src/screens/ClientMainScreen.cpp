@@ -20,7 +20,7 @@ void ClientMainScreen::Destroy()
 
 void ClientMainScreen::OnEntry()
 {
-    m_parent.GetClient().SetNet("localhost", 1337);
+    m_parent.GetClient().SetNet("localhost", 1330);
     m_parent.GetClient().Connect();
 }
 
@@ -31,7 +31,10 @@ void ClientMainScreen::OnExit()
 void ClientMainScreen::Update()
 {
     if (Keyboard::IsPressed(sf::Keyboard::P))
-        m_parent.GetClient().SendArray<Protocol::TCP>(Text, "Hello, world!", 14);
+    {
+        log_info("Asking server if he is alive...");
+        m_parent.GetClient().SendEmpty<TCP>(AreYouAlive);
+    }
 }
 
 void ClientMainScreen::Draw()

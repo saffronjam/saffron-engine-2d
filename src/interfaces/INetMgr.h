@@ -5,14 +5,17 @@
 #include <set>
 #include <mutex>
 #include <thread>
+#include <memory>
 
 #include <SFML/Network/SocketSelector.hpp>
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Network/UdpSocket.hpp>
 #include <SFML/Network/TcpListener.hpp>
 
-#include "Packager.h"
 #include "IException.h"
+#include "INetModule.h"
+#include "Packager.h"
+#include "PacketMgr.h"
 #include "GenericThrowMacros.h"
 #include "Log.h"
 
@@ -25,27 +28,28 @@ public:
     void StartListening();
     void StopListening();
 
-    template <typename S>
-    void AddToSocketSelector(const Connection<S> *conn);
-    template <typename S>
-    void RemoveFromSocketSelector(const Connection<S> *conn);
+    void AddToSocketSelector(const IConnection *iconn);
+    void RemoveFromSocketSelector(const IConnection *iconn);
     void ClearSocketSelector() noexcept { m_socketSelector.clear(); }
 
-    template <Protocol P, typename T, typename S>
-    void Send(PacketType type, const T &data, const Connection<S> &conn);
-    template <Protocol P, typename T, typename S>
-    void SendArray(PacketType type, const T *data, int nElements, const Connection<S> &conn);
-    template <Protocol P, typename S>
-    void SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection<S> &conn);
+    void AddNetModule(std::unique_ptr<INetModule> netModule);
 
-    template <typename S>
-    void Receive(const Connection<S> *conn);
+    template <Protocol P, typename T>
+    void Send(PacketType type, const T &data, const IConnection *iconn);
+    template <Protocol P>
+    void SendEmpty(PacketType type, const IConnection *iconn);
+    template <Protocol P, typename T>
+    void SendArray(PacketType type, const T *data, int nElements, const IConnection *iconn);
+    template <Protocol P>
+    void SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const IConnection *iconn);
+
+    void Receive(const IConnection *conn);
 
     virtual void NewConnection(const Connection<sf::TcpListener> *listener){};
 
 private:
-    template <Protocol P, typename S>
-    void SendOut(sf::Packet &packet, const Connection<S> &conn);
+    template <Protocol P>
+    void SendOut(sf::Packet &packet, const IConnection *iconn);
     void ListenerThreadFn();
 
 protected:
@@ -57,9 +61,8 @@ protected:
 private:
     sf::SocketSelector m_socketSelector;
 
-    std::set<const Connection<sf::TcpListener> *> m_allTcpListenerRefs;
-    std::set<const Connection<sf::TcpSocket> *> m_allTcpSocketRefs;
-    std::set<const Connection<sf::UdpSocket> *> m_allUdpSocketRefs;
+    std::set<std::unique_ptr<INetModule>> m_netModules;
+    std::set<const IConnection *> m_connectionRefs;
     std::thread m_listenerThread;
 
 public:
@@ -76,127 +79,49 @@ public:
     };
 };
 
-template <typename S>
-void INetMgr::AddToSocketSelector(const Connection<S> *conn)
-{
-    if constexpr (std::is_same<S, sf::TcpListener>::value)
-    {
-        m_socketSelector.add(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allTcpListenerRefs.emplace(conn);
-    }
-    else if constexpr (std::is_same<S, sf::TcpSocket>::value)
-    {
-        m_socketSelector.add(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allTcpSocketRefs.emplace(conn);
-    }
-    else if constexpr (std::is_same<S, sf::UdpSocket>::value)
-    {
-        m_socketSelector.add(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allUdpSocketRefs.emplace(conn);
-    }
-    else
-    {
-        THROW(Exception, "Tried to add a non-socket type to socket selector:  %s", typeid(S).name());
-    }
-}
-
-template <typename S>
-void INetMgr::RemoveFromSocketSelector(const Connection<S> *conn)
-{
-    if constexpr (std::is_same<S, sf::TcpListener>::value)
-    {
-        m_socketSelector.remove(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allTcpListenerRefs.erase(conn);
-    }
-    else if constexpr (std::is_same<S, sf::TcpSocket>::value)
-    {
-        m_socketSelector.remove(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allTcpSocketRefs.erase(conn);
-    }
-    else if constexpr (std::is_same<S, sf::UdpSocket>::value)
-    {
-        m_socketSelector.remove(const_cast<Connection<S> *>(conn)->GetSocket());
-        m_allUdpSocketRefs.erase(conn);
-    }
-    else
-    {
-        THROW(Exception, "Tried to remove a non-socket type from socket selector:  %s", typeid(S).name());
-    }
-}
-template <Protocol P, typename T, typename S>
-void INetMgr::Send(PacketType type, const T &data, const Connection<S> &conn)
+template <Protocol P, typename T>
+void INetMgr::Send(PacketType type, const T &data, const IConnection *iconn)
 {
     sf::Packet outgoing = Packager::Pack(type, reinterpret_cast<const sf::Uint8 *>(&data), sizeof(T));
-    SendOut<P>(outgoing, conn);
+    SendOut<P>(outgoing, iconn);
 }
-template <Protocol P, typename T, typename S>
-void INetMgr::SendArray(PacketType type, const T *data, int nElements, const Connection<S> &conn)
+template <Protocol P>
+void INetMgr::SendEmpty(PacketType type, const IConnection *iconn)
+{
+    sf::Packet outgoing = Packager::Pack(type, nullptr, 0);
+    SendOut<P>(outgoing, iconn);
+}
+template <Protocol P, typename T>
+void INetMgr::SendArray(PacketType type, const T *data, int nElements, const IConnection *iconn)
 {
     sf::Packet outgoing = Packager::Pack(type, reinterpret_cast<const sf::Uint8 *>(data), sizeof(T) * nElements);
-    SendOut<P>(outgoing, conn);
+    SendOut<P>(outgoing, iconn);
 }
-template <Protocol P, typename S>
-void INetMgr::SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection<S> &conn)
+template <Protocol P>
+void INetMgr::SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const IConnection *iconn)
 {
     sf::Packet outgoing = Packager::Pack(type, data, size);
-    SendOut<P>(outgoing, conn);
+    SendOut<P>(outgoing, iconn);
 }
 
-template <typename S>
-void INetMgr::Receive(const Connection<S> *conn)
-{
-    sf::Packet incoming;
-    static constexpr Protocol protocol = GetProtocolFromSocketType<S>();
-    if constexpr (protocol == Protocol::TCP)
-    {
-        if (conn->GetSocket().receive(incoming) != sf::Socket::Socket::Done)
-        {
-            return;
-        }
-        if (incoming.getDataSize() < sizeof(PacketType))
-        {
-            return;
-        }
-    }
-    else if constexpr (protocol == Protocol::UDP)
-    {
-        sf::IpAddress ip = conn->GetRemoteAddress();
-        sf::Uint16 port = conn->GetRemotePort();
-        if (conn->GetSocket().receive(incoming, ip, port) != sf::Socket::Socket::Done)
-        {
-            return;
-        }
-        if (incoming.getDataSize() < sizeof(PacketType))
-        {
-            return;
-        }
-    }
-    else
-    {
-        THROW(Exception, "Tried to receive data on non-socket type:  %s", typeid(S).name());
-    }
-    auto parseAttempt = Packager::Parse(incoming);
-    if (parseAttempt.has_value())
-    {
-        m_inBufferLock.lock();
-        m_inBuffer.push_back(parseAttempt.value());
-        m_inBufferLock.unlock();
-    }
-    return;
-}
-
-template <Protocol P, typename S>
-void INetMgr::SendOut(sf::Packet &packet, const Connection<S> &conn)
+template <Protocol P>
+void INetMgr::SendOut(sf::Packet &packet, const IConnection *iconn)
 {
     if constexpr (P == Protocol::TCP)
     {
-        conn.GetSocket().send(packet);
+        const Connection<sf::TcpSocket> *tcpConn = dynamic_cast<const Connection<sf::TcpSocket> *>(iconn);
+        if (!tcpConn)
+            return;
+        tcpConn->GetSocket().send(packet);
     }
     else if constexpr (P == Protocol::UDP)
     {
-        sf::IpAddress ip = conn.GetRemoteAddress();
-        sf::Uint16 port = conn.GetRemotePort();
-        conn.GetSocket().send(packet, ip, port);
+        const Connection<sf::UdpSocket> *udpConn = dynamic_cast<const Connection<sf::UdpSocket> *>(iconn);
+        if (!udpConn)
+            return;
+        sf::IpAddress ip = iconn->GetRemoteAddress();
+        sf::Uint16 port = iconn->GetRemotePort();
+        udpConn->GetSocket().send(packet, ip, port);
     }
     else
     {
