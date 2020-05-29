@@ -41,7 +41,7 @@ public:
     // Removes listener to socket selector
     void RemoveFromSocketSelector(sf::TcpListener *listener);
     // Clears all entries in socket selector
-    void ClearSocketSelector() noexcept { m_socketSelector.clear(); }
+    void ClearSocketSelector();
 
     void AddNetModule(std::unique_ptr<INetModule> netModule);
 
@@ -106,13 +106,11 @@ void INetMgr::AddToSocketSelector(const Connection *conn)
 {
     if constexpr (P == Protocol::TCP)
     {
-        log_info("Added tcp conn to socket selector: %s:%u", conn->GetTcpSocket().getRemoteAddress().toString().c_str(), conn->GetTcpSocket().getRemotePort());
         m_connectionRefs.emplace(conn);
         m_socketSelector.add(conn->GetTcpSocket());
     }
     else if (P == Protocol::UDP)
     {
-        log_info("Added udp conn to socket selector: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
         m_connectionRefs.emplace(conn);
         m_socketSelector.add(conn->GetUdpSocket());
     }

@@ -43,20 +43,24 @@ void Server::Close()
         THROW(Exception, "Tried to close an already closed server: %s", "Try to open before closing the server");
     }
     m_connState = ConnState::Closed;
+    m_nextUID = 1u;
     m_tryOpenDelay = sf::seconds(0.0f);
     m_tcpListener.close();
-    m_udpConnection.GetUdpSocket().unbind();
+
+    StopListening();
+    ClearSocketSelector();
+
     for (auto &[conn, info] : m_clientConnections)
     {
         const_cast<Connection &>(conn).GetTcpSocket().disconnect();
         if (!conn.IsUdpParent())
             const_cast<Connection &>(conn).GetUdpSocket().unbind();
     }
-    ClearSocketSelector();
+    m_udpConnection.GetUdpSocket().unbind();
+    m_clientConnections.clear();
     if (m_opener.joinable())
         m_opener.join();
 
-    StopListening();
     ClearInBuffer();
 }
 

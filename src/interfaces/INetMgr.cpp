@@ -15,8 +15,8 @@ INetMgr::~INetMgr()
 
 void INetMgr::StartListening()
 {
-    m_listenerThread = std::thread(&INetMgr::ListenerThreadFn, this);
     m_listening = true;
+    m_listenerThread = std::thread(&INetMgr::ListenerThreadFn, this);
 }
 
 void INetMgr::StopListening()
@@ -28,14 +28,12 @@ void INetMgr::StopListening()
 
 void INetMgr::AddToSocketSelector(sf::TcpListener *listener)
 {
-    log_info("Add listener to socket selector. Port: %u", listener->getLocalPort());
     m_tcpListenerRefs.emplace(listener);
     m_socketSelector.add(*listener);
 }
 
 void INetMgr::RemoveFromSocketSelector(const Connection *conn)
 {
-    log_info("Remove socket from socket selector");
     m_connectionRefs.erase(conn);
     m_socketSelector.remove(conn->GetTcpSocket());
     if (!conn->IsUdpParent())
@@ -46,6 +44,13 @@ void INetMgr::RemoveFromSocketSelector(sf::TcpListener *listener)
 {
     m_tcpListenerRefs.erase(listener);
     m_socketSelector.remove(*listener);
+}
+
+void INetMgr::ClearSocketSelector()
+{
+    m_connectionRefs.clear();
+    m_tcpListenerRefs.clear();
+    m_socketSelector.clear();
 }
 
 void INetMgr::AddNetModule(std::unique_ptr<INetModule> netModule)
@@ -61,12 +66,10 @@ void INetMgr::ListenerThreadFn()
         bool anySocketReady = m_socketSelector.wait(sf::milliseconds(100));
         if (anySocketReady)
         {
-            log_info("I think I received something...");
             for (auto &listener : m_tcpListenerRefs)
             {
                 if (m_socketSelector.isReady(*listener))
                 {
-                    log_info("New tcp conn!");
                     NewTcpConnection(listener);
                     break;
                 }
@@ -75,13 +78,11 @@ void INetMgr::ListenerThreadFn()
             {
                 if (m_socketSelector.isReady(conn->GetTcpSocket()))
                 {
-                    log_info("New tcp pack!");
                     Receive<Protocol::TCP>(conn);
                     break;
                 }
                 else if (!conn->IsUdpParent() && m_socketSelector.isReady(conn->GetUdpSocket()))
                 {
-                    log_info("New udp pack!");
                     Receive<Protocol::UDP>(conn);
                     break;
                 }

@@ -32,12 +32,12 @@ void ServerMainScreen::Update()
 {
     if (Keyboard::IsPressed(sf::Keyboard::T))
     {
-        log_info("Asking server if he is alive... with TCP!");
+        log_info("Asking clients if they are alive... with TCP!");
         m_parent.GetServer().BroadcastEmpty<TCP>(AreYouAlive);
     }
     if (Keyboard::IsPressed(sf::Keyboard::U))
     {
-        log_info("Asking server if he is alive... with UDP!");
+        log_info("Asking clients if they are alive... with UDP!");
         m_parent.GetServer().BroadcastEmpty<UDP>(AreYouAlive);
     }
 

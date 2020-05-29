@@ -47,9 +47,11 @@ std::optional<ParsedPacket> Packager::Parse(const sf::Packet &packet, const Conn
 
         ParsedPacket parsedPacket;
 
+        const int header = sizeof(PacketType) + sizeof(sf::Uint64);
+
         // CHECK SIZES
         parsedPacket.fullSize = packet.getDataSize();
-        parsedPacket.dataSize = parsedPacket.fullSize - sizeof(PacketType);
+        parsedPacket.dataSize = parsedPacket.fullSize - header;
         if (parsedPacket.dataSize < 0)
         {
             THROW(Exception, "Data size was too small to be a valid packet. Data size: %zu", parsedPacket.dataSize);
@@ -65,7 +67,7 @@ std::optional<ParsedPacket> Packager::Parse(const sf::Packet &packet, const Conn
         if (parsedPacket.dataSize)
         {
             parsedPacket.data = std::shared_ptr<sf::Uint8>(new sf::Uint8[parsedPacket.dataSize]);
-            memcpy(parsedPacket.data.get(), rawPacketData + sizeof(PacketType), parsedPacket.dataSize);
+            memcpy(parsedPacket.data.get(), rawPacketData + header, parsedPacket.dataSize);
         }
 
         if (!conn || !connInfo)

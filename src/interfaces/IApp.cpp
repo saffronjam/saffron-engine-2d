@@ -8,7 +8,7 @@ IApp::IApp()
 {
     EventMgr::AddOnEventCallback(this);
     sf::VideoMode mode = sf::VideoMode::getDesktopMode();
-    Window::Create("V-2DFramework", mode.width * 0.7f, mode.height * 0.7f);
+    Window::Create("V-2DFramework", mode.width * 0.4f, mode.height * 0.4f);
 }
 
 IApp::~IApp()

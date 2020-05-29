@@ -9,8 +9,7 @@ SetupModule::SetupModule(INetMgr *ioHelper)
 
 void SetupModule::HandlePacket(UID, const ParsedPacket &packet)
 {
-    log_info("Received ID!");
-    long uid = *reinterpret_cast<long *>(packet.data.get());
+    sf::Uint64 uid = *reinterpret_cast<sf::Uint64 *>(packet.data.get());
     m_ioHelper->SetUID(uid);
 }
 
