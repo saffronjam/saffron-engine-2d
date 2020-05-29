@@ -39,6 +39,8 @@ private:
     void OpenThreadFn();
     void NewTcpConnection(sf::TcpListener *listener) override;
     void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
+    void HandleClosedConnection(const Connection *conn) override;
+    void RemoveClient(const Connection *conn);
     std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
     std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
 

@@ -9,7 +9,7 @@ PingModule::PingModule(INetMgr *ioHelper)
 
 void PingModule::HandlePacket(AreYouAlive, const ParsedPacket &packet)
 {
-    log_info("Someone asked me if I'm alive, of course I am...");
+    log_info("Someone asked me if I'm alive, of course I am... (Protocol: %s ) (%s:%u)", packet.protocol == Protocol::TCP ? "TCP" : "UDP", packet.connection->GetUdpRemoteAddress().toString().c_str(), packet.connection->GetUdpRemotePort());
     m_ioHelper->SendEmpty<TCP>(IAmAlive, packet.connection);
 }
 

@@ -9,8 +9,8 @@
 
 enum Protocol : sf::Uint8
 {
-    UDP,
     TCP,
+    UDP,
     None // Used ONLY as fallback. Attempting to use this will be treated as using undefined protocol
 };
 

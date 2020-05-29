@@ -20,7 +20,7 @@ void ServerMainScreen::Destroy()
 
 void ServerMainScreen::OnEntry()
 {
-    m_parent.GetServer().SetPort(1331);
+    m_parent.GetServer().SetPort(1332);
     m_parent.GetServer().Open();
 }
 
@@ -30,10 +30,26 @@ void ServerMainScreen::OnExit()
 
 void ServerMainScreen::Update()
 {
-    if (Keyboard::IsPressed(sf::Keyboard::P))
+    if (Keyboard::IsPressed(sf::Keyboard::T))
     {
-        log_info("Asking client if he is alive...");
+        log_info("Asking server if he is alive... with TCP!");
         m_parent.GetServer().BroadcastEmpty<TCP>(AreYouAlive);
+    }
+    if (Keyboard::IsPressed(sf::Keyboard::U))
+    {
+        log_info("Asking server if he is alive... with UDP!");
+        m_parent.GetServer().BroadcastEmpty<UDP>(AreYouAlive);
+    }
+
+    if (Keyboard::IsPressed(sf::Keyboard::C))
+    {
+        log_info("Closing server!");
+        m_parent.GetServer().Close();
+    }
+    if (Keyboard::IsReleased(sf::Keyboard::C))
+    {
+        log_info("Opening server!");
+        m_parent.GetServer().Open();
     }
 }
 

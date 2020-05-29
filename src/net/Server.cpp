@@ -77,9 +77,9 @@ void Server::OpenThreadFn()
             {
                 THROW(Exception, "Could not bind UDP-socket. Port: %u", m_port);
             }
-            AddToSocketSelector(&m_tcpListener);
-            AddToSocketSelector(&m_udpConnection);
             StartListening();
+            AddToSocketSelector(&m_tcpListener);
+            AddToSocketSelector<UDP>(&m_udpConnection);
             m_connState = ConnState::Opened;
             m_tryOpenDelay = sf::seconds(0.0f);
             m_openMutex.unlock();
@@ -125,7 +125,7 @@ void Server::NewTcpConnection(sf::TcpListener *listener)
 
     auto clientConnRes = m_clientConnections.emplace(std::make_pair(newConn, ClientInfo(uid)));
 
-    AddToSocketSelector(&clientConnRes.first->first);
+    AddToSocketSelector<TCP>(&clientConnRes.first->first);
 
     // Giving out UID to connected client
     Send<TCP>(UID, uid, &newConn);
@@ -145,6 +145,20 @@ void Server::NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const
         conn->SetUdpRemotePort(port);
     }
     LogOnly;
+}
+
+void Server::HandleClosedConnection(const Connection *conn)
+{
+    RemoveFromSocketSelector(conn);
+    RemoveClient(conn);
+}
+
+void Server::RemoveClient(const Connection *conn)
+{
+    conn->GetTcpSocket().disconnect();
+    if (!conn->IsUdpParent())
+        conn->GetUdpSocket().unbind();
+    m_clientConnections.erase(*conn);
 }
 
 sf::Uint64 Server::GenerateUID() noexcept

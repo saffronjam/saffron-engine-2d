@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <condition_variable>
 #include <thread>
 
 #include <SFML/System/Sleep.hpp>
@@ -17,6 +18,15 @@
 class Client : public INetMgr, public IPacketHandler
 {
 public:
+    enum class ConnState
+    {
+        Disconnected,
+        Connected,
+        TryingToConnect,
+        TryingToDiconnect
+    };
+
+public:
     Client(sf::IpAddress address = sf::IpAddress::None, sf::Uint16 port = 0);
     ~Client();
     Client(const Client &) = delete;
@@ -24,6 +34,9 @@ public:
 
     void Connect();
     void Disconnect();
+
+    void EnableAutoReconnect() noexcept { m_autoReconnect = true; }
+    void DisableAutoReconnect() noexcept { m_autoReconnect = false; }
 
     void SetNet(sf::IpAddress address, sf::Uint16 port) noexcept;
 
@@ -39,6 +52,7 @@ public:
 private:
     void ConnectThreadFn();
     void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
+    void HandleClosedConnection(const Connection *conn) override;
     std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
     std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
 
@@ -52,59 +66,28 @@ private:
     std::thread m_connector;
     std::mutex m_connectMutex;
     sf::Time m_tryConnectDelay;
-    enum class ConnState
-    {
-        Disconnected,
-        Connected,
-        TryingToConnect
-    } m_connState;
+    ConnState m_connState;
+
+    bool m_autoReconnect;
 };
 
 template <Protocol P, typename T>
 void Client::Send(PacketType type, const T &data)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        INetMgr::Send<P>(type, data, &m_connection);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        INetMgr::Send<P>(type, data, &m_connection);
-    }
+    INetMgr::Send<P>(type, data, &m_connection);
 }
 template <Protocol P>
 void Client::SendEmpty(PacketType type)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        INetMgr::SendEmpty<P>(type, &m_connection);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        INetMgr::SendEmpty<P>(type, &m_connection);
-    }
+    INetMgr::SendEmpty<P>(type, &m_connection);
 }
 template <Protocol P, typename T>
 void Client::SendArray(PacketType type, const T *data, int nElements)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        INetMgr::SendArray<P>(type, data, nElements, &m_connection);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        INetMgr::SendArray<P>(type, data, nElements, &m_connection);
-    }
+    INetMgr::SendArray<P>(type, data, nElements, &m_connection);
 }
 template <Protocol P>
 void Client::SendRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
-    if constexpr (P == Protocol::TCP)
-    {
-        INetMgr::SendRaw<P>(type, data, size, &m_connection);
-    }
-    else if constexpr (P == Protocol::UDP)
-    {
-        INetMgr::SendRaw<P>(type, data, size, &m_connection);
-    }
+    INetMgr::SendRaw<P>(type, data, size, &m_connection);
 }
