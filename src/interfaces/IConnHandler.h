@@ -21,13 +21,14 @@ protected:
 
     virtual void NewTcpConnection(sf::TcpListener *listener) override;
     virtual void NewUdpConnection(NetUID uid, const sf::IpAddress address, const sf::Uint16 &port) override;
-    virtual void HandleClosedConnection(const Connection *conn) override;
+    virtual void HandleClosedConnection(NetUID uid) override;
 
     virtual NetUID GenerateUID() noexcept { return 1; }
 
     std::optional<Connection *> GetConnectionByIndex(size_t index);
     std::optional<Connection *> GetConnectionByUID(NetUID uid) override;
     std::optional<IConnInfo *> GetConnInfoByUID(NetUID uid) override;
+    std::optional<IConnInfo *> GetConnInfoByConnection(const Connection *conn) override;
     auto &GetConnections() const noexcept { return m_connections; }
 
 private:

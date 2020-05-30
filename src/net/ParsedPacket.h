@@ -17,7 +17,7 @@ struct ParsedPacket
     size_t dataSize = 0;
     size_t fullSize = 0;
     const Connection *connection = nullptr;
-    const IConnInfo *connInfo = nullptr;
+    IConnInfo *connInfo = nullptr;
     Protocol protocol = Protocol::None;
 };
 

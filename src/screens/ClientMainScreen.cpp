@@ -22,8 +22,8 @@ void ClientMainScreen::OnEntry()
 {
     FPSLimiter::SetDesiredFPS(60.0f);
     m_parent.GetClient().SetNet("localhost", 1332);
-    m_parent.GetClient().Connect();
     m_parent.GetClient().EnableAutoReconnect();
+    m_parent.GetClient().Connect();
 }
 
 void ClientMainScreen::OnExit()

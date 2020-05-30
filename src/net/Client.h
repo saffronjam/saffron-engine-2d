@@ -31,8 +31,6 @@ public:
     void Connect();
     void Disconnect();
 
-    void UpdateTimeout();
-
     void EnableAutoReconnect() noexcept { m_autoReconnect = true; }
     void DisableAutoReconnect() noexcept { m_autoReconnect = false; }
 
@@ -51,7 +49,7 @@ private:
     void ConnectThreadFn();
     void CollectConnectorThread();
 
-    void HandleClosedConnection(const Connection *conn) override;
+    void HandleClosedConnection(NetUID uid) override;
 
 private:
     sf::IpAddress m_cachedAddress;
@@ -61,6 +59,8 @@ private:
     std::mutex m_connectMutex;
     sf::Time m_tryConnectDelay;
     ConnState m_connState;
+
+    std::mutex m_removeConnMutex;
 
     bool m_autoReconnect;
 };

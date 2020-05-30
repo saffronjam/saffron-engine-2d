@@ -139,21 +139,9 @@ void IConnHandler::NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address,
     LogOnly;
 }
 
-void IConnHandler::HandleClosedConnection(const Connection *conn)
+void IConnHandler::HandleClosedConnection(NetUID uid)
 {
-    NetUID uid = 0;
-    auto findRes = std::find_if(m_connections.begin(), m_connections.end(), [this, &uid, &conn](auto &pair) {
-        if (&pair.second.first == conn)
-        {
-            uid = pair.first;
-            return true;
-        }
-        return false;
-    });
-    if (findRes != m_connections.end())
-    {
-        RemoveConnection(uid);
-    }
+    RemoveConnection(uid);
 }
 
 std::optional<Connection *> IConnHandler::GetConnectionByIndex(size_t index)
@@ -175,5 +163,14 @@ std::optional<Connection *> IConnHandler::GetConnectionByUID(NetUID uid)
 std::optional<IConnInfo *> IConnHandler::GetConnInfoByUID(NetUID uid)
 {
     auto findRes = m_connections.find(uid);
+    return findRes == m_connections.end() ? std::nullopt : std::optional<IConnInfo *>(findRes->second.second);
+}
+
+std::optional<IConnInfo *> IConnHandler::GetConnInfoByConnection(const Connection *conn)
+{
+    auto findRes = std::find_if(m_connections.begin(), m_connections.end(), [this, &conn](const auto &pair) {
+        return &pair.second.first == conn;
+    });
+
     return findRes == m_connections.end() ? std::nullopt : std::optional<IConnInfo *>(findRes->second.second);
 }

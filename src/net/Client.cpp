@@ -96,9 +96,16 @@ void Client::CollectConnectorThread()
         m_connector.join();
 }
 
-void Client::HandleClosedConnection(const Connection *conn)
+void Client::HandleClosedConnection(NetUID uid)
 {
-    Disconnect();
-    if (m_autoReconnect)
-        Connect();
+    if (m_removeConnMutex.try_lock())
+    {
+        if (m_connState == ConnState::Connected)
+        {
+            Disconnect();
+            if (m_autoReconnect)
+                Connect();
+        }
+        m_removeConnMutex.unlock();
+    }
 }

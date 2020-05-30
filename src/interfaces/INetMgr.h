@@ -31,6 +31,25 @@ public:
     void StartListening();
     void StopListening();
 
+    template <Protocol P, typename T>
+    void Send(PacketType type, const T &data, const Connection *conn);
+    template <Protocol P>
+    void SendEmpty(PacketType type, const Connection *conn);
+    template <Protocol P, typename T>
+    void SendArray(PacketType type, const T *data, int nElements, const Connection *conn);
+    template <Protocol P>
+    void SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection *conn);
+
+    void SetUID(sf::Uint64 uid) noexcept { m_uid = uid; }
+    sf::Uint64 GetUID() const noexcept { return m_uid; }
+
+protected:
+    // Receives incoming TCP packet from given Connection
+    // This function is only called from the socket selector thread
+    void ReceiveTCP(const Connection *conn);
+    // Receives incoming UDP packet from given UDP-socket
+    // This function is only called from the socket selector thread
+    void ReceiveUDP(sf::UdpSocket *udpListener);
     // Adds socket to socket selector depending on
     void AddToSocketSelector(const Connection *conn);
     // Adds listener to socket selector
@@ -46,31 +65,17 @@ public:
     void RemoveFromSocketSelector(sf::UdpSocket *listener);
     // Clears all entries in socket selector
     void ClearSocketSelector();
-
+    // Adds NetModule by taking ownership of the unique_ptr with std::move (Parameter will be nullptr after call)
     void AddNetModule(std::unique_ptr<INetModule> netModule);
-
+    // Clears every buffered packet (independant of protocol)
     void ClearInBuffer() { m_inBuffer.clear(); }
 
-    template <Protocol P, typename T>
-    void Send(PacketType type, const T &data, const Connection *conn);
-    template <Protocol P>
-    void SendEmpty(PacketType type, const Connection *conn);
-    template <Protocol P, typename T>
-    void SendArray(PacketType type, const T *data, int nElements, const Connection *conn);
-    template <Protocol P>
-    void SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection *conn);
-    void ReceiveTCP(const Connection *conn);
-    void ReceiveUDP(sf::UdpSocket *udpListener);
-
-    void SetUID(sf::Uint64 uid) noexcept { m_uid = uid; }
-    sf::Uint64 GetUID() const noexcept { return m_uid; }
-
-protected:
     virtual void NewTcpConnection(sf::TcpListener *listener){};
     virtual void NewUdpConnection(NetUID uid, const sf::IpAddress address, const sf::Uint16 &port){};
-    virtual void HandleClosedConnection(const Connection *conn) = 0;
+    virtual void HandleClosedConnection(NetUID uid) = 0;
     virtual std::optional<Connection *> GetConnectionByUID(NetUID uid) = 0;
     virtual std::optional<IConnInfo *> GetConnInfoByUID(NetUID uid) = 0;
+    virtual std::optional<IConnInfo *> GetConnInfoByConnection(const Connection *conn) = 0;
 
 private:
     template <Protocol P>
@@ -109,26 +114,38 @@ public:
 template <Protocol P, typename T>
 void INetMgr::Send(PacketType type, const T &data, const Connection *conn)
 {
-    sf::Packet outgoing = Packager::Pack(type, m_uid, reinterpret_cast<const sf::Uint8 *>(&data), sizeof(T));
-    SendOut<P>(outgoing, conn);
+    if (m_uid != 0)
+    {
+        sf::Packet outgoing = Packager::Pack(type, m_uid, reinterpret_cast<const sf::Uint8 *>(&data), sizeof(T));
+        SendOut<P>(outgoing, conn);
+    }
 }
 template <Protocol P>
 void INetMgr::SendEmpty(PacketType type, const Connection *conn)
 {
-    sf::Packet outgoing = Packager::Pack(type, m_uid, nullptr, 0);
-    SendOut<P>(outgoing, conn);
+    if (m_uid != 0)
+    {
+        sf::Packet outgoing = Packager::Pack(type, m_uid, nullptr, 0);
+        SendOut<P>(outgoing, conn);
+    }
 }
 template <Protocol P, typename T>
 void INetMgr::SendArray(PacketType type, const T *data, int nElements, const Connection *conn)
 {
-    sf::Packet outgoing = Packager::Pack(type, m_uid, reinterpret_cast<const sf::Uint8 *>(data), sizeof(T) * nElements);
-    SendOut<P>(outgoing, conn);
+    if (m_uid != 0)
+    {
+        sf::Packet outgoing = Packager::Pack(type, m_uid, reinterpret_cast<const sf::Uint8 *>(data), sizeof(T) * nElements);
+        SendOut<P>(outgoing, conn);
+    }
 }
 template <Protocol P>
 void INetMgr::SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection *conn)
 {
-    sf::Packet outgoing = Packager::Pack(type, m_uid, data, size);
-    SendOut<P>(outgoing, conn);
+    if (m_uid != 0)
+    {
+        sf::Packet outgoing = Packager::Pack(type, m_uid, data, size);
+        SendOut<P>(outgoing, conn);
+    }
 }
 
 template <Protocol P>

@@ -20,7 +20,7 @@ class Packager
 public:
     static sf::Packet Pack(PacketType type, sf::Uint64 id, const sf::Uint8 *data, size_t size);
     template <Protocol P>
-    static std::optional<ParsedPacket> Parse(const sf::Packet &packet, const Connection *conn, const IConnInfo *connInf);
+    static std::optional<ParsedPacket> Parse(const sf::Packet &packet, const Connection *conn, IConnInfo *connInf);
 
     static std::optional<PacketType> GetTypeFromRawPacket(const sf::Packet &rawPacket);
     static std::optional<sf::Uint64> GetUIDFromRawPacket(const sf::Packet &rawPacket);
@@ -39,7 +39,7 @@ public:
 };
 
 template <Protocol P>
-std::optional<ParsedPacket> Packager::Parse(const sf::Packet &packet, const Connection *conn, const IConnInfo *connInfo)
+std::optional<ParsedPacket> Packager::Parse(const sf::Packet &packet, const Connection *conn, IConnInfo *connInfo)
 {
     try
     {
