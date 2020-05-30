@@ -9,6 +9,14 @@ void AppClient::OnExit()
 {
 }
 
+void AppClient::OnPreUpdate()
+{
+}
+
+void AppClient::OnPostUpdate()
+{
+}
+
 void AppClient::AddScreens()
 {
     m_mainScreen = std::make_unique<ClientMainScreen>(*this);

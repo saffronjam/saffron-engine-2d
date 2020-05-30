@@ -26,6 +26,7 @@ void IApp::Run()
     while (m_isRunning)
     {
         FPSLimiter::Start();
+        OnPreUpdate();
         PacketMgr::HandleAllPackets();
         Keyboard::Update();
         Mouse::Update();
@@ -34,6 +35,7 @@ void IApp::Run()
         try
         {
             Update();
+            OnPostUpdate();
             Draw();
         }
         LogOnly;

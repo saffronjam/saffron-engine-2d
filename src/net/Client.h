@@ -1,29 +1,25 @@
 #pragma once
 
 #include <mutex>
-#include <condition_variable>
 #include <thread>
 
 #include <SFML/System/Sleep.hpp>
 
 #include "Log.h"
-#include "INetMgr.h"
-#include "IPacketHandler.h"
-#include "PacketMgr.h"
+#include "IConnHandler.h"
 #include "ServerInfo.h"
 #include "PingModule.h"
 #include "SetupModule.h"
 #include "GenericThrowMacros.h"
 
-class Client : public INetMgr, public IPacketHandler
+class Client : public IConnHandler
 {
 public:
     enum class ConnState
     {
         Disconnected,
         Connected,
-        TryingToConnect,
-        TryingToDiconnect
+        TryingToConnect
     };
 
 public:
@@ -34,6 +30,8 @@ public:
 
     void Connect();
     void Disconnect();
+
+    void UpdateTimeout();
 
     void EnableAutoReconnect() noexcept { m_autoReconnect = true; }
     void DisableAutoReconnect() noexcept { m_autoReconnect = false; }
@@ -51,15 +49,11 @@ public:
 
 private:
     void ConnectThreadFn();
-    void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
+    void CollectConnectorThread();
+
     void HandleClosedConnection(const Connection *conn) override;
-    std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
-    std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
 
 private:
-    ServerInfo m_serverInfo;
-    Connection m_connection;
-
     sf::IpAddress m_cachedAddress;
     sf::Uint16 m_cachedPort;
 
@@ -74,20 +68,40 @@ private:
 template <Protocol P, typename T>
 void Client::Send(PacketType type, const T &data)
 {
-    INetMgr::Send<P>(type, data, &m_connection);
+    if (m_connState == ConnState::Connected)
+    {
+        auto conn = GetConnectionByUID(SERVER_UID);
+        if (conn.has_value())
+            INetMgr::Send<P>(type, data, conn.value());
+    }
 }
 template <Protocol P>
 void Client::SendEmpty(PacketType type)
 {
-    INetMgr::SendEmpty<P>(type, &m_connection);
+    if (m_connState == ConnState::Connected)
+    {
+        auto conn = GetConnectionByUID(SERVER_UID);
+        if (conn.has_value())
+            INetMgr::SendEmpty<P>(type, conn.value());
+    }
 }
 template <Protocol P, typename T>
 void Client::SendArray(PacketType type, const T *data, int nElements)
 {
-    INetMgr::SendArray<P>(type, data, nElements, &m_connection);
+    if (m_connState == ConnState::Connected)
+    {
+        auto conn = GetConnectionByUID(SERVER_UID);
+        if (conn.has_value())
+            INetMgr::SendArray<P>(type, data, nElements, conn.value());
+    }
 }
 template <Protocol P>
 void Client::SendRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
-    INetMgr::SendRaw<P>(type, data, size, &m_connection);
+    if (m_connState == ConnState::Connected)
+    {
+        auto conn = GetConnectionByUID(SERVER_UID);
+        if (conn.has_value())
+            INetMgr::SendRaw<P>(type, data, size, conn.value());
+    }
 }

@@ -9,6 +9,14 @@ void AppServer::OnExit()
 {
 }
 
+void AppServer::OnPreUpdate()
+{
+}
+
+void AppServer::OnPostUpdate()
+{
+}
+
 void AppServer::AddScreens()
 {
     m_mainScreen = std::make_unique<ServerMainScreen>(*this);

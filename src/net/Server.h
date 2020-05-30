@@ -2,18 +2,16 @@
 
 #include <mutex>
 #include <thread>
-#include <set>
 
 #include <SFML/System/Sleep.hpp>
 
-#include "INetMgr.h"
-#include "IPacketHandler.h"
+#include "IConnHandler.h"
 #include "ClientInfo.h"
 #include "GenericThrowMacros.h"
 #include "Log.h"
 #include "PingModule.h"
 
-class Server : public INetMgr, public IPacketHandler
+class Server : public IConnHandler
 {
 public:
     Server(sf::Uint16 port = 0);
@@ -37,19 +35,12 @@ public:
 
 private:
     void OpenThreadFn();
-    void NewTcpConnection(sf::TcpListener *listener) override;
-    void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port) override;
-    void HandleClosedConnection(const Connection *conn) override;
-    void RemoveClient(const Connection *conn);
-    std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) override;
-    std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) override;
+    void CollectOpenerThread();
 
-    sf::Uint64 GenerateUID() noexcept;
+    NetUID GenerateUID() noexcept override;
+    void ResetUIDGenerator() noexcept { m_nextUID = 1; }; // Start on UID = 1, since 0 is invalid
 
 private:
-    sf::TcpListener m_tcpListener;
-    std::map<Connection, ClientInfo> m_clientConnections;
-    Connection m_udpConnection;
     sf::Uint16 m_port;
 
     std::thread m_opener;
@@ -62,30 +53,30 @@ private:
         TryingToOpen
     } m_connState;
 
-    sf::Uint64 m_nextUID;
+    NetUID m_nextUID;
 };
 
 template <Protocol P, typename T>
 void Server::Broadcast(PacketType type, const T &data)
 {
-    for (auto &[conn, info] : m_clientConnections)
-        INetMgr::Send<P>(type, data, conn);
+    for (auto &[uid, pair] : GetConnections())
+        INetMgr::Send<P>(type, data, &pair.first);
 }
 template <Protocol P>
 void Server::BroadcastEmpty(PacketType type)
 {
-    for (auto &[conn, info] : m_clientConnections)
-        INetMgr::SendEmpty<P>(type, &conn);
+    for (auto &[uid, pair] : GetConnections())
+        INetMgr::SendEmpty<P>(type, &pair.first);
 }
 template <Protocol P, typename T>
 void Server::BroadcastArray(PacketType type, const T *data, int nElements)
 {
-    for (auto &[conn, info] : m_clientConnections)
-        INetMgr::SendArray<P>(type, data, nElements, &conn);
+    for (auto &[uid, pair] : GetConnections())
+        INetMgr::SendArray<P>(type, data, nElements, &pair.first);
 }
 template <Protocol P>
 void Server::BroadcastRaw(PacketType type, const sf::Uint8 *data, size_t size)
 {
-    for (auto &[conn, info] : m_clientConnections)
-        INetMgr::SendRaw<P>(type, data, size, &conn);
+    for (auto &[uid, pair] : GetConnections())
+        INetMgr::SendRaw<P>(type, data, size, &pair.first);
 }

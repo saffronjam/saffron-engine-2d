@@ -11,6 +11,8 @@ class AppClient : public IApp
 public:
     virtual void OnInit() override;
     virtual void OnExit() override;
+    virtual void OnPreUpdate() override;
+    virtual void OnPostUpdate() override;
     virtual void AddScreens() override;
 
     Client &GetClient() noexcept { return m_client; }

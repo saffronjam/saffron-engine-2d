@@ -15,7 +15,8 @@ public:
     Connection(const sf::IpAddress &udpRemoteAddress = sf::IpAddress::None, const sf::Uint16 &udpRemotePort = 0);
     Connection(sf::UdpSocket *udpSocket, const sf::IpAddress &udpRemoteAddress = sf::IpAddress::None, const sf::Uint16 &udpRemotePort = 0);
     ~Connection();
-    bool operator<(const Connection &rhs) const;
+
+    void Destroy();
 
     sf::TcpSocket &GetTcpSocket() const { return *m_tcpSocket; }
     sf::UdpSocket &GetUdpSocket() const { return m_udpSocket.has_value() ? *m_udpSocket.value() : *m_udpSocketChild.value(); }
@@ -26,8 +27,6 @@ public:
     void SetUdpRemotePort(const sf::Uint16 &port) noexcept { m_udpRemotePort = port; }
 
     bool IsUdpParent() const noexcept { return m_udpSocketChild.has_value(); }
-
-    void Close();
 
 private:
     sf::TcpSocket *m_tcpSocket;

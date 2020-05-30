@@ -28,6 +28,8 @@ public:
 
     virtual void OnInit() = 0;
     virtual void OnExit() = 0;
+    virtual void OnPreUpdate() = 0;
+    virtual void OnPostUpdate() = 0;
     virtual void AddScreens() = 0;
 
     TextureMgr &GetTextureMgr() { return m_textureMgr; };

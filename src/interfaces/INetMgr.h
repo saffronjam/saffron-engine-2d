@@ -18,6 +18,7 @@
 #include "IConnInfo.h"
 #include "Packager.h"
 #include "PacketMgr.h"
+#include "NetUID.h"
 #include "GenericThrowMacros.h"
 #include "Log.h"
 
@@ -31,15 +32,18 @@ public:
     void StopListening();
 
     // Adds socket to socket selector depending on
-    template <Protocol P>
     void AddToSocketSelector(const Connection *conn);
     // Adds listener to socket selector
     void AddToSocketSelector(sf::TcpListener *listener);
+    // Adds listener to socket selector
+    void AddToSocketSelector(sf::UdpSocket *listener);
     // Removes both TCP- and UDP-socket from socket selector
     // UDP-socket is only remove if the connection is not a UDP-parent
     void RemoveFromSocketSelector(const Connection *conn);
-    // Removes listener to socket selector
+    // Removes listener from socket selector
     void RemoveFromSocketSelector(sf::TcpListener *listener);
+    // Removes listener from socket selector
+    void RemoveFromSocketSelector(sf::UdpSocket *listener);
     // Clears all entries in socket selector
     void ClearSocketSelector();
 
@@ -55,18 +59,18 @@ public:
     void SendArray(PacketType type, const T *data, int nElements, const Connection *conn);
     template <Protocol P>
     void SendRaw(PacketType type, const sf::Uint8 *data, size_t size, const Connection *conn);
-    template <Protocol P>
-    void Receive(const Connection *conn);
+    void ReceiveTCP(const Connection *conn);
+    void ReceiveUDP(sf::UdpSocket *udpListener);
 
     void SetUID(sf::Uint64 uid) noexcept { m_uid = uid; }
     sf::Uint64 GetUID() const noexcept { return m_uid; }
 
 protected:
     virtual void NewTcpConnection(sf::TcpListener *listener){};
-    virtual void NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port){};
+    virtual void NewUdpConnection(NetUID uid, const sf::IpAddress address, const sf::Uint16 &port){};
     virtual void HandleClosedConnection(const Connection *conn) = 0;
-    virtual std::optional<const Connection *> GetConnectionByUID(sf::Uint64 uid) = 0;
-    virtual std::optional<const IConnInfo *> GetConnInfoByUID(sf::Uint64 uid) = 0;
+    virtual std::optional<Connection *> GetConnectionByUID(NetUID uid) = 0;
+    virtual std::optional<IConnInfo *> GetConnInfoByUID(NetUID uid) = 0;
 
 private:
     template <Protocol P>
@@ -85,6 +89,7 @@ private:
 
     std::set<std::unique_ptr<INetModule>> m_netModules;
     std::set<sf::TcpListener *> m_tcpListenerRefs;
+    std::set<sf::UdpSocket *> m_udpListenerRefs;
     std::set<const Connection *> m_connectionRefs;
 
 public:
@@ -100,21 +105,6 @@ public:
         std::string errorString;
     };
 };
-
-template <Protocol P>
-void INetMgr::AddToSocketSelector(const Connection *conn)
-{
-    if constexpr (P == Protocol::TCP)
-    {
-        m_connectionRefs.emplace(conn);
-        m_socketSelector.add(conn->GetTcpSocket());
-    }
-    else if (P == Protocol::UDP)
-    {
-        m_connectionRefs.emplace(conn);
-        m_socketSelector.add(conn->GetUdpSocket());
-    }
-}
 
 template <Protocol P, typename T>
 void INetMgr::Send(PacketType type, const T &data, const Connection *conn)
@@ -183,92 +173,6 @@ void INetMgr::SendOut(sf::Packet &packet, const Connection *conn)
         else
         {
             THROW(Exception, "Tried to send a packet with invalid protocol: %u", P);
-        }
-    }
-    LogOnly;
-}
-
-template <Protocol P>
-void INetMgr::Receive(const Connection *conn)
-{
-    try
-    {
-        sf::Packet incoming;
-        std::optional<const IConnInfo *> connInfoOpt = std::nullopt;
-        std::optional<sf::Uint64> uidOpt = std::nullopt;
-
-        if constexpr (P == Protocol::TCP)
-        {
-            auto &socket = conn->GetTcpSocket();
-            sf::Socket::Status status;
-            while ((status = socket.receive(incoming)) != sf::Socket::Done)
-            {
-                if (status == sf::Socket::Error)
-                {
-                    THROW(Exception, "Failed to receive TCP-packet: %s:%u", socket.getRemoteAddress().toString().c_str(), socket.getRemotePort());
-                }
-                else if (status == sf::Socket::Disconnected)
-                {
-                    HandleClosedConnection(conn);
-                    return;
-                }
-            }
-            if (incoming.getDataSize() < sizeof(PacketType))
-                THROW(Exception, "Bad data size in TCP-packet: %s:%u", socket.getRemoteAddress().toString().c_str(), socket.getRemotePort());
-
-            // Make sure an UID is present in the packet
-            if (!(uidOpt = Packager::GetUIDFromRawPacket(incoming)).has_value())
-                THROW(Exception, "UID was not found in TCP-packet: %s:%u", socket.getRemoteAddress().toString().c_str(), socket.getRemotePort());
-            // Make sure the UID is valid
-            if (uidOpt.value() == 0)
-                THROW(Exception, "UID was 0 in TCP-packet: %s:%u", socket.getRemoteAddress().toString().c_str(), socket.getRemotePort());
-            // Make sure connInfo is available
-            if (!(connInfoOpt = GetConnInfoByUID(uidOpt.value())).has_value())
-                THROW(Exception, "No ConnInfo was found for connection behind TCP-packet: %s:%u", socket.getRemoteAddress().toString().c_str(), socket.getRemotePort());
-        }
-        else if constexpr (P == Protocol::UDP)
-        {
-            auto &socket = conn->GetUdpSocket();
-            sf::IpAddress address;
-            sf::Uint16 port;
-            sf::Socket::Status status;
-            while ((status = socket.receive(incoming, address, port)) != sf::Socket::Done)
-            {
-                if (status == sf::Socket::Error)
-                    THROW(Exception, "Failed to receive UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-            }
-
-            if (incoming.getDataSize() < sizeof(PacketType))
-                THROW(Exception, "Bad data size in UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-
-            // Make sure an UID is present in the packet
-            if (!(uidOpt = Packager::GetUIDFromRawPacket(incoming)).has_value())
-                THROW(Exception, "UID was not found in UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-            // Make sure the UID is valid
-            if (uidOpt.value() == 0)
-                THROW(Exception, "UID was 0 in UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-            // Make sure connInfo is available
-            if (!(connInfoOpt = GetConnInfoByUID(uidOpt.value())).has_value())
-                THROW(Exception, "No ConnInfo was found for UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-
-            NewUdpConnection(uidOpt.value(), address, port);
-
-            // Change "conn" to point a connection that ALSO have a valid TCP-socket, as the server "udpConnection" which was triggered only hold the UDP-socket
-            auto connOpt = GetConnectionByUID(uidOpt.value());
-            if (!connOpt.has_value())
-                THROW(Exception, "No Connection was found for UDP-packet: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-            conn = connOpt.value();
-        }
-        else
-            THROW(Exception, "Failed cast connection type to TCP och UDP: %s:%u", conn->GetUdpRemoteAddress().toString().c_str(), conn->GetUdpRemotePort());
-
-        std::optional<ParsedPacket> parseAttempt;
-        parseAttempt = Packager::Parse<P>(incoming, conn, connInfoOpt.value());
-        if (parseAttempt.has_value())
-        {
-            m_inBufferLock.lock();
-            m_inBuffer.push_back(parseAttempt.value());
-            m_inBufferLock.unlock();
         }
     }
     LogOnly;

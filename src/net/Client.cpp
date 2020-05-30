@@ -1,13 +1,11 @@
 #include "Client.h"
 
 Client::Client(sf::IpAddress address, sf::Uint16 port)
-    : m_serverInfo(1),
-      m_cachedAddress(address),
+    : m_cachedAddress(address),
       m_cachedPort(port),
       m_connState(ConnState::Disconnected),
       m_autoReconnect(false)
 {
-    PacketMgr::AddHandler(this);
     AddNetModule(std::make_unique<PingModule>(this));
     AddNetModule(std::make_unique<SetupModule>(this));
     StartListening();
@@ -31,11 +29,10 @@ void Client::Connect()
         THROW(Exception, "Tried to connect a non-configured client: %s", "IP-address and port must be configured with SetNet()");
     }
 
-    m_connState == ConnState::Disconnected;
-    m_tryConnectDelay = sf::seconds(0.0f);
-    if (m_connector.joinable())
-        m_connector.join();
-
+    CollectConnectorThread();
+    ClearConnections();
+    m_connState = ConnState::TryingToConnect;
+    m_tryConnectDelay = sf::seconds(2.0f);
     m_connector = std::thread(&Client::ConnectThreadFn, this);
 }
 
@@ -45,16 +42,10 @@ void Client::Disconnect()
     {
         THROW(Exception, "Tried to disconnect an already disconnected client: %s", "Try to connect before disconnecting");
     }
-
-    m_connection.GetTcpSocket().disconnect();
-    m_connection.GetUdpSocket().unbind();
-    m_connState = ConnState::Disconnected;
-    m_tryConnectDelay = sf::seconds(0.0f);
-    if (m_connector.joinable())
-        m_connector.join();
-
-    ClearSocketSelector();
+    CollectConnectorThread();
+    ClearConnections();
     ClearInBuffer();
+    m_connState = ConnState::Disconnected;
 }
 
 void Client::SetNet(sf::IpAddress address, sf::Uint16 port) noexcept
@@ -65,93 +56,49 @@ void Client::SetNet(sf::IpAddress address, sf::Uint16 port) noexcept
 
 void Client::ConnectThreadFn()
 {
-    m_tryConnectDelay = sf::seconds(2.0f);
-    m_connState = ConnState::TryingToConnect;
+    if (!m_connectMutex.try_lock())
+        return;
+    ServerInfo info;
+    Connection conn;
     for (; m_connState == ConnState::TryingToConnect; sf::sleep(m_tryConnectDelay))
     {
         try
         {
-            if (!m_connectMutex.try_lock())
-                return;
-            if (m_connection.GetTcpSocket().connect(m_cachedAddress, m_cachedPort) != sf::Socket::Status::Done)
+            if (conn.GetTcpSocket().connect(m_cachedAddress, m_cachedPort) != sf::Socket::Status::Done)
             {
                 THROW(Exception, "Could not connect TCP-socket to remote host: %s:%u", m_cachedAddress.toString().c_str(), m_cachedPort);
             }
-            if (m_connection.GetUdpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
+            if (conn.GetUdpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done)
             {
                 THROW(Exception, "Could not bind UDP-socket. Port: %s", "Any available port");
             }
-            m_connection.SetUdpRemoteAddress(m_cachedAddress);
-            m_connection.SetUdpRemotePort(m_cachedPort);
+            conn.SetUdpRemoteAddress(m_cachedAddress);
+            conn.SetUdpRemotePort(m_cachedPort);
 
-            AddToSocketSelector<TCP>(&m_connection);
-            AddToSocketSelector<UDP>(&m_connection);
+            AddConnection(conn, &info);
             m_connState = ConnState::Connected;
-            m_tryConnectDelay = sf::seconds(0.0f);
-            m_serverInfo.Reset();
             m_connectMutex.unlock();
+            return;
         }
-        catch (const IException &e)
-        {
-#ifdef LOG_EXCEPTION
-            LogWhat;
-#endif
-            m_connection.GetTcpSocket().disconnect();
-            m_connection.GetUdpSocket().unbind();
-            m_connectMutex.unlock();
-        }
-        catch (const std::exception &e)
-        {
-#ifdef LOG_EXCEPTION
-            LogWhat;
-#endif
-            m_connection.GetTcpSocket().disconnect();
-            m_connection.GetUdpSocket().unbind();
-            m_connectMutex.unlock();
-        }
-        catch (...)
-        {
-#ifdef LOG_EXCEPTION
-            LogNoDetails;
-#endif
-            m_connection.GetTcpSocket().disconnect();
-            m_connection.GetUdpSocket().unbind();
-            m_connectMutex.unlock();
-        }
+        LogOnly;
+        conn.GetTcpSocket().disconnect();
+        conn.GetUdpSocket().unbind();
     };
+    conn.Destroy();
+    m_connectMutex.unlock();
 }
 
-void Client::NewUdpConnection(sf::Uint64 uid, const sf::IpAddress address, const sf::Uint16 &port)
+void Client::CollectConnectorThread()
 {
-    if (uid == 1)
-    {
-        m_connection.SetUdpRemoteAddress(address);
-        m_connection.SetUdpRemotePort(port);
-    }
+    m_connState = ConnState::Disconnected;
+    m_tryConnectDelay = sf::seconds(0.0f);
+    if (m_connector.joinable())
+        m_connector.join();
 }
 
 void Client::HandleClosedConnection(const Connection *conn)
 {
-    if (&m_connection == conn)
-    {
-        Disconnect();
-        if (m_autoReconnect)
-            Connect();
-    }
-}
-
-std::optional<const Connection *> Client::GetConnectionByUID(sf::Uint64 uid)
-{
-    if (uid == 1)
-        return &m_connection;
-    else
-        return std::nullopt;
-}
-
-std::optional<const IConnInfo *> Client::GetConnInfoByUID(sf::Uint64 uid)
-{
-    if (uid == 1)
-        return &m_serverInfo;
-    else
-        return std::nullopt;
+    Disconnect();
+    if (m_autoReconnect)
+        Connect();
 }

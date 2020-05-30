@@ -5,8 +5,8 @@
 class ServerInfo : public IConnInfo
 {
 public:
-    ServerInfo(sf::Uint64 uid)
-        : IConnInfo(uid)
+    ServerInfo()
+        : IConnInfo(1)
     {
     }
 };

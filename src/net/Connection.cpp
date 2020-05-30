@@ -19,12 +19,19 @@ Connection::Connection(sf::UdpSocket *udpSocket, const sf::IpAddress &udpRemoteA
 
 Connection::~Connection()
 {
-    m_tcpSocket = nullptr;
-    m_udpSocket = std::nullopt;
-    m_udpSocketChild = std::nullopt;
+  m_tcpSocket = nullptr;
+  m_udpSocket = std::nullopt;
+  m_udpSocketChild = std::nullopt;
 }
 
-bool Connection::operator<(const Connection &rhs) const
+void Connection::Destroy()
 {
-    return m_tcpSocket < rhs.m_tcpSocket;
+  if (m_tcpSocket)
+    delete m_tcpSocket;
+  if (!IsUdpParent() && m_udpSocket.value())
+    delete m_udpSocket.value();
+
+  m_tcpSocket = nullptr;
+  m_udpSocket.reset();
+  m_udpSocketChild.reset();
 }
