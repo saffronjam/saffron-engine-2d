@@ -6,8 +6,8 @@
 class Clock
 {
 public:
-    static const sf::Time &Delta() { return m_dt; }
-    static float GetFPS() { return 1.0f / m_dt.asSeconds(); }
+    static const sf::Time &Delta() noexcept { return m_dt; }
+    static float GetFPS() noexcept { return m_dt.asSeconds() > 0.0f ? 1.0f / m_dt.asSeconds() : 0.0f; }
 
     static void Mark() noexcept { m_dt = m_clock.getElapsedTime(); }
     static void Reset() noexcept { m_clock.restart(); };
