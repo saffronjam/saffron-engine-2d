@@ -2,10 +2,11 @@
 
 Camera::Camera(const sf::Vector2f &position)
     : m_view(Window::GetDefaultView()),
-      m_position(position),
+      m_viewport(m_view.getViewport()),
       m_follow(nullptr),
       m_zoom(1.0f)
 {
+    SetViewport(sf::FloatRect(0.1f, 0.1f, 0.5f, 0.5f));
 }
 
 Camera::~Camera()
@@ -14,7 +15,6 @@ Camera::~Camera()
 
 Camera::Camera(const Camera &camera)
     : m_view(camera.m_view),
-      m_position(camera.m_position),
       m_follow(camera.m_follow),
       m_zoom(camera.m_zoom)
 {
@@ -23,16 +23,24 @@ Camera::Camera(const Camera &camera)
 const Camera &Camera::operator()(const Camera &camera)
 {
     m_view = camera.m_view;
-    m_position = camera.m_position;
     m_follow = camera.m_follow;
     m_zoom = camera.m_zoom;
     return *this;
 }
 
+void Camera::Update()
+{
+    if (m_follow.has_value())
+    {
+        m_view.setCenter(*m_follow.value());
+    }
+}
+
 void Camera::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) const noexcept
 {
+    renderStates.transform.combine(Window::GetNdcTransform());
     Window::SetView(m_view);
-    Window::Draw(drawable, renderStates);
+    Window::Render(drawable, renderStates);
 }
 
 void Camera::Move(const sf::Vector2f &offset) noexcept
@@ -53,7 +61,11 @@ void Camera::Rotate(float angle) noexcept
 
 void Camera::SetViewport(const sf::FloatRect &viewport) noexcept
 {
-    m_view.setViewport(viewport);
+    m_viewport = viewport;
+    auto vp = viewport;
+    vp.top = 1.0f - vp.top - vp.height;
+
+    m_view.setViewport(vp);
 }
 
 void Camera::SetCenter(const sf::Vector2f &center) noexcept
@@ -72,62 +84,35 @@ void Camera::SetZoom(float factor) noexcept
 
 void Camera::SetRotation(float angle) noexcept
 {
+    m_rotation = angle;
     m_view.setRotation(angle);
-}
-
-void Camera::SetFollow(sf::Vector2f *follow) noexcept
-{
-    m_follow = follow;
-}
-
-sf::Vector2f Camera::ScreenToView(const sf::Vector2f &point) const noexcept
-{
-    return m_view.getTransform().transformPoint(point);
 }
 
 sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point) const noexcept
 {
-    // sf::FloatRect screenRect = Lib::ConvertTo<float>(Window::GetScreenRect());
-    // sf::FloatRect vpNorm = m_view.getViewport();
-    // sf::FloatRect vp = vpNorm;
-    // vp.left *= screenRect.width;
-    // vp.top *= screenRect.height;
-    // vp.width *= screenRect.width;
-    // vp.height *= screenRect.height;
+    sf::FloatRect ndcRect = Window::GetNdcRect();
+    sf::FloatRect vp = m_viewport;
+    vp.left *= ndcRect.width;
+    vp.top *= ndcRect.height;
+    vp.width *= ndcRect.width;
+    vp.height *= ndcRect.height;
+    vp.left += ndcRect.left;
+    vp.top += ndcRect.top;
 
-    // // Log_info("Left: ", viewportInScreenSpace.left, " Top: ", viewportInScreenSpace.top, " Width: ", viewportInScreenSpace.width, " Height: ", viewportInScreenSpace.height);
+    sf::Vector2f rectMid = Lib::Mid(vp);
 
-    // sf::Vector2f point_trans = point;
+    sf::Transform transform = sf::Transform::Identity;
+    transform.translate(rectMid.x, rectMid.y);
+    transform.scale(m_zoom, m_zoom);
+    // transform.rotate(m_rotation);
+    transform.translate(-rectMid.x, -rectMid.y);
+    sf::Vector2f transformedPoint = transform.transformPoint(point);
 
-    // sf::Transform transform = sf::Transform::Identity;
+    transformedPoint = Lib::MapPoint(transformedPoint, vp, ndcRect);
 
-    // transform.translate(-Lib::Mid(vp));
-    // point_trans = transform.transformPoint(point);
-    // Log_info("1: ", point_trans.x, ", ", point_trans.y);
+    return transformedPoint;
+}
 
-    // transform.scale(1.0f / vp.width, 1.0f / vp.height);
-    // point_trans = transform.transformPoint(point);
-    // Log_info("2: ", point_trans.x, ", ", point_trans.y);
-
-    // transform.scale(vp.width / m_zoom, vp.height / m_zoom);
-    // point_trans = transform.transformPoint(point);
-    // Log_info("3: ", point_trans.x, ", ", point_trans.y);
-
-    // sf::Vector2f halfSize(m_view.getSize().x / 2.0f, m_view.getSize().y / 2.0f);
-    // transform.translate(Lib::Mid(screenRect));
-    // point_trans = transform.transformPoint(point);
-    // Log_info("4: ", point_trans.x, ", ", point_trans.y);
-
-    // // sf::Vector2f _point = Lib::MapPoint(point, viewportInScreenSpace, screenRect);
-
-    // // // transform.translate(-sf::Vector2f(screenRect.width / 2.0f, screenRect.height / 2.0f));
-
-    // // // transform.rotate(m_view.getRotation());
-    // // sf::Vector2f halfSize(m_view.getSize().x / 2.0f, m_view.getSize().y / 2.0f);
-    // // sf::Vector2f translate = m_view.getCenter() - halfSize;
-    // // transform.translate(translate);
-
-    // // _point = transform.transformPoint(_point);
-
-    return point;
+sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point) const noexcept
+{
 }

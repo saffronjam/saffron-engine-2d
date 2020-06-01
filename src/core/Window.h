@@ -9,10 +9,12 @@
 #include "WindowThrowMacros.h"
 #include "IException.h"
 #include "Log.h"
+#include "Lib.h"
 
 class Window
 {
     friend class Draw;
+    friend class Camera;
 
 public:
     Window() = default;
@@ -37,6 +39,7 @@ public:
     static sf::View GetCurrentView() noexcept;
     static sf::View GetDefaultView() noexcept;
     static sf::IntRect GetScreenRect() noexcept;
+    static sf::FloatRect GetNdcRect() noexcept;
 
     static bool IsFullscreen() noexcept;
     static bool IsVSyncEnabled() noexcept;
@@ -49,6 +52,13 @@ public:
     static void SetVSync(bool toggle) noexcept;
     static void SetView(const sf::View &view) noexcept;
 
+    static sf::Transform GetNdcTransform() noexcept { return m_ndcTransform; }
+    static sf::Vector2f RawToNdc(const sf::Vector2f &point) noexcept;
+    static sf::Vector2f NdcToRaw(const sf::Vector2f &point) noexcept;
+
+private:
+    static void Render(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
+
 private:
     static sf::RenderWindow *m_sfWindow;
     static std::string m_title;
@@ -57,6 +67,8 @@ private:
     // Used after exiting fullscreen
     static sf::Uint32 m_style;
     static sf::Vector2i m_nonFullscreenPosition;
+
+    static sf::Transform m_ndcTransform;
 
     static bool m_fullscreen;
 

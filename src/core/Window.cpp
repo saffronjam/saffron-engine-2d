@@ -5,6 +5,7 @@ std::string Window::m_title("Unnamed window");
 sf::VideoMode Window::m_videomode;
 sf::Uint32 Window::m_style;
 sf::Vector2i Window::m_nonFullscreenPosition;
+sf::Transform Window::m_ndcTransform;
 bool Window::m_fullscreen;
 
 Window::~Window()
@@ -22,12 +23,18 @@ void Window::Create(const std::string &title, int width, int height)
     m_sfWindow->setKeyRepeatEnabled(false);
     SetTitle(title);
     PositionCenter();
+    m_ndcTransform = sf::Transform::Identity;
+    m_ndcTransform.scale(Lib::ConvertTo<float>(GetSize()) / 2.0f);
+    m_ndcTransform.translate(1.0f, 1.0f);
+    m_ndcTransform.scale(sf::Vector2f(1.0f, -1.0f));
 }
 
 void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_sfWindow->draw(drawable, renderStates);
+    renderStates.transform.combine(m_ndcTransform);
+    SetView(GetDefaultView());
+    Render(drawable, renderStates);
 }
 
 void Window::Clear()
@@ -103,6 +110,12 @@ sf::IntRect Window::GetScreenRect() noexcept
     return sf::IntRect(0, 0, GetWidth(), GetHeight());
 }
 
+sf::FloatRect Window::GetNdcRect() noexcept
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    return sf::FloatRect(-1.0f, -1.0f, 2.0f, 2.0f);
+}
+
 void Window::SetPosition(const sf::Vector2i &pos) noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
@@ -158,6 +171,22 @@ void Window::SetView(const sf::View &view) noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
     m_sfWindow->setView(view);
+}
+
+sf::Vector2f Window::RawToNdc(const sf::Vector2f &point) noexcept
+{
+    return m_ndcTransform.getInverse().transformPoint(point);
+}
+
+sf::Vector2f Window::NdcToRaw(const sf::Vector2f &point) noexcept
+{
+    return m_ndcTransform.transformPoint(point);
+}
+
+void Window::Render(const sf::Drawable &drawable, sf::RenderStates renderStates)
+{
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
+    m_sfWindow->draw(drawable, renderStates);
 }
 
 Window::Exception::Exception(int line, const char *file, const char *errorString) noexcept

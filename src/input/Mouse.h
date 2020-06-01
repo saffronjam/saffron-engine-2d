@@ -60,7 +60,7 @@ public:
     static bool IsReleased(const sf::Mouse::Button &button) noexcept;
     static bool AnyButtonDown() noexcept;
 
-    static sf::Vector2i GetPos() noexcept { return m_mousePos; }
+    static sf::Vector2f GetPos() noexcept { return m_mousePos; }
     static float GetVerticalScroll() noexcept { return m_verticalScrollBuffer; }
     static float GetHorizontalScroll() noexcept { return m_horizontalScrollBuffer; }
 
@@ -82,7 +82,7 @@ private:
     static std::map<CallbackEvent, std::vector<MoveCallback>> m_moveCallbacks;
     static std::map<CallbackEvent, std::vector<EnterLeaveCallback>> m_enterLeaveCallbacks;
 
-    static sf::Vector2i m_mousePos;
+    static sf::Vector2f m_mousePos;
     static bool m_inWindow;
 
     static float m_verticalScrollBuffer;

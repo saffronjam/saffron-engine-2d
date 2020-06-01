@@ -6,7 +6,7 @@ std::map<Mouse::CallbackEvent, std::vector<Mouse::ButtonCallback>> Mouse::m_butt
 std::map<Mouse::CallbackEvent, std::vector<Mouse::ScrollCallback>> Mouse::m_scrollCallbacks;
 std::map<Mouse::CallbackEvent, std::vector<Mouse::MoveCallback>> Mouse::m_moveCallbacks;
 std::map<Mouse::CallbackEvent, std::vector<Mouse::EnterLeaveCallback>> Mouse::m_enterLeaveCallbacks;
-sf::Vector2i Mouse::m_mousePos = sf::Vector2i(0, 0);
+sf::Vector2f Mouse::m_mousePos = sf::Vector2f(0.0f, 0.0f);
 bool Mouse::m_inWindow = true;
 float Mouse::m_verticalScrollBuffer = 0.0f;
 float Mouse::m_horizontalScrollBuffer = 0.0f;
@@ -105,8 +105,7 @@ void Mouse::OnMove(const sf::Event::MouseMoveEvent &event) noexcept
         callback(event);
     if (!m_inWindow && AnyButtonDown() || m_inWindow)
     {
-        m_mousePos.x = event.x;
-        m_mousePos.y = event.y;
+        m_mousePos = Window::RawToNdc(sf::Vector2f(event.x, event.y));
     }
 }
 

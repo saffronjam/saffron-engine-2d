@@ -21,9 +21,6 @@ void ClientMainScreen::Destroy()
 void ClientMainScreen::OnEntry()
 {
     FPSLimiter::SetDesiredFPS(60.0f);
-    m_parent.GetClient().SetNet("localhost", 1332);
-    m_parent.GetClient().EnableAutoReconnect();
-    m_parent.GetClient().Connect();
 }
 
 void ClientMainScreen::OnExit()
@@ -32,16 +29,6 @@ void ClientMainScreen::OnExit()
 
 void ClientMainScreen::Update()
 {
-    if (Keyboard::IsPressed(sf::Keyboard::T))
-    {
-        log_info("Asking server if he is alive... with TCP!");
-        m_parent.GetClient().SendEmpty<TCP>(AreYouAlive);
-    }
-    if (Keyboard::IsPressed(sf::Keyboard::U))
-    {
-        log_info("Asking server if he is alive... with UDP!");
-        m_parent.GetClient().SendEmpty<UDP>(AreYouAlive);
-    }
 }
 
 void ClientMainScreen::Draw()
