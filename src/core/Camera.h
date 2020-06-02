@@ -8,15 +8,17 @@
 #include <SFML/Graphics/Transformable.hpp>
 
 #include "Window.h"
+#include "Mouse.h"
+#include "Keyboard.h"
+#include "Clock.h"
 #include "Lib.h"
+#include "VectorLib.h"
 
 class Camera
 {
 public:
-    Camera(const sf::Vector2f &position = sf::Vector2f(0.0f, 0.0f));
+    Camera();
     ~Camera();
-    Camera(const Camera &camera);
-    const Camera &operator()(const Camera &camera);
 
     // Updates cameras position relative to have follow-target in the middle
     // If no follow-target has been set this function does nothing
@@ -27,7 +29,6 @@ public:
     void Zoom(float factor) noexcept;
     void Rotate(float angle) noexcept;
 
-    void SetViewport(const sf::FloatRect &viewport) noexcept;
     void SetCenter(const sf::Vector2f &center) noexcept;
     void SetZoom(float factor) noexcept;
     void SetRotation(float angle) noexcept;
@@ -42,10 +43,27 @@ public:
     ///@param point: point to be translated from world to screen space.
     sf::Vector2f WorldToScreen(const sf::Vector2f &point) const noexcept;
 
+    void SetRotationSpeed(float rps) noexcept { m_rps = rps; }
+
 private:
-    sf::View m_view;
-    sf::FloatRect m_viewport;
+    void UpdateTransform() noexcept;
+    void CapZoomLevel() noexcept;
+    void ResetTransformation() noexcept;
+
+private:
+    sf::Transform m_transform;
     std::optional<sf::Vector2f *> m_follow;
+
+    sf::Vector2f m_position;
+    sf::Transform m_positionTransform;
+
     float m_rotation;
-    float m_zoom;
+    sf::Transform m_rotationTransform;
+    float m_rps; // Rotations per second
+
+    sf::Vector2f m_zoom;
+    sf::Transform m_zoomTransform;
+
+    bool m_engaged;
+    sf::Vector2f m_lastPos;
 };

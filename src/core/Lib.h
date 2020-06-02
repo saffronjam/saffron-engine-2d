@@ -39,4 +39,15 @@ public:
 
         return _point;
     }
+
+    template <typename T>
+    static T Constrain(const T &value, T from, T to)
+    {
+        if (value < from)
+            return from;
+        else if (value > to)
+            return to;
+        else
+            return value;
+    }
 };
