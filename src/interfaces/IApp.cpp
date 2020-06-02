@@ -32,6 +32,7 @@ void IApp::Run()
         Mouse::Update();
         EventMgr::PollAll();
         GuiMgr::Update();
+        Camera::Update();
         Window::Clear();
         try
         {

@@ -29,7 +29,6 @@ void ClientMainScreen::OnExit()
 
 void ClientMainScreen::Update()
 {
-    m_camera.Update();
 }
 
 void ClientMainScreen::Draw()

@@ -4,6 +4,7 @@
 
 #include "AppThrowMacros.h"
 #include "Window.h"
+#include "Camera.h"
 #include "EventMgr.h"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -49,6 +50,7 @@ protected:
 protected:
     sf::VideoMode m_videoMode;
     Window m_window;
+    Camera m_camera;
 
     EventMgr m_eventMgr;
     Keyboard m_keyboard;

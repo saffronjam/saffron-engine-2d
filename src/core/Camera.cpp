@@ -1,12 +1,22 @@
 #include "Camera.h"
 
+sf::Transform Camera::m_transform = sf::Transform::Identity;
+std::optional<sf::Vector2f *> Camera::m_follow;
+
+sf::Vector2f Camera::m_position(0.0f, 0.0f);
+sf::Transform Camera::m_positionTransform = sf::Transform::Identity;
+
+float Camera::m_rotation = 0.0f;
+sf::Transform Camera::m_rotationTransform = sf::Transform::Identity;
+float Camera::m_rps = 0.2f; // Rotations per second
+
+sf::Vector2f Camera::m_zoom(1.0f, 1.0f);
+sf::Transform Camera::m_zoomTransform = sf::Transform::Identity;
+
+bool Camera::m_engaged = false;
+sf::Vector2f Camera::m_lastPos(0.0f, 0.0f);
+
 Camera::Camera()
-    : m_transform(sf::Transform::Identity),
-      m_follow(std::nullopt),
-      m_position(0.0f, 0.0f),
-      m_rotation(0.0f),
-      m_rps(0.2f),
-      m_zoom(sf::Vector2f(1.0f, 1.0f))
 {
 }
 
@@ -64,7 +74,7 @@ void Camera::Update()
     CapZoomLevel();
 }
 
-void Camera::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) const noexcept
+void Camera::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) noexcept
 {
     renderStates.transform.combine(Window::GetNdcTransform());
     renderStates.transform.combine(m_transform);
@@ -116,32 +126,11 @@ void Camera::SetRotation(float angle) noexcept
     UpdateTransform();
 }
 
-sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point) const noexcept
+sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point) noexcept
 {
-    // sf::FloatRect ndcRect = Window::GetNdcRect();
-    // sf::FloatRect vp = m_viewport;
-    // vp.left *= ndcRect.width;
-    // vp.top *= ndcRect.height;
-    // vp.width *= ndcRect.width;
-    // vp.height *= ndcRect.height;
-    // vp.left += ndcRect.left;
-    // vp.top += ndcRect.top;
-
-    // sf::Vector2f rectMid = Lib::Mid(vp);
-
-    // sf::Transform transform = sf::Transform::Identity;
-    // transform.translate(rectMid.x, rectMid.y);
-    // transform.scale(m_zoom, m_zoom);
-    // transform.rotate(m_rotation);
-    // transform.translate(-rectMid.x, -rectMid.y);
-    // sf::Vector2f transformedPoint = transform.transformPoint(point);
-
-    // transformedPoint = Lib::MapPoint(transformedPoint, vp, ndcRect);
-
-    return vl::Null<float>();
 }
 
-sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point) const noexcept
+sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point) noexcept
 {
 }
 

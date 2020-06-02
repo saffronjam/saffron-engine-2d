@@ -33,7 +33,6 @@ private:
 
 private:
     AppClient &m_parent;
-    Camera m_camera;
 
     float zoom = 1.0f;
     int rot = 0.0f;
