@@ -2,13 +2,13 @@
 #include "IApp.h"
 
 IApp::IApp()
-    : m_screenList(std::make_unique<ScreenList>(this)),
+    : m_videoMode(sf::VideoMode::getDesktopMode()),
+      m_window("V-2DFramework", m_videoMode.width * 0.4f, m_videoMode.height * 0.4f),
+      m_screenList(std::make_unique<ScreenList>(this)),
       m_currentScreen(nullptr),
       m_isRunning(true)
 {
-    EventMgr::AddOnEventCallback(this);
-    sf::VideoMode mode = sf::VideoMode::getDesktopMode();
-    Window::Create("V-2DFramework", mode.width * 0.4f, mode.height * 0.4f);
+    EventMgr::AddHandler(this);
 }
 
 IApp::~IApp()
@@ -31,6 +31,7 @@ void IApp::Run()
         Keyboard::Update();
         Mouse::Update();
         EventMgr::PollAll();
+        GuiMgr::Update();
         Window::Clear();
         try
         {
@@ -39,7 +40,7 @@ void IApp::Run()
             Draw();
         }
         LogOnly;
-
+        GuiMgr::Draw();
         Window::Present();
         Clock::Mark();
         Clock::Reset();

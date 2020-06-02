@@ -7,7 +7,7 @@ std::string Keyboard::m_textInputBuffer;
 
 Keyboard::Keyboard() noexcept
 {
-    EventMgr::AddOnEventCallback(this);
+    EventMgr::AddHandler(this);
 }
 
 Keyboard::~Keyboard() noexcept

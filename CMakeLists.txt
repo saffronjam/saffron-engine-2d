@@ -21,6 +21,7 @@ find_package(Threads REQUIRED)
 
 add_definitions(
   -DSFML_STATIC
+  -DSFGUI_STATIC
   -DLOG_EXCEPTION
 )
 
@@ -65,11 +66,14 @@ set_target_properties(Client PROPERTIES
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Client PRIVATE
     deps/SFML/include
+    deps/SFGUI/include
   )
   target_link_directories(Client PRIVATE
     deps/SFML/lib
+    deps/SFGUI/lib
   )
   target_link_libraries(Client PRIVATE
+    SFGUI
     sfml-graphics-s
     sfml-window-s
     sfml-audio-s
@@ -126,9 +130,11 @@ set_target_properties(Server PROPERTIES
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Server PRIVATE
     deps/SFML/include
+    deps/SFGUI/include
   )
   target_link_directories(Server PRIVATE
     deps/SFML/lib
+    deps/SFGUI/lib
   )
   target_link_libraries(Server PRIVATE
     Threads::Threads
@@ -148,6 +154,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     vorbis
     ogg
     ws2_32
+    SFGUI
   )
 else() 
   target_include_directories(Server PRIVATE

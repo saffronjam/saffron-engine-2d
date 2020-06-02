@@ -16,7 +16,7 @@ class EventMgr
 {
 public:
     static void PollAll();
-    static void AddOnEventCallback(EventHandler *callback);
+    static void AddHandler(EventHandler *handler);
 
 private:
     static std::vector<EventHandler *> m_callbacks;

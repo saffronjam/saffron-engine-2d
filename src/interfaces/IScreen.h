@@ -8,6 +8,12 @@
 #include "Lib.h"
 
 #include <SFML/Graphics.hpp>
+#include <SFGUI/Box.hpp>
+#include <SFGUI/Button.hpp>
+#include <SFGUI/Desktop.hpp>
+#include <SFGUI/Label.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Window.hpp>
 
 #define SCREENINDEX_NO_SCREEN -1
 

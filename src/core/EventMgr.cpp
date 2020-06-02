@@ -14,7 +14,7 @@ void EventMgr::PollAll()
     }
 }
 
-void EventMgr::AddOnEventCallback(EventHandler *callback)
+void EventMgr::AddHandler(EventHandler *handler)
 {
-    m_callbacks.push_back(callback);
+    m_callbacks.push_back(handler);
 }

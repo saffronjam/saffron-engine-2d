@@ -13,7 +13,7 @@ float Mouse::m_horizontalScrollBuffer = 0.0f;
 
 Mouse::Mouse() noexcept
 {
-    EventMgr::AddOnEventCallback(this);
+    EventMgr::AddHandler(this);
 }
 
 Mouse::~Mouse() noexcept

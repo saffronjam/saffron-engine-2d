@@ -10,19 +10,14 @@ sf::Transform Window::m_defaultNdcTransform;
 bool Window::m_fullscreen;
 float Window::m_fov = 1.0f;
 
-Window::~Window()
-{
-    delete m_sfWindow;
-    m_sfWindow = nullptr;
-}
-
-void Window::Create(const std::string &title, int width, int height)
+Window::Window(const std::string &title, int width, int height)
 {
     m_videomode = sf::VideoMode(width, height);
     m_style = sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close;
 
     m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, sf::ContextSettings());
     m_sfWindow->setKeyRepeatEnabled(false);
+    m_sfWindow->resetGLStates();
     SetTitle(title);
     PositionCenter();
     m_defaultNdcTransform = sf::Transform::Identity;
@@ -31,6 +26,12 @@ void Window::Create(const std::string &title, int width, int height)
     m_defaultNdcTransform.scale(sf::Vector2f(1.0f, -1.0f));
 
     SetFoV(static_cast<float>(GetWidth()) / static_cast<float>(GetHeight()));
+}
+
+Window::~Window()
+{
+    delete m_sfWindow;
+    m_sfWindow = nullptr;
 }
 
 void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)

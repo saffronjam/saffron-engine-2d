@@ -7,6 +7,7 @@
 #include "EventMgr.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "GuiMgr.h"
 #include "ScreenList.h"
 #include "TextureMgr.h"
 #include "FontMgr.h"
@@ -46,12 +47,13 @@ protected:
     virtual void OnEvent(const sf::Event &event) override;
 
 protected:
-    std::unique_ptr<ScreenList> m_screenList;
-    IScreen *m_currentScreen;
+    sf::VideoMode m_videoMode;
     Window m_window;
+
     EventMgr m_eventMgr;
     Keyboard m_keyboard;
     Mouse m_mouse;
+    GuiMgr m_guiMgr;
     Clock m_clock;
     FPSLimiter m_fpsLimiter;
 
@@ -59,6 +61,9 @@ protected:
     FontMgr m_fontMgr;
     MusicMgr m_musicMgr;
     SoundBufferMgr m_soundBufferMgr;
+
+    std::unique_ptr<ScreenList> m_screenList;
+    IScreen *m_currentScreen;
 
 private:
     bool m_isRunning;
