@@ -50,9 +50,12 @@ public:
     static void SetIcon(const std::string &icon) noexcept;
     static void SetFullscreen(bool toggle) noexcept;
     static void SetVSync(bool toggle) noexcept;
-    static void SetView(const sf::View &view) noexcept;
 
-    static sf::Transform GetNdcTransform() noexcept { return m_ndcTransform; }
+    static sf::Transform
+    GetNdcTransform() noexcept
+    {
+        return m_ndcTransform;
+    }
     static sf::Vector2f RawToNdc(const sf::Vector2f &point) noexcept;
     static sf::Vector2f NdcToRaw(const sf::Vector2f &point) noexcept;
 

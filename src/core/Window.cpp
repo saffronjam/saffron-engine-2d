@@ -33,7 +33,6 @@ void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
     renderStates.transform.combine(m_ndcTransform);
-    SetView(GetDefaultView());
     Render(drawable, renderStates);
 }
 
@@ -167,19 +166,15 @@ void Window::SetVSync(bool toggle) noexcept
     m_sfWindow->setVerticalSyncEnabled(toggle);
 }
 
-void Window::SetView(const sf::View &view) noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_sfWindow->setView(view);
-}
-
 sf::Vector2f Window::RawToNdc(const sf::Vector2f &point) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
     return m_ndcTransform.getInverse().transformPoint(point);
 }
 
 sf::Vector2f Window::NdcToRaw(const sf::Vector2f &point) noexcept
 {
+    assert("Attempted to handle the window without creating it" && m_sfWindow);
     return m_ndcTransform.transformPoint(point);
 }
 
