@@ -34,12 +34,6 @@ void ClientMainScreen::Update()
 
 void ClientMainScreen::Draw()
 {
-    sf::RectangleShape tmp;
-    tmp.setPosition(-1.0f, -1.0f);
-    tmp.setSize(sf::Vector2f(1.0f, 1.0f));
-    tmp.setFillColor(sf::Color::Red);
-    m_camera.Draw(tmp);
-    Window::Draw(tmp);
 }
 
 int ClientMainScreen::GetNextScreenIndex() const

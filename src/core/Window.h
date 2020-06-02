@@ -50,17 +50,15 @@ public:
     static void SetIcon(const std::string &icon) noexcept;
     static void SetFullscreen(bool toggle) noexcept;
     static void SetVSync(bool toggle) noexcept;
+    static void SetFoV(float fov) noexcept;
 
-    static sf::Transform
-    GetNdcTransform() noexcept
-    {
-        return m_ndcTransform;
-    }
+    static sf::Transform GetNdcTransform() noexcept;
     static sf::Vector2f RawToNdc(const sf::Vector2f &point) noexcept;
     static sf::Vector2f NdcToRaw(const sf::Vector2f &point) noexcept;
 
 private:
     static void Render(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
+    static void ResetNdcTransform() noexcept;
 
 private:
     static sf::RenderWindow *m_sfWindow;
@@ -71,9 +69,11 @@ private:
     static sf::Uint32 m_style;
     static sf::Vector2i m_nonFullscreenPosition;
 
+    static sf::Transform m_defaultNdcTransform;
     static sf::Transform m_ndcTransform;
 
     static bool m_fullscreen;
+    static float m_fov;
 
 public:
     class Exception : public IException
