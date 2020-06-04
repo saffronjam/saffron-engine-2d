@@ -33,11 +33,6 @@ void ClientMainScreen::Update()
 
 void ClientMainScreen::Draw()
 {
-    sf::RectangleShape rect;
-    rect.setPosition(Mouse::GetPos());
-    rect.setSize(sf::Vector2f(50.0f, 50.0f));
-    rect.setFillColor(sf::Color::Green);
-    Window::Draw(rect);
 }
 
 int ClientMainScreen::GetNextScreenIndex() const
