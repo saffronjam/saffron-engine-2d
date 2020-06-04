@@ -33,7 +33,4 @@ private:
 
 private:
     AppClient &m_parent;
-
-    float zoom = 1.0f;
-    int rot = 0.0f;
 };

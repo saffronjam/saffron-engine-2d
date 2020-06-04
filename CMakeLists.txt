@@ -52,6 +52,7 @@ target_include_directories(Client PRIVATE
   src/interfaces
   src/net
   src/netmodules
+  src/project
   src/res
   src/screens
   src/throwmacros

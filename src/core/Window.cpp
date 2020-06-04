@@ -5,27 +5,20 @@ std::string Window::m_title("Unnamed window");
 sf::VideoMode Window::m_videomode;
 sf::Uint32 Window::m_style;
 sf::Vector2i Window::m_nonFullscreenPosition;
-sf::Transform Window::m_ndcTransform;
-sf::Transform Window::m_defaultNdcTransform;
 bool Window::m_fullscreen;
-float Window::m_fov = 1.0f;
 
 Window::Window(const std::string &title, int width, int height)
 {
     m_videomode = sf::VideoMode(width, height);
     m_style = sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close;
 
-    m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, sf::ContextSettings());
+    auto contexSettings = sf::ContextSettings(0u, 0u, 8u);
+
+    m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, contexSettings);
     m_sfWindow->setKeyRepeatEnabled(false);
     m_sfWindow->resetGLStates();
     SetTitle(title);
     PositionCenter();
-    m_defaultNdcTransform = sf::Transform::Identity;
-    m_defaultNdcTransform.scale(Lib::ConvertTo<float>(GetSize()) / 2.0f);
-    m_defaultNdcTransform.translate(1.0f, 1.0f);
-    m_defaultNdcTransform.scale(sf::Vector2f(1.0f, -1.0f));
-
-    SetFoV(static_cast<float>(GetWidth()) / static_cast<float>(GetHeight()));
 }
 
 Window::~Window()
@@ -34,11 +27,39 @@ Window::~Window()
     m_sfWindow = nullptr;
 }
 
-void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)
+void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    renderStates.transform.combine(m_ndcTransform);
     Render(drawable, renderStates);
+}
+
+void Window::DrawText(const sf::Text &text, TextAlign align, sf::RenderStates renderStates) noexcept
+{
+    auto textCpy = text;
+    sf::Vector2f offset(0.0f, 0.0f);
+    switch (align)
+    {
+    case TextAlign::Left:
+        break;
+    case TextAlign::Middle:
+        offset.x = textCpy.getLocalBounds().width / 2.0f;
+        break;
+    case TextAlign::Right:
+        offset.x = textCpy.getLocalBounds().width;
+        break;
+    }
+
+    textCpy.setPosition(text.getPosition() + offset);
+    Window::Render(textCpy, renderStates);
+}
+
+void Window::DrawPoint(const sf::Vector2f &position, sf::Color color, float radius) noexcept
+{
+    sf::CircleShape circle;
+    circle.setPosition(position - sf::Vector2f(radius, radius));
+    circle.setFillColor(color);
+    circle.setRadius(radius);
+    Window::Draw(circle);
 }
 
 void Window::Clear()
@@ -114,12 +135,6 @@ sf::IntRect Window::GetScreenRect() noexcept
     return sf::IntRect(0, 0, GetWidth(), GetHeight());
 }
 
-sf::FloatRect Window::GetNdcRect() noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return sf::FloatRect(-1.0f, -1.0f, 2.0f, 2.0f);
-}
-
 void Window::SetPosition(const sf::Vector2i &pos) noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
@@ -171,42 +186,10 @@ void Window::SetVSync(bool toggle) noexcept
     m_sfWindow->setVerticalSyncEnabled(toggle);
 }
 
-void Window::SetFoV(float fov) noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_fov = fov;
-    ResetNdcTransform();
-    m_ndcTransform.scale(1.0f / m_fov, 1.0f);
-}
-
-sf::Transform Window::GetNdcTransform() noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return m_ndcTransform;
-}
-
-sf::Vector2f Window::RawToNdc(const sf::Vector2f &point) noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return m_ndcTransform.getInverse().transformPoint(point);
-}
-
-sf::Vector2f Window::NdcToRaw(const sf::Vector2f &point) noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    return m_ndcTransform.transformPoint(point);
-}
-
-void Window::Render(const sf::Drawable &drawable, sf::RenderStates renderStates)
+void Window::Render(const sf::Drawable &drawable, sf::RenderStates renderStates) noexcept
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
     m_sfWindow->draw(drawable, renderStates);
-}
-
-void Window::ResetNdcTransform() noexcept
-{
-    assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_ndcTransform = m_defaultNdcTransform;
 }
 
 Window::Exception::Exception(int line, const char *file, const char *errorString) noexcept
