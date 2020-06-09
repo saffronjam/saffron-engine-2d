@@ -34,6 +34,7 @@ void IApp::Run()
         GuiMgr::Update();
         Camera::Update();
         Window::Clear();
+        LightningMgr::ClearOccluders();
         try
         {
             Update();
@@ -41,6 +42,10 @@ void IApp::Run()
             Draw();
         }
         LogOnly;
+        LightningMgr::RenderShadowMaps();
+        LightningMgr::RenderLightMaps();
+        LightningMgr::RenderCollectiveLightMap();
+        LightningMgr::Draw();
         GuiMgr::Draw();
         Window::Present();
         Clock::Mark();

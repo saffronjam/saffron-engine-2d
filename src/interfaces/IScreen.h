@@ -8,6 +8,7 @@
 #include "Mouse.h"
 #include "Log.h"
 #include "Lib.h"
+#include "PointLight.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFGUI/Adjustment.hpp>

@@ -1,5 +1,7 @@
 #include "Window.h"
 
+#include "LightningMgr.h"
+
 sf::RenderWindow *Window::m_sfWindow = nullptr;
 std::string Window::m_title("Unnamed window");
 sf::VideoMode Window::m_videomode;
@@ -12,13 +14,14 @@ Window::Window(const std::string &title, int width, int height)
     m_videomode = sf::VideoMode(width, height);
     m_style = sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close;
 
-    auto contexSettings = sf::ContextSettings(0u, 0u, 8u);
+    auto contexSettings = sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u, true);
 
     m_sfWindow = new sf::RenderWindow(m_videomode, title, m_style, contexSettings);
     m_sfWindow->setKeyRepeatEnabled(false);
     m_sfWindow->resetGLStates();
     SetTitle(title);
     PositionCenter();
+    glewInit();
 }
 
 Window::~Window()
@@ -65,7 +68,8 @@ void Window::DrawPoint(const sf::Vector2f &position, sf::Color color, float radi
 void Window::Clear()
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_sfWindow->clear();
+    m_sfWindow->clear(sf::Color(100, 100, 100, 255));
+    // m_sfWindow->clear();
 }
 
 void Window::Present() noexcept

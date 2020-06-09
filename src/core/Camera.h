@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -23,6 +24,7 @@ public:
 
     static void Update();
     static void Draw(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
+    static void Draw(const sf::Drawable &drawable, sf::RenderTexture &texture, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
     static void DrawText(const sf::Text &text, TextAlign align, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
     static void DrawPoint(const sf::Vector2f &position, sf::Color color = sf::Color::Red, float radius = 3.0f) noexcept;
 
@@ -47,6 +49,7 @@ public:
     static sf::FloatRect GetViewPort() noexcept { return m_transform.transformRect(Lib::ConvertTo<float>(Window::GetScreenRect())); }
     static sf::Vector2f GetViewSize() noexcept { return m_transform.transformPoint(GetViewPort().width, GetViewPort().height); }
     static sf::Vector2f GetOffset() noexcept { return Lib::ConvertTo<float>(Window::GetSize()) / 2.0f; }
+    static float GetZoom() noexcept { return m_zoom.x; }
 
     static void SetRotationSpeed(float rps) noexcept { m_rps = rps; }
 

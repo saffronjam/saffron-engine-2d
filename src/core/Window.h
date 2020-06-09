@@ -3,6 +3,8 @@
 #include <string>
 #include <cassert>
 
+#include <GL/glew.h>
+#include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/CircleShape.hpp>

@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include <SFML/System/Vector2.hpp>
+#include <SFML/System/Vector3.hpp>
 
 class vl
 {
@@ -38,6 +39,12 @@ public:
     static float Determinant(const sf::Vector2<T> &u, const sf::Vector2<T> &v);
     template <typename T>
     static float DotProduct(const sf::Vector2<T> &u, const sf::Vector2<T> &v);
+    template <typename T>
+    static sf::Vector2<T> MapRange(const sf::Vector2<T> &v, T a1, T b1, T a2, T b2);
+    template <typename T>
+    static sf::Vector3<T> MapRange(const sf::Vector3<T> &v, T a1, T b1, T a2, T b2);
+    template <typename T = float>
+    static sf::Vector3<T> ByColor(const sf::Color &color);
 };
 
 template <typename T>
@@ -130,4 +137,27 @@ template <typename T>
 float vl::DistanceFromLine(sf::Vector2<T> linePoint1, sf::Vector2<T> linePoint2, sf::Vector2<T> point)
 {
     return abs(((linePoint2.x - linePoint1.x) * (point.y - linePoint1.y) - (linePoint2.y - linePoint1.y) * (point.x - linePoint1.x)) / vl::Length(linePoint2 - linePoint1));
+}
+
+template <typename T>
+sf::Vector2<T> vl::MapRange(const sf::Vector2<T> &v, T a1, T b1, T a2, T b2)
+{
+    T x = (v.x - a1) * (b2 - a2) / (b1 - a1) + a2;
+    T y = (v.y - a1) * (b2 - a2) / (b1 - a1) + a2;
+    return sf::Vector2<T>(x, y);
+}
+
+template <typename T>
+sf::Vector3<T> vl::MapRange(const sf::Vector3<T> &v, T a1, T b1, T a2, T b2)
+{
+    T x = (v.x - a1) * (b2 - a2) / (b1 - a1) + a2;
+    T y = (v.y - a1) * (b2 - a2) / (b1 - a1) + a2;
+    T z = (v.z - a1) * (b2 - a2) / (b1 - a1) + a2;
+    return sf::Vector3<T>(x, y, z);
+}
+
+template <typename T>
+sf::Vector3<T> vl::ByColor(const sf::Color &color)
+{
+    return sf::Vector3<T>((T)color.r, (T)color.g, (T)color.b);
 }

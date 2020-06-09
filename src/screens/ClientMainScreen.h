@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IScreen.h"
-
 #include "Camera.h"
 
 class AppClient;

@@ -81,6 +81,12 @@ void Camera::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) n
     Window::Render(drawable, renderStates);
 }
 
+void Camera::Draw(const sf::Drawable &drawable, sf::RenderTexture &texture, sf::RenderStates renderStates) noexcept
+{
+    renderStates.transform.combine(m_transform);
+    texture.draw(drawable, renderStates);
+}
+
 void Camera::DrawText(const sf::Text &text, TextAlign align, sf::RenderStates renderStates) noexcept
 {
     auto textCpy = text;
@@ -157,10 +163,12 @@ void Camera::SetRotation(float angle) noexcept
 
 sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point) noexcept
 {
+    return m_transform.getInverse().transformPoint(point);
 }
 
 sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point) noexcept
 {
+    return m_transform.transformPoint(point);
 }
 
 void Camera::UpdateTransform() noexcept

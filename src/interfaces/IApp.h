@@ -14,6 +14,7 @@
 #include "FontMgr.h"
 #include "MusicMgr.h"
 #include "SoundBufferMgr.h"
+#include "LightningMgr.h"
 #include "PacketMgr.h"
 #include "IScreen.h"
 #include "Clock.h"
@@ -51,6 +52,7 @@ protected:
     sf::VideoMode m_videoMode;
     Window m_window;
     Camera m_camera;
+    LightningMgr m_lightningMgr;
 
     EventMgr m_eventMgr;
     Keyboard m_keyboard;

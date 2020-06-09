@@ -20,7 +20,6 @@ void ClientMainScreen::Destroy()
 
 void ClientMainScreen::OnEntry()
 {
-    FPSLimiter::SetDesiredFPS(60.0f);
 }
 
 void ClientMainScreen::OnExit()
