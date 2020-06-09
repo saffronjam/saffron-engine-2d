@@ -65,7 +65,7 @@ public:
     template <typename T>
     static T ToRadians(const T &degress)
     {
-        return (T)180 / degress;
+        return (T)(degress * PI<>) / (T)180;
     }
 
     template <typename T>
