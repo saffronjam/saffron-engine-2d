@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "Lib.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 
 #include <SFML/Graphics.hpp>
 #include <SFGUI/Adjustment.hpp>

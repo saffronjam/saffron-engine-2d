@@ -42,10 +42,9 @@ void LightningMgr::AddOccluder(const sf::Drawable &drawable, sf::RenderStates re
     sf::RenderStates copy = renderStates;
     for (auto &renderLight : m_renderLights)
     {
-        float hypotenuse = std::sqrt(std::pow(renderLight.light->GetRadius(), 2.0f));
         float radius = renderLight.light->GetRadius();
         sf::Vector2f position = renderLight.light->GetPosition();
-        copy.transform.combine(sf::Transform().translate(sf::Vector2f(radius, radius) / 2.0f - position)); // - sf::Vector2f(radius, radius)));
+        copy.transform.combine(sf::Transform().translate(sf::Vector2f(radius, radius) / 2.0f - position));
         renderLight.occluders->draw(drawable, copy);
         copy = renderStates;
     }
@@ -70,6 +69,7 @@ void LightningMgr::RenderShadowMaps() noexcept
         renderLight.shadowMap->clear(sf::Color(0, 0, 0, 0));
         m_shadowMapShader.setUniform("resolution", m_resolution);
         renderLight.shadowMap->draw(sf::Sprite(renderLight.occluders->getTexture()), sf::RenderStates(&m_shadowMapShader));
+        renderLight.shadowMap->draw(sf::Sprite(renderLight.light->GetStaticOccluderMap().getTexture()), sf::RenderStates(&m_shadowMapShader));
     }
 }
 
