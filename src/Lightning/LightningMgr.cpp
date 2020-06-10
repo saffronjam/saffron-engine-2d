@@ -44,7 +44,7 @@ void LightningMgr::AddOccluder(const sf::Drawable &drawable, sf::RenderStates re
     {
         float radius = renderLight.light->GetRadius();
         sf::Vector2f position = renderLight.light->GetPosition();
-        copy.transform.combine(sf::Transform().translate(sf::Vector2f(radius, radius) / 2.0f - position));
+        copy.transform.combine(sf::Transform().translate(sf::Vector2f(radius, radius) - position));
         renderLight.occluders->draw(drawable, copy);
         copy = renderStates;
     }
@@ -66,10 +66,11 @@ void LightningMgr::RenderShadowMaps() noexcept
 {
     for (auto &renderLight : m_renderLights)
     {
-        renderLight.shadowMap->clear(sf::Color(0, 0, 0, 0));
         m_shadowMapShader.setUniform("resolution", m_resolution);
+        renderLight.shadowMap->clear(sf::Color(0, 0, 0, 0));
         renderLight.shadowMap->draw(sf::Sprite(renderLight.occluders->getTexture()), sf::RenderStates(&m_shadowMapShader));
         renderLight.shadowMap->draw(sf::Sprite(renderLight.light->GetStaticOccluderMap().getTexture()), sf::RenderStates(&m_shadowMapShader));
+        renderLight.shadowMap->display();
     }
 }
 
@@ -80,9 +81,9 @@ void LightningMgr::RenderLightMaps() noexcept
         m_renderLightsShader.setUniform("resolution", m_resolution);
         renderLight.lightMap->clear(sf::Color(0, 0, 0, 0));
         sf::Sprite shadowMapSprite(renderLight.shadowMap->getTexture());
-        for (int i = 0; i < renderLight.light->GetRadius(); i++)
+        for (int i = 0; i < renderLight.light->GetBoundingBox().height; i++)
         {
-            shadowMapSprite.setPosition(0.0, (float)i);
+            shadowMapSprite.setPosition(0.0, static_cast<float>(i));
             renderLight.lightMap->draw(shadowMapSprite, sf::RenderStates(&m_renderLightsShader));
         }
         renderLight.lightMap->display();
@@ -95,10 +96,10 @@ void LightningMgr::RenderCollectiveLightMap() noexcept
     for (auto &renderLight : m_renderLights)
     {
         sf::Sprite lightSprite(renderLight.lightMap->getTexture());
-        lightSprite.setScale(renderLight.light->GetRadius() / lightSprite.getLocalBounds().width,
-                             renderLight.light->GetRadius() / lightSprite.getLocalBounds().height);
-        lightSprite.setPosition(renderLight.light->GetPosition() -
-                                sf::Vector2f(lightSprite.getLocalBounds().width, lightSprite.getLocalBounds().height) / 2.0f);
+        sf::FloatRect box = renderLight.light->GetBoundingBox();
+        lightSprite.setScale(box.width / lightSprite.getLocalBounds().width,
+                             box.height / lightSprite.getLocalBounds().height);
+        lightSprite.setPosition(box.left, box.top);
         lightSprite.setColor(renderLight.light->GetColor());
         Camera::Draw(lightSprite, m_collectiveLightMap, sf::RenderStates(sf::BlendAdd));
     }

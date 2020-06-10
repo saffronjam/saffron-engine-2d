@@ -24,6 +24,7 @@ public:
     const sf::Vector2f &GetPosition() const noexcept { return m_position; }
     float GetRadius() const noexcept { return m_radius; }
     const sf::Color &GetColor() const noexcept { return m_color; }
+    sf::FloatRect GetBoundingBox() const noexcept { return sf::FloatRect(m_position.x - GetRadius(), m_position.y - GetRadius(), GetRadius() * 2.0f, GetRadius() * 2.0f); }
 
     void SetPosition(const sf::Vector2f &position) noexcept { m_position = position; }
     void SetRadius(float radius) noexcept { m_radius = radius; }

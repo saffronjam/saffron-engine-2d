@@ -5,7 +5,7 @@ void Light::BuildBase(const sf::Vector2f &position, float radius, sf::Color colo
     m_position = position;
     m_radius = radius;
     m_color = color;
-    m_staticOccluderMap.create(radius, radius);
+    m_staticOccluderMap.create(GetBoundingBox().width, GetBoundingBox().height);
     m_staticOccluderMap.clear(sf::Color(0, 0, 0, 0));
 }
 

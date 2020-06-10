@@ -22,9 +22,10 @@ private:
               shadowMap(new sf::RenderTexture()),
               lightMap(new sf::RenderTexture())
         {
-            occluders->create(light->GetRadius(), light->GetRadius());
-            shadowMap->create(light->GetRadius(), 1);
-            lightMap->create(light->GetRadius(), light->GetRadius());
+            auto box = light->GetBoundingBox();
+            occluders->create(box.width, box.height);
+            shadowMap->create(box.width, 1);
+            lightMap->create(box.width, box.height);
         }
         Light::Ptr light;
         sf::RenderTexture *occluders;
