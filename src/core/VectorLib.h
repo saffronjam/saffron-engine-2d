@@ -65,7 +65,10 @@ sf::Vector2<T> vl::Direction(const sf::Vector2<T> &point1, const sf::Vector2<T> 
 template <typename T>
 sf::Vector2<T> vl::Unit(const sf::Vector2<T> &vector)
 {
-    return vector / vl::Length(vector);
+    if (vector != vl::Null<T>())
+        return vector / vl::Length(vector);
+    else
+        return vl::Null<T>();
 }
 
 template <typename T>
