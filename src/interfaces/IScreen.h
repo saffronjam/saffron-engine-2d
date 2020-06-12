@@ -2,15 +2,6 @@
 
 #include <iostream>
 
-#include "Window.h"
-#include "EventMgr.h"
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "Log.h"
-#include "Lib.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-
 #include <SFML/Graphics.hpp>
 #include <SFGUI/Adjustment.hpp>
 #include <SFGUI/Box.hpp>
@@ -23,6 +14,16 @@
 #include <SFGUI/Scrollbar.hpp>
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Window.hpp>
+
+#include "Window.h"
+#include "EventMgr.h"
+#include "Keyboard.h"
+#include "Mouse.h"
+#include "Log.h"
+#include "Lib.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#include "Random.h"
 
 #define SCREENINDEX_NO_SCREEN -1
 

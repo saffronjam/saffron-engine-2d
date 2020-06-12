@@ -43,9 +43,7 @@ void IApp::Run()
         }
         LogOnly;
         LightningMgr::DisplayOccluders();
-        LightningMgr::RenderShadowMaps();
-        LightningMgr::RenderLightMaps();
-        LightningMgr::RenderCollectiveLightMap();
+        LightningMgr::Render();
         LightningMgr::Draw();
         GuiMgr::Draw();
         Window::Present();

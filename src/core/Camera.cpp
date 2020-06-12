@@ -1,7 +1,9 @@
 #include "Camera.h"
 
+#include "LightningMgr.h"
+
 sf::Transform Camera::m_transform = sf::Transform::Identity;
-std::optional<sf::Vector2f *> Camera::m_follow;
+std::optional<const sf::Vector2f *> Camera::m_follow;
 
 sf::Vector2f Camera::m_position(0.0f, 0.0f);
 sf::Transform Camera::m_positionTransform = sf::Transform::Identity;
@@ -71,8 +73,6 @@ void Camera::Update()
     {
         ResetTransformation();
     }
-
-    CapZoomLevel();
 }
 
 void Camera::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates) noexcept
@@ -116,39 +116,48 @@ void Camera::DrawPoint(const sf::Vector2f &position, sf::Color color, float radi
     Camera::Draw(circle);
 }
 
+void Camera::DrawRect(const sf::FloatRect rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
+{
+    sf::RectangleShape rectShape;
+    rectShape.setPosition(rect.top, rect.left);
+    rectShape.setSize(sf::Vector2f(rect.width, rect.height));
+    rectShape.setFillColor(fillColor);
+    if (outlined)
+    {
+        rectShape.setOutlineThickness(1);
+        rectShape.setOutlineColor(outlineColor);
+    }
+    Camera::Draw(rectShape);
+}
+
 void Camera::Move(const sf::Vector2f &offset) noexcept
 {
-    m_position += offset;
-    m_positionTransform.translate(offset);
-    UpdateTransform();
+    SetCenter(m_position + offset);
 }
 
 void Camera::Zoom(float factor) noexcept
 {
-    m_zoom *= factor;
-    m_zoomTransform.scale(factor, factor);
-    UpdateTransform();
+    SetZoom(m_zoom.x * factor);
 }
 
 void Camera::Rotate(float angle) noexcept
 {
-    m_rotation += angle;
-    m_rotationTransform = sf::Transform().rotate(m_rotation);
-    UpdateTransform();
+    SetRotation(m_rotation + angle);
 }
 
 void Camera::SetCenter(const sf::Vector2f &center) noexcept
 {
-    m_position = center - GetViewSize() / 2.0f;
+    m_position = center;
     m_positionTransform = sf::Transform().translate(m_position);
     UpdateTransform();
 }
 
-void Camera::SetZoom(float factor) noexcept
+void Camera::SetZoom(float zoom) noexcept
 {
-    if (factor != 0.0f)
+    if (zoom != 0.0f)
     {
-        m_zoom = sf::Vector2f(factor, factor);
+        LightningMgr::ChangeResolution(zoom / m_zoom.x);
+        m_zoom = sf::Vector2f(zoom, zoom);
         m_zoomTransform = sf::Transform().scale(m_zoom, m_zoom);
         UpdateTransform();
     }
@@ -166,9 +175,19 @@ sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point) noexcept
     return m_transform.getInverse().transformPoint(point);
 }
 
+sf::FloatRect Camera::ScreenToWorld(const sf::FloatRect &rect) noexcept
+{
+    return m_transform.getInverse().transformRect(rect);
+}
+
 sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point) noexcept
 {
     return m_transform.transformPoint(point);
+}
+
+sf::FloatRect Camera::WorldToScreen(const sf::FloatRect &rect) noexcept
+{
+    return m_transform.transformRect(rect);
 }
 
 void Camera::UpdateTransform() noexcept
@@ -190,9 +209,9 @@ void Camera::CapZoomLevel() noexcept
 
 void Camera::ResetTransformation() noexcept
 {
-    m_position = sf::Vector2f(0.0f, 0.0f);
-    m_rotation = 0.0f;
-    m_zoom = sf::Vector2f(1.0f, 1.0f);
+    SetCenter(sf::Vector2f(0.0f, 0.0f));
+    SetRotation(0.0f);
+    SetZoom(1.0f);
 
     m_positionTransform = sf::Transform::Identity;
     m_rotationTransform = sf::Transform::Identity;

@@ -14,7 +14,7 @@ void SpotLight::SetDirection(const sf::Vector2f &newDirection, float theta)
 
     sf::Vector2f unitDirection = vl::Unit(newDirection);
     sf::VertexArray shape(sf::TriangleFan);
-    sf::Vector2f adjustedPosition = m_position + sf::Vector2f(m_radius / 2.0f, m_radius / 2.0f);
+    sf::Vector2f adjustedPosition = m_position + sf::Vector2f(m_radius, m_radius);
     shape.append(sf::Vertex(adjustedPosition - unitDirection * 10.0f, sf::Color::Black));
     shape.append(sf::Vertex(adjustedPosition + vl::Rotate(unitDirection, Lib::ToRadians(theta / 2.0f), vl::Null<>()) * 50.0f, sf::Color::Black));
     shape.append(sf::Vertex(adjustedPosition - unitDirection * 25.0f, sf::Color::Black));

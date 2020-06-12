@@ -30,6 +30,7 @@ public:
     static void Draw(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
     static void DrawText(const sf::Text &text, TextAlign align = TextAlign::Left, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
     static void DrawPoint(const sf::Vector2f &position, sf::Color color = sf::Color::Red, float radius = 3.0f) noexcept;
+    static void DrawRect(const sf::FloatRect rect, sf::Color fillColor = sf::Color::Red, bool outlined = false, sf::Color outlineColor = sf::Color::Black);
     static void Clear();
     static void Present() noexcept;
 

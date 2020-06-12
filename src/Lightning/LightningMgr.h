@@ -41,25 +41,32 @@ public:
 
     static void Draw();
 
-    static void AddOccluder(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
+    static void AddOccluder(const sf::Drawable &drawable, sf::FloatRect boundingBox, sf::RenderStates renderStates = sf::RenderStates::Default) noexcept;
     static void ClearOccluders() noexcept;
     static void DisplayOccluders() noexcept;
 
+    static void Render() noexcept;
+
+    static void AddLight(const Light::Ptr &light);
+    static void RemoveLight(const Light::Ptr &light);
+    static void SetAmbientLight(const sf::Color &ambient) noexcept { m_ambient = ambient; }
+
+    static void ChangeResolution(float factor) noexcept { m_resolution *= factor; }
+
+    static float GetResolution() noexcept { return m_resolution; }
+    static void SetResolution(float resolution) noexcept { m_resolution = resolution; }
+
+private:
     static void RenderShadowMaps() noexcept;
     static void RenderLightMaps() noexcept;
     static void RenderCollectiveLightMap() noexcept;
 
-    static void AddLight(const Light::Ptr &light);
-    static void SetAmbientLight(const sf::Color &ambient) noexcept { m_ambientRect.setFillColor(ambient); }
-
-    static void SetResolution(float resolution) noexcept { m_resolution = resolution; }
-
-public:
+private:
     static std::vector<RenderLight> m_renderLights;
     static sf::Shader m_shadowMapShader;
     static sf::Shader m_renderLightsShader;
     static sf::RenderTexture m_collectiveLightMap;
-    static sf::RectangleShape m_ambientRect;
+    static sf::Color m_ambient;
 
     static float m_resolution;
 };

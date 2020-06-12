@@ -65,11 +65,25 @@ void Window::DrawPoint(const sf::Vector2f &position, sf::Color color, float radi
     Window::Draw(circle);
 }
 
+void Window::DrawRect(const sf::FloatRect rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
+{
+    sf::RectangleShape rectShape;
+    rectShape.setPosition(rect.top, rect.left);
+    rectShape.setSize(sf::Vector2f(rect.width, rect.height));
+    rectShape.setFillColor(fillColor);
+    if (outlined)
+    {
+        rectShape.setOutlineThickness(1);
+        rectShape.setOutlineColor(outlineColor);
+    }
+    Window::Draw(rectShape);
+}
+
 void Window::Clear()
 {
     assert("Attempted to handle the window without creating it" && m_sfWindow);
-    m_sfWindow->clear(sf::Color(100, 100, 100, 255));
-    // m_sfWindow->clear();
+    // m_sfWindow->clear(sf::Color(100, 100, 100, 255));
+    m_sfWindow->clear();
 }
 
 void Window::Present() noexcept

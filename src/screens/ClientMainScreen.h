@@ -3,6 +3,8 @@
 #include "IScreen.h"
 #include "Camera.h"
 
+#include "LightEntity.h"
+
 class AppClient;
 
 class ClientMainScreen : public IScreen
@@ -32,4 +34,6 @@ private:
 
 private:
     AppClient &m_parent;
+
+    std::vector<LightEntity> m_lights;
 };
