@@ -21,7 +21,6 @@ Window::Window(const std::string &title, int width, int height)
     m_sfWindow->resetGLStates();
     SetTitle(title);
     PositionCenter();
-    glewInit();
 }
 
 Window::~Window()

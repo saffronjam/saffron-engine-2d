@@ -17,8 +17,7 @@
                 "${workspaceFolder}/src/screens",
                 "${workspaceFolder}/src/throwmacros",
                 "${workspaceFolder}/deps/SFML/include",
-                "${workspaceFolder}/deps/SFGUI/include",
-                "${workspaceFolder}/deps/GLEW/include"
+                "${workspaceFolder}/deps/SFGUI/include"
             ],
             "intelliSenseMode": "gcc-x64",
             "compilerPath": "C:\\mingw64\\bin\\g++.exe",

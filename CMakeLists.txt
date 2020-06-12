@@ -22,7 +22,6 @@ find_package(Threads REQUIRED)
 add_definitions(
   -DSFML_STATIC
   -DSFGUI_STATIC
-  -DGLEW_STATIC
   -DLOG_EXCEPTION
 )
 
@@ -70,15 +69,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Client PRIVATE
     deps/SFML/include
     deps/SFGUI/include
-    deps/GLEW/include
   )
   target_link_directories(Client PRIVATE
     deps/SFML/lib
     deps/SFGUI/lib
-    deps/GLEW/lib
   )
   target_link_libraries(Client PRIVATE
-    glew32s
     SFGUI
     sfml-graphics-s
     sfml-window-s
@@ -138,12 +134,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Server PRIVATE
     deps/SFML/include
     deps/SFGUI/include
-    deps/GLEW/include
   )
   target_link_directories(Server PRIVATE
     deps/SFML/lib
     deps/SFGUI/lib
-    deps/GLEW/lib
   )
   target_link_libraries(Server PRIVATE
     Threads::Threads
