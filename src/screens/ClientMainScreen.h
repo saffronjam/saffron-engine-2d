@@ -4,8 +4,6 @@
 
 #include "IScreen.h"
 #include "Camera.h"
-#include "BoxEntity.h"
-#include "CircleEntity.h"
 
 class AppClient;
 
@@ -36,9 +34,4 @@ private:
 
 private:
     AppClient &m_parent;
-
-    std::vector<BoxEntity> m_boxes;
-    std::vector<CircleEntity> m_circles;
-
-    BoxEntity m_mouseCollider;
 };
