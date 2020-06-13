@@ -44,6 +44,14 @@ public:
         return sf::Color(r, g, b, a);
     }
 
+    template <typename T>
+    static sf::Vector2<T> Vec2(T lowX, T lowY, T highX, T highY)
+    {
+        float x = Random::Float(lowX, highX);
+        float y = Random::Float(lowY, highY);
+        return sf::Vector2<T>((T)x, (T)y);
+    }
+
 private:
     int m_lower;
     int m_upper;

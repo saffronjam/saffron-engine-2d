@@ -5,6 +5,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 class vl
 {
@@ -45,6 +46,8 @@ public:
     static sf::Vector3<T> MapRange(const sf::Vector3<T> &v, T a1, T b1, T a2, T b2);
     template <typename T = float>
     static sf::Vector3<T> ByColor(const sf::Color &color);
+    template <typename T, typename U>
+    static T ConvertTo(const U &in);
 };
 
 template <typename T>
@@ -163,4 +166,10 @@ template <typename T>
 sf::Vector3<T> vl::ByColor(const sf::Color &color)
 {
     return sf::Vector3<T>((T)color.r, (T)color.g, (T)color.b);
+}
+
+template <typename T, typename U>
+T vl::ConvertTo(const U &in)
+{
+    return T(in.x, in.y);
 }

@@ -10,6 +10,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   file(GLOB SDL2_SHARED_BINARIES
     "deps/SFML/bin/*.dll"
+    "deps/Box2D/bin/*.dll"
   )
   file(COPY ${SDL2_SHARED_BINARIES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
   file(COPY "res" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
@@ -53,6 +54,7 @@ target_include_directories(Client PRIVATE
   src/lightning
   src/net
   src/netmodules
+  src/physics
   src/project
   src/res
   src/screens
@@ -69,12 +71,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Client PRIVATE
     deps/SFML/include
     deps/SFGUI/include
+    deps/Box2D/include
   )
   target_link_directories(Client PRIVATE
     deps/SFML/lib
     deps/SFGUI/lib
+    deps/Box2D/lib
   )
   target_link_libraries(Client PRIVATE
+    Box2D
     SFGUI
     sfml-graphics-s
     sfml-window-s
@@ -116,6 +121,8 @@ target_include_directories(Server PRIVATE
   src/input
   src/interfaces
   src/lightning
+  src/physics
+  src/project
   src/net
   src/netmodules
   src/res
@@ -134,10 +141,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Server PRIVATE
     deps/SFML/include
     deps/SFGUI/include
+    deps/Box2D/include
   )
   target_link_directories(Server PRIVATE
     deps/SFML/lib
     deps/SFGUI/lib
+    deps/Box2D/lib
   )
   target_link_libraries(Server PRIVATE
     Threads::Threads

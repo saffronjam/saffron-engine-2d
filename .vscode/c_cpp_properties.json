@@ -12,12 +12,14 @@
                 "${workspaceFolder}/src/lightning",
                 "${workspaceFolder}/src/net",
                 "${workspaceFolder}/src/netmodules",
+                "${workspaceFolder}/src/physics",
                 "${workspaceFolder}/src/project",
                 "${workspaceFolder}/src/res",
                 "${workspaceFolder}/src/screens",
                 "${workspaceFolder}/src/throwmacros",
                 "${workspaceFolder}/deps/SFML/include",
-                "${workspaceFolder}/deps/SFGUI/include"
+                "${workspaceFolder}/deps/SFGUI/include",
+                "${workspaceFolder}/deps/Box2D/include"
             ],
             "intelliSenseMode": "gcc-x64",
             "compilerPath": "C:\\mingw64\\bin\\g++.exe",

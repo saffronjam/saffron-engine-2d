@@ -53,6 +53,7 @@ protected:
     Window m_window;
     Camera m_camera;
     LightningMgr m_lightningMgr;
+    PhysicsMgr m_physicsMgr;
 
     EventMgr m_eventMgr;
     Keyboard m_keyboard;

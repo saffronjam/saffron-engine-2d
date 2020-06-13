@@ -137,7 +137,9 @@ void Camera::Move(const sf::Vector2f &offset) noexcept
 
 void Camera::Zoom(float factor) noexcept
 {
-    SetZoom(m_zoom.x * factor);
+    m_zoom *= factor;
+    m_zoomTransform.scale(factor, factor);
+    UpdateTransform();
 }
 
 void Camera::Rotate(float angle) noexcept

@@ -23,6 +23,9 @@
 #include "Lib.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "BoxCollider.h"
+#include "CircleCollider.h"
+#include "PolygonCollider.h"
 #include "Random.h"
 
 #define SCREENINDEX_NO_SCREEN -1

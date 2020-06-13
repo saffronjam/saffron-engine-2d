@@ -28,6 +28,7 @@ void IApp::Run()
         FPSLimiter::Start();
         OnPreUpdate();
         PacketMgr::HandleAllPackets();
+        PhysicsMgr::Step();
         Keyboard::Update();
         Mouse::Update();
         EventMgr::PollAll();
