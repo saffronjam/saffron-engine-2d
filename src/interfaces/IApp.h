@@ -15,6 +15,7 @@
 #include "MusicMgr.h"
 #include "SoundBufferMgr.h"
 #include "LightningMgr.h"
+#include "PhysicsMgr.h"
 #include "PacketMgr.h"
 #include "IScreen.h"
 #include "Clock.h"
