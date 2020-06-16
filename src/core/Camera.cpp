@@ -110,21 +110,22 @@ void Camera::DrawText(const sf::Text &text, TextAlign align, sf::RenderStates re
 void Camera::DrawPoint(const sf::Vector2f &position, sf::Color color, float radius) noexcept
 {
     sf::CircleShape circle;
-    circle.setPosition(position - sf::Vector2f(radius, radius));
+    float adjustedRadius = radius / m_zoom.x;
+    circle.setPosition(position - sf::Vector2f(adjustedRadius, adjustedRadius));
     circle.setFillColor(color);
-    circle.setRadius(radius);
+    circle.setRadius(adjustedRadius);
     Camera::Draw(circle);
 }
 
 void Camera::DrawRect(const sf::FloatRect rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
 {
     sf::RectangleShape rectShape;
-    rectShape.setPosition(rect.top, rect.left);
+    rectShape.setPosition(rect.left, rect.top);
     rectShape.setSize(sf::Vector2f(rect.width, rect.height));
     rectShape.setFillColor(fillColor);
     if (outlined)
     {
-        rectShape.setOutlineThickness(1);
+        rectShape.setOutlineThickness(1.0f / m_zoom.x);
         rectShape.setOutlineColor(outlineColor);
     }
     Camera::Draw(rectShape);
