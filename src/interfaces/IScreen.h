@@ -27,6 +27,7 @@
 #include "CircleCollider.h"
 #include "PolygonCollider.h"
 #include "Random.h"
+#include "Voronoi.h"
 
 #define SCREENINDEX_NO_SCREEN -1
 

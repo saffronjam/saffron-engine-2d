@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Box2D/Box2D.h>
-
 #include "IScreen.h"
-#include "Camera.h"
 
 class AppClient;
 
