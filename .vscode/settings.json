@@ -89,7 +89,7 @@
         "**/*.out": true,
         "**/*.app": true,
         "**/build/": true,
-        // "**/deps/": true,
+        "**/deps/": true,
         "**/cmake/": true,
     },
     // "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
