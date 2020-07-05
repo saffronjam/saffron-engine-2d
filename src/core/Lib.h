@@ -28,11 +28,21 @@ public:
 
     static sf::Vector2f Mid(const sf::ConvexShape &polygon) noexcept;
 
+    static sf::Vector2f Mid(const std::vector<sf::Vector2f> &polygonPoints) noexcept;
+
     template <typename T>
     static sf::Vector2<T> MapPoint(const sf::Vector2<T> &point, sf::Rect<T> from, sf::Rect<T> to) noexcept;
 
     template <typename T>
+    static T Map(const T &value, T lowerFrom, T upperFrom, T lowerTo, T upperTo);
+
+    template <typename T>
+    static T Map(const T &value, std::pair<T, T> from, std::pair<T, T> to);
+
+    template <typename T>
     static T Constrain(const T &value, T from, T to);
+
+    static void Rotate(sf::Transformable &transformable, const sf::Vector2f &direction);
 
     template <typename T>
     static T ToDegress(const T &radians);
@@ -88,7 +98,33 @@ sf::Vector2<T> Lib::MapPoint(const sf::Vector2<T> &point, sf::Rect<T> from, sf::
 }
 
 template <typename T>
-T Lib::Constrain(const T &value, T from, T to)
+T Lib::Map(const T &value, T lowerFrom, T upperFrom, T lowerTo, T upperTo)
+{
+    if (upperFrom < lowerFrom)
+    {
+        std::swap(lowerFrom, upperFrom);
+    }
+    if (upperTo < lowerTo)
+    {
+        std::swap(lowerTo, upperTo);
+    }
+
+    float diffFrom = upperFrom - lowerFrom;
+    float diffTo = upperTo - lowerTo;
+
+    float diffFromPercent = (value - lowerFrom) / diffFrom;
+
+    return lowerTo + diffTo * diffFromPercent;
+}
+
+template <typename T>
+T Lib::Map(const T &value, std::pair<T, T> from, std::pair<T, T> to)
+{
+    return Lib::Map(value, from.first, from.second, to.first, to.second);
+}
+
+template <typename T>
+T Lib::Lib::Constrain(const T &value, T from, T to)
 {
     if (value < from)
         return from;

@@ -9,6 +9,34 @@ sf::Vector2f Lib::Mid(const sf::ConvexShape &polygon) noexcept
     return total / static_cast<float>(nPoints);
 }
 
+sf::Vector2f Lib::Mid(const std::vector<sf::Vector2f> &polygonPoints) noexcept
+{
+    size_t nPoints = polygonPoints.size();
+    if (nPoints > 0)
+    {
+        sf::Vector2f total(0.0f, 0.0f);
+        for (auto &point : polygonPoints)
+            total += point;
+        return total / static_cast<float>(nPoints);
+    }
+    else
+    {
+        return vl::Null<>();
+    }
+}
+
+void Lib::Rotate(sf::Transformable &transformable, const sf::Vector2f &direction)
+{
+    sf::Vector2f right(1.0f, 0.0f);
+
+    float angle = Lib::ToDegress(vl::Angle(right, direction));
+    if (direction.y < 0.0f)
+    {
+        angle = 360.0f - angle;
+    }
+    transformable.setRotation(angle);
+}
+
 sf::ConvexShape Lib::CreateConvexShape(const std::vector<sf::Vector2f> &points)
 {
     std::vector<sf::Vector2f> usablePoints = Lib::WrapPoints(points);
