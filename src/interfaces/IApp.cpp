@@ -3,12 +3,11 @@
 
 IApp::IApp()
     : m_videoMode(sf::VideoMode::getDesktopMode()),
-      m_window("V-2DFramework", m_videoMode.width * 0.4f, m_videoMode.height * 0.4f),
+      m_window("V-2DFramework", m_videoMode.width * 0.7f, m_videoMode.height * 0.7f),
       m_screenList(std::make_unique<ScreenList>(this)),
       m_currentScreen(nullptr),
       m_isRunning(true)
 {
-    EventMgr::AddHandler(this);
 }
 
 IApp::~IApp()
@@ -27,15 +26,12 @@ void IApp::Run()
     {
         FPSLimiter::Start();
         OnPreUpdate();
-        PacketMgr::HandleAllPackets();
-        PhysicsMgr::Step();
         Keyboard::Update();
         Mouse::Update();
         EventMgr::PollAll();
         GuiMgr::Update();
         Camera::Update();
         Window::Clear();
-        LightningMgr::ClearOccluders();
         try
         {
             Update();
@@ -43,9 +39,6 @@ void IApp::Run()
             Draw();
         }
         LogOnly;
-        LightningMgr::DisplayOccluders();
-        LightningMgr::Render();
-        LightningMgr::Draw();
         GuiMgr::Draw();
         Window::Present();
         Clock::Mark();
@@ -118,7 +111,7 @@ bool IApp::Init()
     return true;
 }
 
-void IApp::OnEvent(const sf::Event &event)
+void IApp::HandleEvent(const sf::Event &event)
 {
     switch (event.type)
     {

@@ -14,6 +14,9 @@
 template <typename T = float>
 static constexpr T PI = (T)3.141592653589793238462643383279;
 
+template <typename T = float>
+static constexpr T E = (T)2.71828182845904523536;
+
 class Lib
 {
 public:
@@ -57,6 +60,15 @@ public:
 
     template <typename T>
     static std::vector<sf::Vector2<T>> WrapPoints(const std::vector<sf::Vector2<T>> &points);
+
+    /// @hue: 0-360°
+    /// @saturation: 0.0 - 1.0
+    /// @value: 0.0 - 1.0
+    static sf::Color HSVtoRGB(int hue, float saturation, float value);
+    static sf::Color HSVtoRGB(const class HSVColor &hsvColor);
+
+    static class HSVColor RGBtoHSV(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b);
+    static class HSVColor RGBtoHSV(const sf::Color &color);
 
 private:
     template <typename T>

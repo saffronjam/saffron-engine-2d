@@ -9,10 +9,13 @@
 #include <SFGUI/CheckButton.hpp>
 #include <SFGUI/ComboBox.hpp>
 #include <SFGUI/Desktop.hpp>
+#include <SFGUI/Image.hpp>
 #include <SFGUI/Label.hpp>
+#include <SFGUI/RadioButton.hpp>
 #include <SFGUI/Scale.hpp>
 #include <SFGUI/Scrollbar.hpp>
 #include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Entry.hpp>
 #include <SFGUI/Window.hpp>
 
 #include "Window.h"
@@ -28,6 +31,7 @@
 #include "PolygonCollider.h"
 #include "Random.h"
 #include "Voronoi.h"
+#include "HSVColor.h"
 
 #define SCREENINDEX_NO_SCREEN -1
 
