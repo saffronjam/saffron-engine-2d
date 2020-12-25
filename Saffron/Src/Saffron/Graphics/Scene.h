@@ -11,20 +11,6 @@ namespace Se
 {
 class Scene
 {
-private:
-	class DrawCommand
-	{
-	public:
-		DrawCommand(sf::Drawable &drawable, sf::RenderStates renderStates)
-			: Drawable(drawable), RenderStates(renderStates)
-		{
-		}
-
-	public:
-		const sf::Drawable &Drawable;
-		const sf::RenderStates RenderStates;
-	};
-
 public:
 	Scene(ControllableRenderTexture *target, Camera *camera);
 
@@ -43,8 +29,6 @@ public:
 	void SetViewportSize(const sf::Vector2f &size) { _viewportSize = size; }
 
 private:
-	ArrayList<DrawCommand> _drawCommands;
-
 	ControllableRenderTexture *_target;
 	Camera *_camera;
 
