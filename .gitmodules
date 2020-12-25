@@ -1,0 +1,22 @@
+[submodule "Deps/Box2D"]
+	path = Deps/Box2D
+	url = https://github.com/saffronjam/Box2D.git
+[submodule "Deps/entt"]
+	path = Deps/entt
+	url = https://github.com/saffronjam/entt.git
+[submodule "Deps/FastNoise"]
+	path = Deps/FastNoise
+	url = https://github.com/saffronjam/FastNoise.git
+[submodule "Deps/imgui"]
+	path = Deps/imgui
+	url = https://github.com/saffronjam/imgui.git
+	branch = docking
+[submodule "Deps/spdlog"]
+	path = Deps/spdlog
+	url = https://github.com/saffronjam/spdlog.git
+[submodule "Deps/yaml-cpp"]
+	path = Deps/yaml-cpp
+	url = https://github.com/saffronjam/yaml-cpp.git
+[submodule "Deps/SFML"]
+	path = Deps/SFML
+	url = https://github.com/saffronjam/SFML.git
