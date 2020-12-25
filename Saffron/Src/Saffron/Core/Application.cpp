@@ -22,8 +22,6 @@ Application::Application(const Properties &properties)
 	SE_ASSERT(!s_Instance, "Application already exist");
 	s_Instance = this;
 
-	Log::Init();
-
 	SE_CORE_INFO("--- Saffron 2D Framework ---");
 	SE_CORE_INFO("Creating application {0}", properties.Name);
 
@@ -43,6 +41,7 @@ Application::Application(const Properties &properties)
 Application::~Application()
 {
 	Gui::Shutdown();
+	SE_CORE_INFO("Shutting down");
 }
 
 void Application::PushLayer(std::shared_ptr<Layer> layer)
