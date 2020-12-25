@@ -36,11 +36,9 @@ IncludeDir = {}
 IncludeDir["Saffron"] = "Saffron/Src"
 IncludeDir["Box2D"] = "Deps/Box2D/include"
 IncludeDir["entt"] = "Deps/entt/include"
-IncludeDir["FastNoise"] = "Deps/FastNoise/include"
 IncludeDir["ImGui"] = "Deps/ImGui"
 IncludeDir["SFML"] = "Deps/SFML/include"
 IncludeDir["spdlog"] = "Deps/spdlog/include"
-IncludeDir["yamlcpp"] = "Deps/yaml-cpp/include"
 
 LibraryDir = {}
 
@@ -59,11 +57,9 @@ group "Engine"
 group "Engine/Dependencies"
 	include "Deps/Box2D/premake5"
 	include "Deps/entt/premake5"
-	include "Deps/FastNoise/premake5"
 	include "Deps/ImGui/premake5"
 	include "Deps/SFML/premake5"
 	include "Deps/spdlog/premake5"
-	include "Deps/yaml-cpp/premake5"	
 group "Engine"
 
 -- --------------------------------------
@@ -95,11 +91,9 @@ project "Saffron"
 		"%{prj.name}/Src",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.FastNoise}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.SFML}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.spdlog}"
 	}
 	
 	defines
@@ -111,10 +105,8 @@ project "Saffron"
 	{
 		"SFML",
 		"Box2D",
-		"FastNoise",
 		"ImGui",
 		"opengl32.lib",
-		"yaml-cpp"
 	}
 
 	filter "system:windows"
@@ -169,11 +161,9 @@ project "Project"
 		"%{IncludeDir.Saffron}",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.FastNoise}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.SFML}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yamlcpp}"
 	}
 	
 	defines
@@ -186,9 +176,7 @@ project "Project"
 		"SFML",
 		"Saffron",
 		"Box2D",
-		"FastNoise",
 		"ImGui",
-		"yaml-cpp"
 	}
 	
 	postbuildcommands 
