@@ -1,4 +1,4 @@
-# SaffronEngine2D
+# Saffron Engine 2D
 2D Framework using SFML
 
 ## Setting up
