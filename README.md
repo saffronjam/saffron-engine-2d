@@ -10,7 +10,6 @@ Clone using ``git clone <this repo> --recursive``
 Prerequisite: Visual Studio 2019</br>
 <b> 1. </b> Run ``Scripts/RemoteUpdateAndGenerate.bat``</br>
 <b> 2. </b> Start ``Saffron2D.sln`` from repository root directory</br>
-<b> 3. </b> Run project in <i>Release</i></br>
 
 ### Linux
 To be supported
