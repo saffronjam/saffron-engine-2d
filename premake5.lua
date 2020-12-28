@@ -43,6 +43,7 @@ IncludeDir["spdlog"] = "Deps/spdlog/include"
 LibraryDir = {}
 
 SharedLibraryDir = {}
+SharedLibraryDir["SFML"] = SfmlLibs .. "/openal32.dll"
 
 RuntimeLibararyDir = {}
 
@@ -105,8 +106,13 @@ project "Saffron"
 	{
 		"SFML",
 		"Box2D",
-		"ImGui",
-		"opengl32.lib",
+		"ImGui"
+	}
+	
+	disablewarnings
+	{
+		"4244",
+		"4267"
 	}
 
 	filter "system:windows"
@@ -173,10 +179,19 @@ project "Project"
 
 	links 
 	{			
-		"SFML",
-		"Saffron",
-		"Box2D",
-		"ImGui",
+		"Saffron"
+	}
+	
+	disablewarnings
+	{
+		"4244",
+		"4267"
+	}
+	
+	linkoptions 
+	{ 
+		"-IGNORE:4006",
+		"-IGNORE:4098" 
 	}
 	
 	postbuildcommands 
@@ -198,11 +213,26 @@ project "Project"
 		defines "SE_DEBUG"
 		symbols "On"
 			
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
+			
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		optimize "On"
+		
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		optimize "On"
+		
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
 		

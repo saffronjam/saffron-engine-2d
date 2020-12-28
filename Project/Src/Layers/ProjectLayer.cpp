@@ -23,11 +23,14 @@ void ProjectLayer::OnGuiRender()
 
 	if ( ImGui::Begin("Project") )
 	{
-		Gui::BeginPropertyGrid();
-		Gui::EndPropertyGrid();
 	}
 	ImGui::End();
 
 	ImGui::ShowDemoWindow();
+}
+
+void ProjectLayer::OnRenderTargetResize(const sf::Vector2f &newSize)
+{
+	BaseLayer::OnRenderTargetResize(newSize);
 }
 }

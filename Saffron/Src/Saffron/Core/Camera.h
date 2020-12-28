@@ -46,10 +46,8 @@ public:
 	sf::FloatRect WorldToScreen(const sf::FloatRect &rect);
 
 	const sf::Transform &GetTransform() const { return _transform; }
-	sf::FloatRect GetViewport() const;
-	sf::Vector2f GetRelativeViewportSize() const;
-	sf::Vector2f GetAbsoluteViewportSize() const;
-	const sf::Vector2f &GetOffset() const;
+	Pair<sf::Vector2f, sf::Vector2f> GetViewport() const;
+	sf::Vector2f GetOffset() const;
 	float GetZoom() { return _zoom.x; }
 
 	void SetViewportSize(const sf::Vector2f &viewportSize) { _viewportSize = viewportSize; }

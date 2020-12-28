@@ -22,7 +22,7 @@ public:
 
 	bool InViewport(sf::Vector2f positionNDC) const;
 
-	sf::Vector2f GetMousePosition() const;
+	sf::Vector2f GetMousePosition(bool normalized = false) const;
 	sf::Vector2f GetViewportSize() const;
 	Uint32 GetDockID() const { return _dockID; }
 

@@ -31,7 +31,7 @@ public:
 		std::shared_ptr<sf::Music> resource = std::make_shared<sf::Music>();
 		if ( !resource->openFromFile(filepath) )
 		{
-			THROW(Exception, "Failed to open music: %s", filepath.c_str());
+			{ char buf[200]; sprintf(buf, "Failed to open music: %s", filepath.c_str()); throw Exception(__LINE__, __FILE__, buf); };
 		}
 		_resources.emplace(std::make_pair(filepath, resource));
 	}
