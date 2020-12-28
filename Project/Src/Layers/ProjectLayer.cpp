@@ -1,7 +1,5 @@
 ﻿#include "ProjectLayer.h"
 
-#include <SFML/Graphics.hpp>
-
 namespace Se
 {
 void ProjectLayer::OnAttach(std::shared_ptr<BatchLoader> &loader)
@@ -25,16 +23,14 @@ void ProjectLayer::OnGuiRender()
 
 	if ( ImGui::Begin("Project") )
 	{
-		OutputStringStream oss;
-		oss << Mouse::GetPosition().x << ", " << Mouse::GetPosition().y;
-		Gui::BeginPropertyGrid();
-		Gui::Property("Mouse pos", oss.str());
-		Gui::EndPropertyGrid();
 	}
 	ImGui::End();
 
-
-
 	ImGui::ShowDemoWindow();
+}
+
+void ProjectLayer::OnRenderTargetResize(const sf::Vector2f &newSize)
+{
+	BaseLayer::OnRenderTargetResize(newSize);
 }
 }

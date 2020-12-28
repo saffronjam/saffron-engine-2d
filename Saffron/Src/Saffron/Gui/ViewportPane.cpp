@@ -10,8 +10,8 @@ namespace Se
 SignalAggregate<void> ViewportPane::Signals::OnPostRender;
 SignalAggregate<const sf::Vector2f &> ViewportPane::Signals::OnWantRenderTargetResize;
 
-ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture &target)
-	: _windowTitle(Move(windowTitle)),
+ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture &target) :
+	_windowTitle(Move(windowTitle)),
 	_target(&target),
 	//_fallbackTexture(Factory::Create<Texture2D>("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
 	_topLeft(0.0f, 0.0f),
@@ -92,15 +92,19 @@ bool ViewportPane::InViewport(sf::Vector2f positionNDC) const
 	return positionNDC.x < _bottomRight.x &&positionNDC.y < _bottomRight.y;
 }
 
-sf::Vector2f ViewportPane::GetMousePosition() const
+sf::Vector2f ViewportPane::GetMousePosition(bool normalized) const
 {
-	sf::Vector2f position = Mouse::GetPosition(true);
+	sf::Vector2f position = Mouse::GetPosition(false);
 	position.x -= _topLeft.x;
 	position.y -= _topLeft.y;
-	const auto viewportWidth = _bottomRight.x - _topLeft.x;
-	const auto viewportHeight = _bottomRight.y - _topLeft.y;
 
-	return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
+	if ( normalized )
+	{
+		const auto viewportWidth = _bottomRight.x - _topLeft.x;
+		const auto viewportHeight = _bottomRight.y - _topLeft.y;
+		return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
+	}
+	return { position.x, position.y };
 }
 
 sf::Vector2f ViewportPane::GetViewportSize() const

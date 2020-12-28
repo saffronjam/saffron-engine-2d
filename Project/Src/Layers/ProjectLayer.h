@@ -12,5 +12,10 @@ public:
 
 	void OnUpdate() override;
 	void OnGuiRender() override;
+
+	void OnRenderTargetResize(const sf::Vector2f &newSize) override;
+
+private:
+
 };
 }

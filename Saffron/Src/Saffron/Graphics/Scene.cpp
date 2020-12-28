@@ -7,15 +7,21 @@
 
 namespace Se
 {
-Scene::Scene(ControllableRenderTexture *target, Camera *camera)
+Scene::Scene(String name, ControllableRenderTexture *target, Camera *camera)
 	: _target(target),
-	_camera(camera)
+	_camera(camera),
+	_viewportPane(Move(name), *_target)
 {
 }
 
 void Scene::OnUpdate()
 {
 	_camera->OnUpdate();
+}
+
+void Scene::OnGuiRender()
+{
+	_viewportPane.OnGuiRender();
 }
 
 void Scene::Submit(const sf::Drawable &drawable, sf::RenderStates renderStates)

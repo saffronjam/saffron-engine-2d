@@ -37,7 +37,9 @@ public:
 
 		const char *GetType() const override
 		{
-			return "V-2DFramework ResourceMgr Exception";
+			static char buffer[100];
+			sprintf_s(buffer, 100, "%s %s", typeid(T).name(), "Exception");
+			return buffer;
 		}
 		const char *GetErrorString() const
 		{

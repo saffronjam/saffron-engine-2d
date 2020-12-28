@@ -156,23 +156,16 @@ sf::FloatRect Camera::WorldToScreen(const sf::FloatRect &rect)
 	return _transform.transformRect(rect);
 }
 
-sf::FloatRect Camera::GetViewport() const
+Pair<sf::Vector2f, sf::Vector2f> Camera::GetViewport() const
 {
-	return _transform.transformRect({ 0, 0, _viewportSize.x, _viewportSize.y });
+	const sf::FloatRect screenRect = { {0.0f, 0.0f}, _viewportSize };
+	const auto TL = sf::Vector2f(screenRect.left, screenRect.top);
+	const auto BR = sf::Vector2f(screenRect.left + screenRect.width, screenRect.top + screenRect.height);
+
+	return std::make_pair(_transform.getInverse().transformPoint(TL), _transform.getInverse().transformPoint(BR));
 }
 
-sf::Vector2f Camera::GetRelativeViewportSize() const
-{
-	const auto viewport = GetViewport();
-	return { viewport.width, viewport.height };
-}
-
-sf::Vector2f Camera::GetAbsoluteViewportSize() const
-{
-	return _viewportSize;
-}
-
-const sf::Vector2f &Camera::GetOffset() const
+sf::Vector2f Camera::GetOffset() const
 {
 	return _viewportSize / 2.0f;;
 }

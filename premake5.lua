@@ -36,15 +36,14 @@ IncludeDir = {}
 IncludeDir["Saffron"] = "Saffron/Src"
 IncludeDir["Box2D"] = "Deps/Box2D/include"
 IncludeDir["entt"] = "Deps/entt/include"
-IncludeDir["FastNoise"] = "Deps/FastNoise/include"
 IncludeDir["ImGui"] = "Deps/ImGui"
 IncludeDir["SFML"] = "Deps/SFML/include"
 IncludeDir["spdlog"] = "Deps/spdlog/include"
-IncludeDir["yamlcpp"] = "Deps/yaml-cpp/include"
 
 LibraryDir = {}
 
 SharedLibraryDir = {}
+SharedLibraryDir["SFML"] = SfmlLibs .. "/openal32.dll"
 
 RuntimeLibararyDir = {}
 
@@ -59,11 +58,9 @@ group "Engine"
 group "Engine/Dependencies"
 	include "Deps/Box2D/premake5"
 	include "Deps/entt/premake5"
-	include "Deps/FastNoise/premake5"
 	include "Deps/ImGui/premake5"
 	include "Deps/SFML/premake5"
 	include "Deps/spdlog/premake5"
-	include "Deps/yaml-cpp/premake5"	
 group "Engine"
 
 -- --------------------------------------
@@ -95,11 +92,9 @@ project "Saffron"
 		"%{prj.name}/Src",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.FastNoise}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.SFML}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.spdlog}"
 	}
 	
 	defines
@@ -111,10 +106,13 @@ project "Saffron"
 	{
 		"SFML",
 		"Box2D",
-		"FastNoise",
-		"ImGui",
-		"opengl32.lib",
-		"yaml-cpp"
+		"ImGui"
+	}
+	
+	disablewarnings
+	{
+		"4244",
+		"4267"
 	}
 
 	filter "system:windows"
@@ -169,11 +167,9 @@ project "Project"
 		"%{IncludeDir.Saffron}",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.FastNoise}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.SFML}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yamlcpp}"
 	}
 	
 	defines
@@ -183,12 +179,19 @@ project "Project"
 
 	links 
 	{			
-		"SFML",
-		"Saffron",
-		"Box2D",
-		"FastNoise",
-		"ImGui",
-		"yaml-cpp"
+		"Saffron"
+	}
+	
+	disablewarnings
+	{
+		"4244",
+		"4267"
+	}
+	
+	linkoptions 
+	{ 
+		"-IGNORE:4006",
+		"-IGNORE:4098" 
 	}
 	
 	postbuildcommands 
@@ -210,11 +213,26 @@ project "Project"
 		defines "SE_DEBUG"
 		symbols "On"
 			
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
+			
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		optimize "On"
+		
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		optimize "On"
+		
+		postbuildcommands 
+		{
+			'{COPY} "%{SharedLibraryDir.SFML}" "%{cfg.targetdir}"'
+		}
 		

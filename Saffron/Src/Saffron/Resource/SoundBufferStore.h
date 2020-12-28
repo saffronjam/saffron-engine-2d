@@ -38,7 +38,7 @@ public:
 		sf::SoundBuffer resource;
 		if ( !resource.loadFromFile(filepath) )
 		{
-			THROW(Exception, "Failed to load soundbuffer: %s", filepath.c_str());
+			{ char buf[200]; sprintf(buf, "Failed to load soundbuffer: %s", filepath.c_str()); throw Exception(__LINE__, __FILE__, buf); };
 		}
 		_resources.emplace(std::make_pair(filepath, resource));
 	}
