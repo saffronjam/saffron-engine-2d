@@ -56,3 +56,4 @@ Bin-Int/
 !deps/premake5/Bin/
 
 bin/
+build/
