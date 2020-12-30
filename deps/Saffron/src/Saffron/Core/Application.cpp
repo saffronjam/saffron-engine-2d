@@ -28,7 +28,7 @@ Application::Application(const Properties &properties)
 	_window.SetEventCallback([this](const sf::Event &event) {OnEvent(event); });
 
 	FileIOManager::Init(_window);
-    Gui::Init(Filepath("../../../gui.ini"));
+    Gui::Init(Filepath("../../../imgui.ini"));
 
 	_preLoader->Submit([]
 					   {
