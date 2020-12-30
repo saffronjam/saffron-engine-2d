@@ -34,4 +34,4 @@ Follow previous steps, but make sure you have CMake installed.
   
 Start the application by running <i>Client</i> using <i>CMake Tools</i> plugin
 
-<img src="https://github.com/viesa/VSaffronEngine2D/blob/master/startCMakeProjectVSCode.png">
+<img src="https://github.com/saffronjam/SaffronEngine2D/blob/master/startCMakeProjectVSCode.png">
