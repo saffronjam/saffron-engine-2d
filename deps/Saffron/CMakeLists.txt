@@ -54,22 +54,29 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             ${LIBRARY_DIR}/imgui/include
             ${LIBRARY_DIR}/SFML/include
             ${LIBRARY_DIR}/spdlog/include
-            PARENT_SCOPE
             )
-
-    ### EXPORT ###
-    set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT} PARENT_SCOPE)
-    set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT})
-    set(SAFFRON_SHARED_BINARES ${SHARED_BINARIES} PARENT_SCOPE)
 
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions(-D${PLATFORM_MACRO}_LINUX)
 
     find_package(SFML REQUIRED network audio graphics window system)
     find_package(Box2D REQUIRED)
+
+    file(GLOB INCLUDES_EXT
+            ${BOX2D_INCLUDE_DIRS}
+            ${SFML_INCLUDE_DIR}
+            ${LIBRARY_DIR}/entt/include
+            ${LIBRARY_DIR}/imgui/include
+            ${LIBRARY_DIR}/spdlog/include
+            )
 else ()
     message(FATAL_ERROR "Unknown OS")
 endif ()
+
+### EXPORT ###
+set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT} PARENT_SCOPE)
+set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT})
+set(SAFFRON_SHARED_BINARES ${SHARED_BINARIES} PARENT_SCOPE)
 
 find_package(Threads REQUIRED)
 
@@ -93,7 +100,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_include_directories(Saffron PUBLIC ${SAFFRON_INCLUDE_DIRS_EXT})
     target_link_directories(Saffron PUBLIC
             ${LIBRARY_DIR}/Box2D/lib
-            ${LIBRARY_DIR}/imgui/lib
+            ${LIBRARY_DIR}/imgui/windows/lib
             ${LIBRARY_DIR}/SFML/lib
             )
     target_link_libraries(Saffron PUBLIC
@@ -122,20 +129,16 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             imgui
             )
 else ()
-    target_include_directories(Saffron PRIVATE
-            ${BOX2D_INCLUDE_DIR}
-            ${SFML_INCLUDE_DIR}
-            ${LIBRARY_DIR}/entt/include
-            ${LIBRARY_DIR}/imgui/include
-            ${LIBRARY_DIR}/spdlog/include
+    target_include_directories(Saffron PUBLIC ${SAFFRON_INCLUDE_DIRS_EXT})
+    target_link_directories(Saffron PUBLIC
+            ${LIBRARY_DIR}/imgui/lib/linux
             )
-    target_link_directories(Saffron PRIVATE
-            )
-    target_link_libraries(Saffron PRIVATE
+    target_link_libraries(Saffron PUBLIC
             ${BOX2D_LIBRARY}
             ${SFML_LIBRARIES}
             Threads::Threads
             imgui
+            GL
             )
 endif ()
 

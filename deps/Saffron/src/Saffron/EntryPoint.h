@@ -2,8 +2,6 @@
 
 #include "Saffron/Core/Core.h"
 
-#ifdef SE_PLATFORM_WINDOWS
-
 extern Se::Application *Se::CreateApplication();
 
 int main(int argc, char **argv)
@@ -15,5 +13,3 @@ int main(int argc, char **argv)
 	delete app;
 	Se::Core::Shutdown();
 }
-
-#endif

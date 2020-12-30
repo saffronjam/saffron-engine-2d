@@ -1,6 +1,6 @@
 #pragma once
 
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 #include <SFML/System/Vector2.hpp>
 
 #include "Saffron/Base.h"

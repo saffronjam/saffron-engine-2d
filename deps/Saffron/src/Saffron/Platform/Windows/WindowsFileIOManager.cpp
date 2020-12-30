@@ -1,5 +1,7 @@
 #include "SaffronPCH.h"
 
+#ifdef SE_PLATFORM_WINDOWS
+
 #include <commdlg.h>
 
 #include "Saffron/Core/FileIOManager.h"
@@ -81,3 +83,5 @@ Filepath FileIOManager::SaveFile(const Filter &filter)
 
 
 }
+
+#endif

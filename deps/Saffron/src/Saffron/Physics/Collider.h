@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 
 #include "Saffron/Base.h"
 #include "Saffron/Libraries/GenUtils.h"

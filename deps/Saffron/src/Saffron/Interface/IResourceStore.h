@@ -38,7 +38,7 @@ public:
 		const char *GetType() const override
 		{
 			static char buffer[100];
-			sprintf_s(buffer, 100, "%s %s", typeid(T).name(), "Exception");
+            snprintf(buffer, 100, "%s %s", typeid(T).name(), "Exception");
 			return buffer;
 		}
 		const char *GetErrorString() const

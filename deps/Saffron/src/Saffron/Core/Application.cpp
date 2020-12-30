@@ -194,8 +194,8 @@ String Application::GetPlatformName()
 {
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";
-#else
-#error Undefined platform?
+#elif defined(SE_PLATFORM_LINUX)
+    return "Linux x64";
 #endif
 }
 }

@@ -44,19 +44,16 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions(-D${PLATFORM_MACRO}_WINDOWS)
 
     file(COPY ${SAFFRON_SHARED_BINARES} DESTINATION ${BUILD_DIR})
-    file(COPY ${SAFFRON_RESOURCES_DIR} DESTINATION ${BUILD_DIR})
-    file(COPY ${RESOURCES_DIR} DESTINATION ${BUILD_DIR})
 
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 else ()
     add_definitions(-D${PLATFORM_MACRO}_LINUX)
 
-    find_package(SFML REQUIRED network audio graphics window system)
-    find_package(Box2D REQUIRED)
-
 endif ()
 
+file(COPY ${SAFFRON_RESOURCES_DIR} DESTINATION ${BUILD_DIR})
+file(COPY ${RESOURCES_DIR} DESTINATION ${BUILD_DIR})
 find_package(Threads REQUIRED)
 
 ### DEFINITIONS ###
