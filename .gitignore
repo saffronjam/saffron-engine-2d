@@ -54,3 +54,5 @@ Saffron/bin/
 Bin/
 Bin-Int/
 !deps/premake5/Bin/
+
+bin/
