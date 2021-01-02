@@ -6,7 +6,7 @@
 ### Windows
 Prerequisites: 
 - CLion (or VSCode, see below) </br>
-- C++11 compiler
+- C++17 compiler
 
 Run <i>Client</i> in CLion
 
