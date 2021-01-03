@@ -42,7 +42,6 @@ RelWithDebInfo
 
 # Executables
 *.exe
-!Deps/premake5/Bin/premake5.exe
 *.out
 *.app
 
