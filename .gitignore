@@ -13,7 +13,6 @@ _ReSharper*
 *.vcxproj*
 *.sln
 .vs
-CMakeSettings.json
 Win32
 MinSizeRel
 RelWithDebInfo
@@ -47,12 +46,6 @@ RelWithDebInfo
 
 # Build directory
 Saffron/bin/
-
-# Folders
-.vs/
-Bin/
-Bin-Int/
-!deps/premake5/Bin/
-
 bin/
 build/
+out/
