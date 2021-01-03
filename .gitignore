@@ -45,7 +45,7 @@ RelWithDebInfo
 *.app
 
 # Build directory
-Saffron/bin/
-bin/
+/Saffron/bin/
+/bin/
 build/
 out/
