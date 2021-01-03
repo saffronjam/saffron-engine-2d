@@ -29,6 +29,7 @@ void Scene::Submit(const sf::Drawable &drawable, sf::RenderStates renderStates)
 	if ( !_screenSpaceDrawing )
 	{
 		renderStates.transform.combine(_camera->GetTransform());
+		renderStates.blendMode = sf::BlendAlpha;
 	}
 	_target->GetRenderTexture().draw(drawable, renderStates);
 }

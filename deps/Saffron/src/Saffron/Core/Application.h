@@ -39,8 +39,6 @@ public:
 	void EraseLayer(std::shared_ptr<Layer> layer);
 	void EraseOverlay(std::shared_ptr<Layer> overlay);
 
-	void RenderGui();
-
 	Window &GetWindow() { return _window; }
 
 	static Application &Get() { return *s_Instance; }
@@ -50,6 +48,8 @@ public:
 
 private:
 	bool OnWindowClose();
+
+	void RunSplashScreen();
 
 protected:
 	std::shared_ptr<BatchLoader> _preLoader;
