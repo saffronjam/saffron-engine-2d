@@ -12,8 +12,6 @@ Prerequisites:
 
 Just run <i>Client</i> in IDE
 
-\* Visual Studio Code requires the <i>CMake Tools</i> plugin!
-
 ### Linux
 Prerequisites: 
 - CLion or Visual Studio Code*
@@ -24,7 +22,8 @@ Prerequisites:
 
 <b> 3. </b> Run <i>Client</i> in IDE
 
-\* Visual Studio Code requires the <i>CMake Tools</i> plugin!
 
 ### Mac
 To be supported
+
+\* Requires <i>CMake Tools</i> plugin
