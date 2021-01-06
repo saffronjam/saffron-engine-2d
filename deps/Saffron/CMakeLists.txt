@@ -25,6 +25,10 @@ set(PLATFORM_MACRO SE_PLATFORM)
 ### COMPILER SPECIFIC ###
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
     set(COMPILER_LIB_DIR "msvc")
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/w44244)
+    add_compile_options(/w44267)
+	
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
     set(COMPILER_LIB_DIR "mingw")
 else ()
@@ -156,5 +160,4 @@ set_target_properties(Saffron PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY ${BUILD_DIR}
         LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR}
         RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR}
-        CMAKE_INSTALL_PREFIX ${BUILD_DIR}
         )

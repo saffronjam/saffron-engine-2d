@@ -200,7 +200,7 @@ sf::Color GenUtils::ValueToSpectrum(T value, T maxValue)
 	case 5:
 		return sf::Color(255, 0, 255);
 	default:
-		break;
+		return sf::Color::White;
 	}
 };
 
