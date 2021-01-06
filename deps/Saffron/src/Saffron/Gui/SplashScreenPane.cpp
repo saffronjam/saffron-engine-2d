@@ -8,108 +8,135 @@
 namespace Se
 {
 SplashScreenPane::SplashScreenPane(const std::shared_ptr<BatchLoader> &batchLoader)
-	: _batchLoader(batchLoader),
-	_texture(TextureStore::GetCopy("res/Editor/Saffron.png")),
-	_finalizingStatus("Finalizing")
+        : _batchLoader(batchLoader),
+          _texture(TextureStore::GetCopy("res/Editor/Saffron.png")),
+          _finalizingStatus("Finalizing"),
+          _fadeIn(FadePane::Type::In, sf::seconds(0.4f), sf::seconds(0.5f), true),
+          _fadeOut(FadePane::Type::Out, sf::seconds(0.4f), [](sf::Time timer, sf::Time duration)
+          {
+              return std::min(duration, timer * 2.0f) / duration * 255.0f;
+          })
 {
+    _fadeOut.GetSignal(FadePane::Signals::OnFinish).Connect([this] { _finished = true; });
 }
 
 void SplashScreenPane::OnUpdate()
 {
-	if ( _hidden )
-		return;
+    if ( _hidden )
+        return;
 
-	if ( std::abs(_batchLoader->GetProgress() - _goalProgressView) > 0.1f )
-	{
-		_goalProgressView = _batchLoader->GetProgress();
-		_currentSinTimer = 0.0f;
-	}
-	else
-	{
-		_currentSinTimer += Global::Clock::GetFrameTime().asSeconds();
-	}
-	_currentProgressView += (_goalProgressView - _currentProgressView) * std::sin(_currentSinTimer / (2.0f * Math::PI));
+    const auto dt = Global::Clock::GetFrameTime();
+
+    _fadeIn.OnUpdate();
+
+    if ( _fadeOut.IsActive() && !_fadeIn.IsActive())
+    {
+        if ( _holdTimer >= _holdTimerFinished )
+        {
+            _fadeOut.OnUpdate();
+        }
+        else
+        {
+            _holdTimer += dt;
+        }
+    }
+
+    if ( _batchLoader->GetProgress() > 99.9f )
+    {
+        _fadeOut.Start();
+    }
+
+    if ( std::abs(_batchLoader->GetProgress() - _progressViewFinished) > 0.1f )
+    {
+        _progressViewFinished = _batchLoader->GetProgress();
+        _progressTimer = sf::Time::Zero;
+    }
+    else
+    {
+        _progressTimer += dt;
+    }
+
+    _progressView += (_progressViewFinished - _progressView) * std::sin(_progressTimer.asSeconds() / (2.0f * Math::PI));
 }
 
 void SplashScreenPane::OnGuiRender()
 {
-	if ( _hidden )
-		return;
+    if ( _hidden )
+        return;
 
-	ImGuiViewport *viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
+    ImGuiViewport *viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
 
-	OutputStringStream oss;
-	oss << "Loading Screen##";
-	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+    OutputStringStream oss;
+    oss << "Loading Screen##";
+    ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-	ImGui::GetWindowDrawList()->AddRectFilled({ 0.0f, 0.0f }, ImGui::GetWindowSize(), IM_COL32(0, 0, 0, 255));
 
-	const auto windowSize = ImGui::GetWindowSize();
+    ImGui::GetWindowDrawList()->AddRectFilled({0.0f, 0.0f}, ImGui::GetWindowSize(), IM_COL32(0, 0, 0, 255));
 
-	const auto logoWidth = 200;
-	const auto logoHeight = 200;
-	ImGui::SetCursorPos({ windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f });
-	ImGui::Image(reinterpret_cast<ImTextureID>(_texture.getNativeHandle()), { logoWidth, logoHeight }, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-	//Gui::Image(_texture, , sf::FloatRect{ 0.0f, 0.0f, 1.0f, 1.0f }, sf::Color(255, 255, 255, 255));
+    const auto windowSize = ImGui::GetWindowSize();
 
-	Gui::SetFontSize(36);
-	ImGui::NewLine();
-	Gui::SetFontSize(48);
+    const auto logoWidth = 200;
+    const auto logoHeight = 200;
+    ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
+    Gui::Image(_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f}, sf::Color(255, 255, 255, 255));
 
-	const char *title = "Saffron Engine";
-	const float titleTextWidth = ImGui::CalcTextSize(title).x;
-	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - titleTextWidth / 2.0f);
-	ImGui::Text(title);
+    Gui::SetFontSize(36);
+    ImGui::NewLine();
+    Gui::SetFontSize(48);
 
-	/*IM_COL32(106, 58, 206, 255),
-	IM_COL32(106, 58, 206, 255),
-	IM_COL32(176, 121, 220, 255),
-	IM_COL32(176, 121, 220, 255));*/
-	Gui::SetFontSize(24);
+    const char *title = _title.c_str();
+    const float titleTextWidth = ImGui::CalcTextSize(title).x;
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - titleTextWidth / 2.0f);
+    ImGui::Text("%s", title);
 
-	oss.str("");
-	oss.clear();
+    /*IM_COL32(106, 58, 206, 255),
+    IM_COL32(106, 58, 206, 255),
+    IM_COL32(176, 121, 220, 255),
+    IM_COL32(176, 121, 220, 255));*/
+    Gui::SetFontSize(24);
 
-	oss << std::setprecision(0) << std::fixed << _currentProgressView << "%";
+    oss.str("");
+    oss.clear();
 
-	ImGui::NewLine();
-	const float currentProgressTextWidth = ImGui::CalcTextSize(oss.str().c_str()).x;
-	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - currentProgressTextWidth / 2.0f);
-	ImGui::Text("%s", oss.str().c_str());
+    oss << std::setprecision(0) << std::fixed << _progressView << "%";
 
-	Gui::SetFontSize(18);
+    ImGui::NewLine();
+    const float currentProgressTextWidth = ImGui::CalcTextSize(oss.str().c_str()).x;
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - currentProgressTextWidth / 2.0f);
+    ImGui::Text("%s", oss.str().c_str());
 
-	const String *status = _goalProgressView < 100.0f ? _batchLoader->GetStatus() : &_finalizingStatus;
-	if ( status && !status->empty() )
-	{
-		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
-		ImGui::NewLine();
-		ImGui::SetCursorPosX(windowSize.x / 2.0f - infoTextWidth / 2.0f);
-		ImGui::Text("%s", status->c_str());
-	}
+    Gui::SetFontSize(18);
 
-	ImGui::End();
+    const String *status = _progressViewFinished < 100.0f ? _batchLoader->GetStatus() : &_finalizingStatus;
+    if ( status && !status->empty())
+    {
+        const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
+        ImGui::NewLine();
+        ImGui::SetCursorPosX(windowSize.x / 2.0f - infoTextWidth / 2.0f);
+        ImGui::Text("%s", status->c_str());
+    }
+
+    _fadeIn.OnGuiRender();
+    _fadeOut.OnGuiRender();
+
+    ImGui::End();
 }
 
 void SplashScreenPane::Show()
 {
-	_hidden = false;
+    _hidden = false;
 }
 
 void SplashScreenPane::Hide()
 {
-	_hidden = true;
+    _hidden = true;
 }
 
 bool SplashScreenPane::IsIdle() const
 {
-	return  static_cast<int>(std::round(_currentProgressView)) == static_cast<int>(std::round(_goalProgressView));
+    return static_cast<int>(std::round(_progressView)) == static_cast<int>(std::round(_progressViewFinished));
 }
 
-bool SplashScreenPane::IsFinished() const
-{
-	return _currentProgressView > 99.9f;
-}
 }

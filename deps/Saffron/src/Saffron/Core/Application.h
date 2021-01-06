@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Layer/LayerStack.h"
 #include "Saffron/Core/Window.h"
+#include "Saffron/Layer/LayerStack.h"
+#include "Saffron/Gui/FadePane.h"
 
 namespace Se
 {
@@ -65,6 +66,8 @@ private:
 	sf::Time _cachedSpf = sf::Time::Zero;
 	sf::Time _storedFrametime = sf::Time::Zero;
 	int _storedFrameCount = 0;
+
+	FadePane _fadeIn;
 
 	static Application *s_Instance;
 };
