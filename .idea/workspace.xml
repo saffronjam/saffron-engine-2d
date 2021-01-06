@@ -14,31 +14,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f371d995-24fb-488f-8799-6e588a5b111f" name="Default Changelist" comment="Add MSVC support">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Scripts/RemoteUpdateAndGenerate.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/deps/Saffron/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/cmake/SFML/SFMLConfig.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/cmake/SFML/SFMLConfigDependencies.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/cmake/SFML/SFMLConfigVersion.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/cmake/SFML/SFMLSharedTargets-debug.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/cmake/SFML/SFMLSharedTargets.cmake" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libFLAC.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libfreetype.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libogg.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libopenal32.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-audio-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-graphics-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-main-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-network-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-system-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libsfml-window-d.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libvorbis.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libvorbisenc.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/lib/libvorbisfile.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/imgui/lib/linux/libimgui.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/imgui/lib/windows/libimgui.a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deps/Saffron/src/Saffron/Gui/Gui.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/deps/Saffron/src/Saffron/Gui/Gui.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/openal32.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/sfml-audio-d-2.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/sfml-graphics-d-2.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/sfml-network-d-2.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/sfml-system-d-2.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/Saffron/lib/SFML/bin/mingw/sfml-window-d-2.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/imgui.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +31,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Release" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -68,20 +51,20 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+    <property name="settings.editor.selected.configurable" value="CPPToolchains" />
   </component>
   <component name="RunManager" selected="CMake Application.Client">
-    <configuration name="Client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PROJECT_NAME" TARGET_NAME="Client" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="PROJECT_NAME" RUN_TARGET_NAME="Client">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PROJECT_NAME" TARGET_NAME="Client" CONFIG_NAME="Release" RUN_TARGET_PROJECT_NAME="PROJECT_NAME" RUN_TARGET_NAME="Client">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Saffron" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PROJECT_NAME" TARGET_NAME="Saffron" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true">
+    <configuration name="Saffron" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PROJECT_NAME" TARGET_NAME="Saffron" CONFIG_NAME="Release">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -106,6 +89,7 @@
       <updated>1609371114301</updated>
       <workItem from="1609371117501" duration="674000" />
       <workItem from="1609425879689" duration="802000" />
+      <workItem from="1609974237765" duration="494000" />
     </task>
     <servers />
   </component>
