@@ -28,7 +28,7 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/w44244)
     add_compile_options(/w44267)
-	
+
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
     set(COMPILER_LIB_DIR "mingw")
 else ()
@@ -68,6 +68,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             ${LIBRARY_DIR}/Box2D/include
             ${LIBRARY_DIR}/entt/include
             ${LIBRARY_DIR}/imgui/include
+            ${LIBRARY_DIR}/jcv/include
             ${LIBRARY_DIR}/SFML/include
             ${LIBRARY_DIR}/spdlog/include
             PARENT_SCOPE
@@ -143,6 +144,7 @@ else ()
             ${SFML_INCLUDE_DIR}
             ${LIBRARY_DIR}/entt/include
             ${LIBRARY_DIR}/imgui/include
+            ${LIBRARY_DIR}/jcv/include
             ${LIBRARY_DIR}/spdlog/include
             )
     target_link_directories(Saffron PRIVATE
