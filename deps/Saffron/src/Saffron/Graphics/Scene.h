@@ -13,33 +13,35 @@ namespace Se
 class Scene
 {
 public:
-	Scene(String name, ControllableRenderTexture *target, Camera *camera);
+	Scene(String name, ControllableRenderTexture* target, Camera* camera);
 
-	void OnUpdate();
+	void OnUpdate() const;
 	void OnGuiRender();
-	void OnRenderTargetResize(const sf::Vector2f& size);
+	void OnRenderTargetResize(const sf::Vector2f& size) const;
 
 	void ActivateScreenSpaceDrawing() { _screenSpaceDrawing = true; }
+
 	void DeactivateScreenSpaceDrawing() { _screenSpaceDrawing = false; }
 
-	void Submit(const sf::Drawable &drawable, sf::RenderStates renderStates = sf::RenderStates());
-	void Submit(const sf::Text &text, TextAlign align, sf::RenderStates renderStates = sf::RenderStates());
-	void Submit(const sf::Vector2f &position, sf::Color color, float radius);
-	void Submit(const sf::FloatRect &rect, sf::Color fillColor, bool outlined, sf::Color outlineColor);
-	void Submit(const sf::Vector2f &first, const sf::Vector2f &second, sf::Color color);
+	void Submit(const sf::Drawable& drawable, sf::RenderStates renderStates = sf::RenderStates()) const;
+	void Submit(const sf::Text& text, TextAlign align, sf::RenderStates renderStates = sf::RenderStates());
+	void Submit(const sf::Vector2f& position, sf::Color color, float radius);
+	void Submit(const sf::FloatRect& rect, sf::Color fillColor, bool outlined, sf::Color outlineColor);
+	void Submit(const sf::Vector2f& first, const sf::Vector2f& second, sf::Color color);
 
-	Camera &GetCamera() { return *_camera; }
-	const Camera &GetCamera() const { return *_camera; }
+	auto GetCamera() -> Camera& { return *_camera; }
 
-	ViewportPane &GetViewportPane() { return _viewportPane; }
-	const ViewportPane &GetViewportPane() const { return _viewportPane; }
+	auto GetCamera() const -> const Camera& { return *_camera; }
+
+	auto GetViewportPane() -> ViewportPane& { return _viewportPane; }
+
+	auto GetViewportPane() const -> const ViewportPane& { return _viewportPane; }
 
 private:
-	ControllableRenderTexture *_target;
-	Camera *_camera;
+	ControllableRenderTexture* _target;
+	Camera* _camera;
 	ViewportPane _viewportPane;
 
 	bool _screenSpaceDrawing = false;
-
 };
 }

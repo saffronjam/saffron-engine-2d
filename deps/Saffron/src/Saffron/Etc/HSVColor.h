@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics/Color.hpp>
 
-#include "Saffron/Libraries/GenUtils.h"
 
 namespace Se
 {
@@ -12,14 +11,14 @@ public:
 	HSVColor();
 	HSVColor(int hue, float saturation, float value);
 	HSVColor(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b, sf::Uint8 a = 255);
-	HSVColor(const sf::Color &color);
-	HSVColor(const HSVColor &hsvColor);
+	HSVColor(const Color& color);
+	HSVColor(const HSVColor& hsvColor);
 
-	const sf::Color &GetRGBA() const;
+	auto GetRGBA() const -> const sf::Color&;
 
-	int GetHue() const;
-	float GetSaturation() const;
-	float GetValue() const;
+	auto GetHue() const -> int;
+	auto GetSaturation() const -> float;
+	auto GetValue() const -> float;
 
 	void SetHue(int hue);
 	void SetSaturation(float saturation);

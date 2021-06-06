@@ -4,8 +4,8 @@
 
 namespace Se
 {
-Layer::Layer(const String &name)
-	: _debugName(name)
+Layer::Layer(const String& name) :
+	_debugName(name)
 {
 }
 }

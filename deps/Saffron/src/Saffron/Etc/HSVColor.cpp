@@ -1,52 +1,54 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Etc/HSVColor.h"
+#include "Saffron/Libraries/GenUtils.h"
 
 namespace Se
 {
-HSVColor::HSVColor()
-	: HSVColor(0, 0.0f, 0.0f)
+HSVColor::HSVColor() :
+	HSVColor(0, 0.0f, 0.0f)
 {
 }
 
-HSVColor::HSVColor(int hue, float saturation, float value)
-	: sf::Color(GenUtils::HSVtoRGB(hue, saturation, value)),
+HSVColor::HSVColor(int hue, float saturation, float value) :
+	Color(GenUtils::HSVtoRGB(hue, saturation, value)),
 	_hue(hue),
-	_saturation(saturation), _value(value)
+	_saturation(saturation),
+	_value(value)
 {
 }
 
-HSVColor::HSVColor(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b, sf::Uint8 a)
-	: HSVColor(sf::Color(r, g, b, a))
+HSVColor::HSVColor(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b, sf::Uint8 a) :
+	HSVColor(Color(r, g, b, a))
 {
 }
 
-HSVColor::HSVColor(const sf::Color &color)
-	: HSVColor(GenUtils::RGBtoHSV(color))
+HSVColor::HSVColor(const Color& color) :
+	HSVColor(GenUtils::RGBtoHSV(color))
 {
 }
 
-HSVColor::HSVColor(const HSVColor &hsvColor)
-	: HSVColor(hsvColor._hue, hsvColor._saturation, hsvColor._value)
+HSVColor::HSVColor(const HSVColor& hsvColor) :
+	HSVColor(hsvColor._hue, hsvColor._saturation, hsvColor._value)
 {
 }
 
-const sf::Color &HSVColor::GetRGBA() const
+auto HSVColor::GetRGBA() const -> const sf::Color&
 {
 	return *this;
 }
 
-int HSVColor::GetHue() const
+auto HSVColor::GetHue() const -> int
 {
 	return _hue;
 }
 
-float HSVColor::GetSaturation() const
+auto HSVColor::GetSaturation() const -> float
 {
 	return _saturation;
 }
 
-float HSVColor::GetValue() const
+auto HSVColor::GetValue() const -> float
 {
 	return _value;
 }

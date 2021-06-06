@@ -16,7 +16,7 @@ void PhysicsMgr::Step()
 	_world->Step(1.0f / 60.0f, 6, 2);
 }
 
-void PhysicsMgr::AddCollider(Collider *collider, const b2BodyDef *bodyDef)
+void PhysicsMgr::AddCollider(Collider* collider, const b2BodyDef* bodyDef)
 {
 	collider->AssignBody(_world->CreateBody(bodyDef));
 }

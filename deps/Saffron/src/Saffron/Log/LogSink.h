@@ -5,6 +5,8 @@
 #include "Saffron/Log/LogMessage.h"
 #include "Saffron/Core/ScopedLock.h"
 
+#include <format>
+
 namespace Se
 {
 class LogSink : public spdlog::sinks::sink
@@ -12,13 +14,13 @@ class LogSink : public spdlog::sinks::sink
 	friend class Log;
 
 public:
-	virtual void Sink(const LogMessage &message) = 0;
+	virtual void Sink(const LogMessage& message) = 0;
 	virtual void Flush() = 0;
 
 	void SetLevel(Log::Level::LevelEnum level);
 
 protected:
-	void log(const spdlog::details::log_msg &msg) final override
+	void log(const spdlog::details::log_msg& msg) final override
 	{
 		ScopedLock lock(_mutex);
 		Sink(LogMessage(msg));

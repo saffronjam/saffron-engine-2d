@@ -4,7 +4,7 @@
 
 namespace Se
 {
-CircleCollider::Ptr CircleCollider::Create(const sf::Vector2f &position, float radius)
+auto CircleCollider::Create(const sf::Vector2f& position, float radius) -> CircleCollider::Ptr
 {
 	Ptr ret = std::make_shared<CircleCollider>();
 	ret->_radius = radius;

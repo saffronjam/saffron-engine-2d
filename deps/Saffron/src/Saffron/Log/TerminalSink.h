@@ -10,16 +10,16 @@ class TerminalSink : public LogSink
 public:
 	void Clear();
 
-	const ImGuiTextBuffer &GetTextBuffer() const { return _textBuffer; }
-	const ArrayList<int> &GetLineOffsets() const { return _lineOffsets; }
+	auto GetTextBuffer() const -> const ImGuiTextBuffer& { return _textBuffer; }
+
+	auto GetLineOffsets() const -> const ArrayList<int>& { return _lineOffsets; }
 
 protected:
-	void Sink(const LogMessage &message) override;
+	void Sink(const LogMessage& message) override;
 	void Flush() override;
 
 private:
 	ImGuiTextBuffer _textBuffer;
 	ArrayList<int> _lineOffsets;
-
 };
 }

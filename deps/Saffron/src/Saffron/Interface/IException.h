@@ -8,12 +8,15 @@ namespace Se
 class IException : public std::exception
 {
 public:
-	IException(int line, const char *file);
-	const char * what() const noexcept override;
-	virtual const char *GetType() const;
-	int GetLine() const { return _line; }
-	const std::string& GetFile() const { return _file; }
-	std::string GetOriginString() const;
+	IException(int line, const char* file);
+	auto what() const noexcept -> const char* override;
+	virtual auto GetType() const -> const char*;
+
+	auto GetLine() const -> int { return _line; }
+
+	auto GetFile() const -> const std::string& { return _file; }
+
+	auto GetOriginString() const -> std::string;
 
 private:
 	int _line;

@@ -10,33 +10,39 @@ class FontStore : public IResourceStore<sf::Font>
 {
 public:
 	FontStore() = default;
-	FontStore(const FontStore &) = delete;
-	const FontStore &operator()(const FontStore &) = delete;
+	FontStore(const FontStore&) = delete;
+	auto operator()(const FontStore&) -> const FontStore& = delete;
 
-	static sf::Font *Get(const std::string &filepath)
+	static auto Get(const std::string& filepath) -> sf::Font*
 	{
-		if ( _resources.find(filepath) == _resources.end() )
+		if (_resources.find(filepath) == _resources.end())
 		{
 			Load(filepath);
 		}
 		return &_resources[filepath];
 	}
+
 	// Returns copy of resource from cache, if not existing, call Load();
-	static const sf::Font &GetCopy(const std::string &filepath)
+	static auto GetCopy(const std::string& filepath) -> const sf::Font&
 	{
-		if ( _resources.find(filepath) == _resources.end() )
+		if (_resources.find(filepath) == _resources.end())
 		{
 			Load(filepath);
 		}
 		return _resources[filepath];
 	}
+
 	// Load resource into memory
-	static void Load(const std::string &filepath)
+	static void Load(const std::string& filepath)
 	{
 		sf::Font resource;
-		if ( !resource.loadFromFile(filepath) )
+		if (!resource.loadFromFile(filepath))
 		{
-			{ char buf[200]; sprintf(buf, "Failed to load font: %s", filepath.c_str()); throw Exception(__LINE__, __FILE__, buf); };
+			{
+				char buf[200];
+				sprintf(buf, "Failed to load font: %s", filepath.c_str());
+				throw Exception(__LINE__, __FILE__, buf);
+			}
 		}
 		_resources.emplace(std::make_pair(filepath, resource));
 	}

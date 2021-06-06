@@ -12,22 +12,23 @@ class Keyboard
 public:
 	Keyboard() = default;
 	~Keyboard() = default;
-	Keyboard(const Keyboard &) = delete;
-	Keyboard &operator=(const Keyboard &) = delete;
+	Keyboard(const Keyboard&) = delete;
+	auto operator=(const Keyboard&) -> Keyboard& = delete;
 
 	static void OnUpdate();
-	static void OnEvent(const sf::Event &event);
+	static void OnEvent(const sf::Event& event);
 
-	static bool IsDown(const sf::Keyboard::Key &key);
-	static bool IsPressed(const sf::Keyboard::Key &key);
-	static bool IsReleased(const sf::Keyboard::Key &key);
-	static bool IsAnyDown();
-	static std::string GetTextInput() { return _textInputBuffer; }
+	static auto IsDown(const sf::Keyboard::Key& key) -> bool;
+	static auto IsPressed(const sf::Keyboard::Key& key) -> bool;
+	static auto IsReleased(const sf::Keyboard::Key& key) -> bool;
+	static auto IsAnyDown() -> bool;
+
+	static auto GetTextInput() -> std::string { return _textInputBuffer; }
 
 private:
 
-	static void OnPress(const sf::Event::KeyEvent &event);
-	static void OnRelease(const sf::Event::KeyEvent &event);
+	static void OnPress(const sf::Event::KeyEvent& event);
+	static void OnRelease(const sf::Event::KeyEvent& event);
 	static void OnTextInput(unsigned char character);
 
 private:

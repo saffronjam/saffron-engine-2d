@@ -14,10 +14,11 @@ public:
 	using Ptr = std::shared_ptr<BoxCollider>;
 
 public:
-	static Ptr Create(const sf::Vector2f &position, const sf::Vector2f &dimensions);
+	static auto Create(const sf::Vector2f& position, const sf::Vector2f& dimensions) -> Ptr;
 
-	const sf::Vector2f &GetDimensions() const { return _dimensions; }
-	sf::FloatRect GetRect() const;
+	auto GetDimensions() const -> const sf::Vector2f& { return _dimensions; }
+
+	auto GetRect() const -> sf::FloatRect;
 
 private:
 	sf::Vector2f _dimensions;

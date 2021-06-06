@@ -89,7 +89,7 @@ public:
 	///
 	////////////////////////////////////////////////////////////
 	template <typename U>
-	explicit Vector4(const Vector4<U> &vector) :
+	explicit Vector4(const Vector4<U>& vector) :
 		x(static_cast<T>(vector.x)),
 		y(static_cast<T>(vector.y)),
 		z(static_cast<T>(vector.z)),
@@ -116,7 +116,7 @@ public:
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator -(const Vector4<T> &left)
+auto operator -(const Vector4<T>& left) -> Vector4<T>
 {
 	return Vector4<T>(-left.x, -left.y, -left.z, -left.w);
 }
@@ -135,7 +135,7 @@ Vector4<T> operator -(const Vector4<T> &left)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> &operator +=(Vector4<T> &left, const Vector4<T> &right)
+auto operator +=(Vector4<T>& left, const Vector4<T>& right) -> Vector4<T>&
 {
 	left.x += right.x;
 	left.y += right.y;
@@ -159,7 +159,7 @@ Vector4<T> &operator +=(Vector4<T> &left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> &operator -=(Vector4<T> &left, const Vector4<T> &right)
+auto operator -=(Vector4<T>& left, const Vector4<T>& right) -> Vector4<T>&
 {
 	left.x -= right.x;
 	left.y -= right.y;
@@ -180,7 +180,7 @@ Vector4<T> &operator -=(Vector4<T> &left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator +(const Vector4<T> &left, const Vector4<T> &right)
+auto operator +(const Vector4<T>& left, const Vector4<T>& right) -> Vector4<T>
 {
 	return Vector4<T>(left.x + right.x, left.y + right.y, left.z + right.z, left.w + right.w);
 }
@@ -196,7 +196,7 @@ Vector4<T> operator +(const Vector4<T> &left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator -(const Vector4<T> &left, const Vector4<T> &right)
+auto operator -(const Vector4<T>& left, const Vector4<T>& right) -> Vector4<T>
 {
 	return Vector4<T>(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
 }
@@ -212,7 +212,7 @@ Vector4<T> operator -(const Vector4<T> &left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator *(const Vector4<T> &left, T right)
+auto operator *(const Vector4<T>& left, T right) -> Vector4<T>
 {
 	return Vector4<T>(left.x * right, left.y * right, left.z * right, left.w * right);
 }
@@ -228,7 +228,7 @@ Vector4<T> operator *(const Vector4<T> &left, T right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator *(T left, const Vector4<T> &right)
+auto operator *(T left, const Vector4<T>& right) -> Vector4<T>
 {
 	return Vector4<T>(right.x * left, right.y * left, right.z * left, right.w * left);
 }
@@ -247,7 +247,7 @@ Vector4<T> operator *(T left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> &operator *=(Vector4<T> &left, T right)
+auto operator *=(Vector4<T>& left, T right) -> Vector4<T>&
 {
 	left.x *= right;
 	left.y *= right;
@@ -268,7 +268,7 @@ Vector4<T> &operator *=(Vector4<T> &left, T right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> operator /(const Vector4<T> &left, T right)
+auto operator /(const Vector4<T>& left, T right) -> Vector4<T>
 {
 	return Vector4<T>(left.x / right, left.y / right, left.z / right, left.w / right);
 }
@@ -287,7 +287,7 @@ Vector4<T> operator /(const Vector4<T> &left, T right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-Vector4<T> &operator /=(Vector4<T> &left, T right)
+auto operator /=(Vector4<T>& left, T right) -> Vector4<T>&
 {
 	left.x /= right;
 	left.y /= right;
@@ -310,7 +310,7 @@ Vector4<T> &operator /=(Vector4<T> &left, T right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-bool operator ==(const Vector4<T> &left, const Vector4<T> &right)
+auto operator ==(const Vector4<T>& left, const Vector4<T>& right) -> bool
 {
 	return (left.x == right.x) && (left.y == right.y) && (left.z == right.z && (left.w == right.w));
 }
@@ -328,17 +328,15 @@ bool operator ==(const Vector4<T> &left, const Vector4<T> &right)
 ///
 ////////////////////////////////////////////////////////////
 template <typename T>
-bool operator !=(const Vector4<T> &left, const Vector4<T> &right)
+auto operator !=(const Vector4<T>& left, const Vector4<T>& right) -> bool
 {
 	return (left.x != right.x) || (left.y != right.y) || (left.z != right.z) || (left.w != right.w);
 }
 
 
-
 // Define the most common types
-typedef Vector4<int>   Vector4i;
+typedef Vector4<int> Vector4i;
 typedef Vector4<float> Vector4f;
-
 } // namespace sf
 
 
@@ -384,4 +382,3 @@ typedef Vector4<float> Vector4f;
 /// Note: for 2-dimensional vectors, see sf::Vector2.
 ///
 ////////////////////////////////////////////////////////////
-

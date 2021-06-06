@@ -17,69 +17,61 @@ float Mouse::_horizontalScrollBuffer = 0.0f;
 
 void Mouse::OnUpdate()
 {
-	for ( auto &[key, state] : _buttonmap )
+	for (auto& [key, state] : _buttonmap)
 	{
 		_prevButtonmap[key] = state;
 	}
 
 	_horizontalScrollBuffer = 0.0f;
 	_verticalScrollBuffer = 0.0f;
-	_mouseSwipe = { 0.0f, 0.0f };
+	_mouseSwipe = {0.0f, 0.0f};
 }
 
-void Mouse::OnEvent(const sf::Event &event)
+void Mouse::OnEvent(const sf::Event& event)
 {
-	switch ( event.type )
+	switch (event.type)
 	{
-	case sf::Event::EventType::MouseButtonPressed:
-		OnPress(event.mouseButton);
+	case sf::Event::EventType::MouseButtonPressed: OnPress(event.mouseButton);
 		break;
-	case sf::Event::EventType::MouseButtonReleased:
-		OnRelease(event.mouseButton);
+	case sf::Event::EventType::MouseButtonReleased: OnRelease(event.mouseButton);
 		break;
-	case sf::Event::EventType::MouseMoved:
-		OnMove(event.mouseMove);
+	case sf::Event::EventType::MouseMoved: OnMove(event.mouseMove);
 		break;
-	case sf::Event::EventType::MouseEntered:
-		OnEnter();
+	case sf::Event::EventType::MouseEntered: OnEnter();
 		break;
-	case sf::Event::EventType::MouseLeft:
-		OnLeave();
+	case sf::Event::EventType::MouseLeft: OnLeave();
 		break;
-	case sf::Event::EventType::MouseWheelScrolled:
-		OnScroll(event.mouseWheelScroll);
+	case sf::Event::EventType::MouseWheelScrolled: OnScroll(event.mouseWheelScroll);
 		break;
-	default:
-		break;
+	default: break;
 	}
 }
 
-bool Mouse::IsDown(const sf::Mouse::Button &button)
+auto Mouse::IsDown(const sf::Mouse::Button& button) -> bool
 {
 	return _buttonmap[button];
 }
 
-bool Mouse::IsPressed(const sf::Mouse::Button &button)
+auto Mouse::IsPressed(const sf::Mouse::Button& button) -> bool
 {
 	return _buttonmap[button] && !_prevButtonmap[button];
 }
 
-bool Mouse::IsReleased(const sf::Mouse::Button &button)
+auto Mouse::IsReleased(const sf::Mouse::Button& button) -> bool
 {
 	return !_buttonmap[button] && _prevButtonmap[button];
 }
 
-bool Mouse::AnyButtonDown()
+auto Mouse::AnyButtonDown() -> bool
 {
-	for ( auto &[button, state] : _buttonmap )
-		if ( state )
-			return true;
+	for (auto& [button, state] : _buttonmap)
+		if (state) return true;
 	return false;
 }
 
-const sf::Vector2f &Mouse::GetPosition(bool normalized)
+auto Mouse::GetPosition(bool normalized) -> const sf::Vector2f&
 {
-	if ( !normalized )
+	if (!normalized)
 	{
 		return _mousePosition;
 	}
@@ -90,24 +82,24 @@ const sf::Vector2f &Mouse::GetPosition(bool normalized)
 	return _mousePosition;
 }
 
-const sf::Vector2f &Mouse::GetSwipe()
+auto Mouse::GetSwipe() -> const sf::Vector2f&
 {
 	return _mouseSwipe;
 }
 
-void Mouse::OnPress(const sf::Event::MouseButtonEvent &event)
+void Mouse::OnPress(const sf::Event::MouseButtonEvent& event)
 {
 	_buttonmap[event.button] = true;
 }
 
-void Mouse::OnRelease(const sf::Event::MouseButtonEvent &event)
+void Mouse::OnRelease(const sf::Event::MouseButtonEvent& event)
 {
 	_buttonmap[event.button] = false;
 }
 
-void Mouse::OnMove(const sf::Event::MouseMoveEvent &event)
+void Mouse::OnMove(const sf::Event::MouseMoveEvent& event)
 {
-	if ( !_inWindow && AnyButtonDown() || _inWindow )
+	if (!_inWindow && AnyButtonDown() || _inWindow)
 	{
 		const auto oldPosition = _mousePosition;
 		_mousePosition = sf::Vector2f(event.x, event.y);
@@ -125,13 +117,13 @@ void Mouse::OnLeave()
 	_inWindow = false;
 }
 
-void Mouse::OnScroll(const sf::Event::MouseWheelScrollEvent &event)
+void Mouse::OnScroll(const sf::Event::MouseWheelScrollEvent& event)
 {
-	if ( event.wheel == sf::Mouse::Wheel::HorizontalWheel )
+	if (event.wheel == sf::Mouse::Wheel::HorizontalWheel)
 	{
 		_horizontalScrollBuffer += event.delta;
 	}
-	else if ( event.wheel == sf::Mouse::Wheel::VerticalWheel )
+	else if (event.wheel == sf::Mouse::Wheel::VerticalWheel)
 	{
 		_verticalScrollBuffer += event.delta;
 	}

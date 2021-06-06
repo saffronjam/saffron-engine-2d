@@ -10,61 +10,55 @@ std::string Keyboard::_textInputBuffer;
 
 void Keyboard::OnUpdate()
 {
-	for ( auto &[key, state] : _keymap )
-		_prevKeymap[key] = state;
+	for (auto& [key, state] : _keymap) _prevKeymap[key] = state;
 	_textInputBuffer.clear();
 }
 
 
-void Keyboard::OnEvent(const sf::Event &event)
+void Keyboard::OnEvent(const sf::Event& event)
 {
-	switch ( event.type )
+	switch (event.type)
 	{
-	case sf::Event::EventType::KeyPressed:
-		OnPress(event.key);
+	case sf::Event::EventType::KeyPressed: OnPress(event.key);
 		break;
-	case sf::Event::EventType::KeyReleased:
-		OnRelease(event.key);
+	case sf::Event::EventType::KeyReleased: OnRelease(event.key);
 		break;
-	case sf::Event::EventType::TextEntered:
-		OnTextInput(event.text.unicode);
+	case sf::Event::EventType::TextEntered: OnTextInput(event.text.unicode);
 		break;
-	default:
-		break;
+	default: break;
 	}
 }
 
-bool Keyboard::IsDown(const sf::Keyboard::Key &key)
+auto Keyboard::IsDown(const sf::Keyboard::Key& key) -> bool
 {
 	return _keymap[key];
 }
 
-bool Keyboard::IsPressed(const sf::Keyboard::Key &key)
+auto Keyboard::IsPressed(const sf::Keyboard::Key& key) -> bool
 {
 	return _keymap[key] && !_prevKeymap[key];
 }
 
-bool Keyboard::IsReleased(const sf::Keyboard::Key &key)
+auto Keyboard::IsReleased(const sf::Keyboard::Key& key) -> bool
 {
 	return !_keymap[key] && _prevKeymap[key];
 }
 
-bool Keyboard::IsAnyDown()
+auto Keyboard::IsAnyDown() -> bool
 {
-	for ( auto &[key, state] : _keymap )
+	for (auto& [key, state] : _keymap)
 	{
-		if ( _keymap[key] )
-			return true;
+		if (_keymap[key]) return true;
 	}
 	return false;
 }
 
-void Keyboard::OnPress(const sf::Event::KeyEvent &event)
+void Keyboard::OnPress(const sf::Event::KeyEvent& event)
 {
 	_keymap[event.code] = true;
 }
 
-void Keyboard::OnRelease(const sf::Event::KeyEvent &event)
+void Keyboard::OnRelease(const sf::Event::KeyEvent& event)
 {
 	_keymap[event.code] = false;
 }

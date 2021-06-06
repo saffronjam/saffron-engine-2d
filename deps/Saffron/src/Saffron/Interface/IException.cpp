@@ -4,30 +4,29 @@
 
 namespace Se
 {
-IException::IException(int line, const char *file)
-	: _line(line), _file(file)
+IException::IException(int line, const char* file) :
+	_line(line),
+	_file(file)
 {
 }
 
-const char *IException::what() const noexcept
+auto IException::what() const noexcept -> const char*
 {
 	std::ostringstream oss;
-	oss << "[Type] " << GetType() << std::endl
-		<< GetOriginString();
+	oss << "[Type] " << GetType() << std::endl << GetOriginString();
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
 
-const char *IException::GetType() const
+auto IException::GetType() const -> const char*
 {
 	return "IException";
 }
 
-std::string IException::GetOriginString() const
+auto IException::GetOriginString() const -> std::string
 {
 	std::ostringstream oss;
-	oss << "[File] " << _file << std::endl
-		<< "[Line] " << _line << std::endl;
+	oss << "[File] " << _file << std::endl << "[Line] " << _line << std::endl;
 	return oss.str();
 }
 }

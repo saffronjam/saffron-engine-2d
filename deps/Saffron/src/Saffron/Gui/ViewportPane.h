@@ -12,31 +12,32 @@ public:
 	struct Signals
 	{
 		static SignalAggregate<void> OnPostRender;
-		static SignalAggregate<const sf::Vector2f &> OnWantRenderTargetResize;
+		static SignalAggregate<const sf::Vector2f&> OnWantRenderTargetResize;
 	};
 
 public:
-	explicit ViewportPane(String windowTitle, const ControllableRenderTexture &target);
+	explicit ViewportPane(String windowTitle, const ControllableRenderTexture& target);
 
-	void OnGuiRender(bool *open = nullptr, UUID uuid = 0);
+	void OnGuiRender(bool* open = nullptr, UUID uuid = 0);
 
-	bool InViewport(sf::Vector2f positionNDC) const;
+	auto InViewport(sf::Vector2f positionNDC) const -> bool;
 
-	sf::Vector2f GetMousePosition(bool normalized = false) const;
-	sf::Vector2f GetViewportSize() const;
-	Uint32 GetDockID() const { return _dockID; }
+	auto GetMousePosition(bool normalized = false) const -> sf::Vector2f;
+	auto GetViewportSize() const -> sf::Vector2f;
 
-	const sf::Vector2f &GetTopLeft() const { return _topLeft; }
-	const sf::Vector2f &GetBottomRight() const { return _bottomRight; }
+	auto GetDockID() const -> Uint32;
 
-	bool IsHovered() const { return _hovered; }
-	bool IsFocused() const { return _focused; }
+	auto GetTopLeft() const -> const sf::Vector2f&;
+	auto GetBottomRight() const -> const sf::Vector2f&;
 
-	void SetTarget(const ControllableRenderTexture &target) { _target = &target; }
+	auto IsHovered() const -> bool;
+	auto IsFocused() const -> bool;
+
+	void SetTarget(const ControllableRenderTexture& target);
 
 private:
 	String _windowTitle;
-	const ControllableRenderTexture *_target;
+	const ControllableRenderTexture* _target;
 	sf::Texture _fallbackTexture;
 	Uint32 _dockID = 0;
 
@@ -44,7 +45,5 @@ private:
 	sf::Vector2f _bottomRight;
 	bool _hovered;
 	bool _focused;
-
 };
-
 }

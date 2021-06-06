@@ -8,16 +8,15 @@ namespace Se
 class RenderTargetManager
 {
 public:
-	static void Add(ControllableRenderTexture *target);
+	static void Add(ControllableRenderTexture* target);
 
-	static void Remove(ControllableRenderTexture *target);
+	static void Remove(ControllableRenderTexture* target);
 
 	static void ClearAll();
 
 	static void DisplayAll();
 
 private:
-	static ArrayList<ControllableRenderTexture *> _targets;
-
+	static ArrayList<ControllableRenderTexture*> _targets;
 };
 }

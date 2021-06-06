@@ -4,28 +4,45 @@
 
 #include "Saffron/Core/BatchLoader.h"
 
-namespace Se {
-
+namespace Se
+{
 class Layer
 {
 public:
-	Layer(const String &name = "Layer");
+	Layer(const String& name = "Layer");
 	virtual ~Layer() = default;
 
-	virtual void OnAttach(std::shared_ptr<BatchLoader> &loader) {}
-	virtual void OnDetach() {}
+	virtual void OnAttach(std::shared_ptr<BatchLoader>& loader)
+	{
+	}
 
-	virtual void OnPreFrame() {}
-	virtual void OnPostFrame() {}
+	virtual void OnDetach()
+	{
+	}
 
-	virtual void OnUpdate() {}
-	virtual void OnGuiRender() {}
+	virtual void OnPreFrame()
+	{
+	}
 
-	virtual void OnEvent(const sf::Event &event) {}
+	virtual void OnPostFrame()
+	{
+	}
 
-	const String &GetName() const { return _debugName; }
+	virtual void OnUpdate()
+	{
+	}
+
+	virtual void OnGuiRender()
+	{
+	}
+
+	virtual void OnEvent(const sf::Event& event)
+	{
+	}
+
+	auto GetName() const -> const String& { return _debugName; }
+
 protected:
 	String _debugName;
 };
-
 }

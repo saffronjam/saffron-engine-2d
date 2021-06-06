@@ -13,7 +13,7 @@ public:
 	using Ptr = std::shared_ptr<VoidBody>;
 
 public:
-	static Ptr Create(const sf::Vector2f &position);
+	static auto Create(const sf::Vector2f& position) -> Ptr;
 
 private:
 };

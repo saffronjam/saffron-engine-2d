@@ -9,10 +9,10 @@ class Terminal
 public:
 	Terminal();
 
-	void Clear();
+	void Clear() const;
 	void OnGuiRender();
 
-	void SetLevel(Log::Level::LevelEnum level);
+	void SetLevel(Log::Level::LevelEnum level) const;
 
 private:
 	std::shared_ptr<TerminalSink> _sink;

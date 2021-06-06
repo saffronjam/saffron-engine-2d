@@ -10,6 +10,7 @@ public:
 	using Ptr = std::shared_ptr<PointLight>;
 
 public:
-	static PointLight::Ptr Create(const sf::Vector2f &position, float radius, sf::Color color = sf::Color::White);
+	static auto Create(const sf::Vector2f& position, float radius,
+	                   sf::Color color = sf::Color::White) -> PointLight::Ptr;
 };
 }

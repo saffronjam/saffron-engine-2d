@@ -9,6 +9,7 @@
 
 #include "Saffron/Core/Assert.h"
 #include "Saffron/Core/TypeDefs.h"
+#include "Saffron/Etc/HSVColor.h"
 #include "Saffron/Libraries/VecUtils.h"
 
 namespace Se
@@ -25,88 +26,88 @@ class GenUtils
 {
 public:
 	template <typename T, typename U>
-	static sf::Vector2<T> ConvertTo(const sf::Vector2<U> &vec);
+	static auto ConvertTo(const sf::Vector2<U>& vec) -> sf::Vector2<T>;
 
 	template <typename T, typename U>
-	static sf::Rect<T> ConvertTo(const sf::Rect<U> &rect);
+	static auto ConvertTo(const sf::Rect<U>& rect) -> sf::Rect<T>;
 
 	template <typename T>
-	static sf::Vector2<T> Mid(sf::Rect<T> rect);
+	static auto Mid(sf::Rect<T> rect) -> sf::Vector2<T>;
 
-	static sf::Vector2f Mid(const sf::ConvexShape &polygon);
+	static auto Mid(const sf::ConvexShape& polygon) -> sf::Vector2f;
 
-	static sf::Vector2f Mid(const ArrayList<sf::Vector2f> &polygonPoints);
-
-	template <typename T>
-	static sf::Vector2<T> MapPoint(const sf::Vector2<T> &point, sf::Rect<T> from, sf::Rect<T> to);
+	static auto Mid(const ArrayList<sf::Vector2f>& polygonPoints) -> sf::Vector2f;
 
 	template <typename T>
-	static T Map(const T &value, T lowerFrom, T upperFrom, T lowerTo, T upperTo);
+	static auto MapPoint(const sf::Vector2<T>& point, sf::Rect<T> from, sf::Rect<T> to) -> sf::Vector2<T>;
 
 	template <typename T>
-	static T Map(const T &value, std::pair<T, T> from, std::pair<T, T> to);
+	static auto Map(const T& value, T lowerFrom, T upperFrom, T lowerTo, T upperTo) -> T;
 
 	template <typename T>
-	static T Constrain(const T &value, T from, T to);
+	static auto Map(const T& value, std::pair<T, T> from, std::pair<T, T> to) -> T;
 
 	template <typename T>
-	static void Clamp(T &value, T from, T to);
+	static auto Constrain(const T& value, T from, T to) -> T;
 
 	template <typename T>
-	static T Clamped(const T &value, T from, T to);
-
-	static void Rotate(sf::Transformable &transformable, const sf::Vector2f &direction);
+	static void Clamp(T& value, T from, T to);
 
 	template <typename T>
-	static T ToDegress(const T &radians);
+	static auto Clamped(const T& value, T from, T to) -> T;
+
+	static void Rotate(sf::Transformable& transformable, const sf::Vector2f& direction);
 
 	template <typename T>
-	static T ToRadians(const T &degress);
+	static auto ToDegress(const T& radians) -> T;
 
 	template <typename T>
-	static sf::Color ValueToSpectrum(T value, T maxValue);
-
-	static sf::ConvexShape CreateConvexShape(const ArrayList<sf::Vector2f> &points);
+	static auto ToRadians(const T& degress) -> T;
 
 	template <typename T>
-	static ArrayList<sf::Vector2<T>> WrapPoints(const ArrayList<sf::Vector2<T>> &points);
+	static auto ValueToSpectrum(T value, T maxValue) -> sf::Color;
+
+	static auto CreateConvexShape(const ArrayList<sf::Vector2f>& points) -> sf::ConvexShape;
+
+	template <typename T>
+	static auto WrapPoints(const ArrayList<sf::Vector2<T>>& points) -> ArrayList<sf::Vector2<T>>;
 
 	/// @hue: 0-360°
 	/// @saturation: 0.0 - 1.0
 	/// @value: 0.0 - 1.0
-	static sf::Color HSVtoRGB(int hue, float saturation, float value);
-	static sf::Color HSVtoRGB(const class HSVColor &hsvColor);
+	static auto HSVtoRGB(int hue, float saturation, float value) -> sf::Color;
+	static auto HSVtoRGB(const class HSVColor& hsvColor) -> sf::Color;
 
-	static class HSVColor RGBtoHSV(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b);
-	static class HSVColor RGBtoHSV(const sf::Color &color);
+	static auto RGBtoHSV(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b) -> HSVColor;
+	static auto RGBtoHSV(const sf::Color& color) -> HSVColor;
 
 private:
 	template <typename T>
-	static void ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>> &line,
-									   const ArrayList<sf::Vector2<T>> &points,
-									   ArrayList<sf::Vector2<T>> &finalPoints);
+	static void ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>>& line,
+	                                   const ArrayList<sf::Vector2<T>>& points, ArrayList<sf::Vector2<T>>& finalPoints);
 };
 
 template <typename T, typename U>
-sf::Vector2<T> GenUtils::ConvertTo(const sf::Vector2<U> &vec)
+auto GenUtils::ConvertTo(const sf::Vector2<U>& vec) -> sf::Vector2<T>
 {
-	return sf::Vector2<T>((T)vec.x, (T)vec.y);
+	return sf::Vector2<T>(static_cast<T>(vec.x), static_cast<T>(vec.y));
 }
 
 template <typename T, typename U>
-sf::Rect<T> GenUtils::ConvertTo(const sf::Rect<U> &rect)
+auto GenUtils::ConvertTo(const sf::Rect<U>& rect) -> sf::Rect<T>
 {
-	return sf::Rect<T>((T)rect.left, (T)rect.top, (T)rect.width, (T)rect.height);
+	return sf::Rect<T>(static_cast<T>(rect.left), static_cast<T>(rect.top), static_cast<T>(rect.width),
+	                   static_cast<T>(rect.height));
 }
 
 template <typename T>
-sf::Vector2<T> GenUtils::Mid(sf::Rect<T> rect)
+auto GenUtils::Mid(sf::Rect<T> rect) -> sf::Vector2<T>
 {
-	return sf::Vector2<T>(rect.left + rect.width / (T)2, rect.top + rect.height / (T)2);
+	return sf::Vector2<T>(rect.left + rect.width / static_cast<T>(2), rect.top + rect.height / static_cast<T>(2));
 }
 
 template <typename T>
-sf::Vector2<T> GenUtils::MapPoint(const sf::Vector2<T> &point, sf::Rect<T> from, sf::Rect<T> to)
+auto GenUtils::MapPoint(const sf::Vector2<T>& point, sf::Rect<T> from, sf::Rect<T> to) -> sf::Vector2<T>
 {
 	sf::Vector2<T> _point = point;
 	float x_diff = _point.x - from.left;
@@ -122,13 +123,13 @@ sf::Vector2<T> GenUtils::MapPoint(const sf::Vector2<T> &point, sf::Rect<T> from,
 }
 
 template <typename T>
-T GenUtils::Map(const T &value, T lowerFrom, T upperFrom, T lowerTo, T upperTo)
+auto GenUtils::Map(const T& value, T lowerFrom, T upperFrom, T lowerTo, T upperTo) -> T
 {
-	if ( upperFrom < lowerFrom )
+	if (upperFrom < lowerFrom)
 	{
 		std::swap(lowerFrom, upperFrom);
 	}
-	if ( upperTo < lowerTo )
+	if (upperTo < lowerTo)
 	{
 		std::swap(lowerTo, upperTo);
 	}
@@ -142,72 +143,63 @@ T GenUtils::Map(const T &value, T lowerFrom, T upperFrom, T lowerTo, T upperTo)
 }
 
 template <typename T>
-T GenUtils::Map(const T &value, std::pair<T, T> from, std::pair<T, T> to)
+auto GenUtils::Map(const T& value, std::pair<T, T> from, std::pair<T, T> to) -> T
 {
 	return GenUtils::Map(value, from.first, from.second, to.first, to.second);
 }
 
 template <typename T>
-T GenUtils::Constrain(const T &value, T from, T to)
+auto GenUtils::Constrain(const T& value, T from, T to) -> T
 {
-	if ( value < from )
-		return from;
-	if ( value > to )
-		return to;
+	if (value < from) return from;
+	if (value > to) return to;
 	return value;
 }
 
 template <typename T>
-void GenUtils::Clamp(T &value, T from, T to)
+void GenUtils::Clamp(T& value, T from, T to)
 {
 	value = Clamped(value, from, to);
 }
 
 template <typename T>
-T GenUtils::Clamped(const T &value, T from, T to)
+auto GenUtils::Clamped(const T& value, T from, T to) -> T
 {
 	return std::clamp(value, from, to);
 }
 
 template <typename T>
-T GenUtils::ToDegress(const T &radians)
+auto GenUtils::ToDegress(const T& radians) -> T
 {
-	return (radians * (T)180) / (T)PI<>;
+	return (radians * static_cast<T>(180)) / static_cast<T>(PI<>);
 }
 
 template <typename T>
-T GenUtils::ToRadians(const T &degress)
+auto GenUtils::ToRadians(const T& degress) -> T
 {
-	return (T)(degress * PI<>) / (T)180;
+	return static_cast<T>(degress * PI<>) / static_cast<T>(180);
 }
 
 template <typename T>
-sf::Color GenUtils::ValueToSpectrum(T value, T maxValue)
+auto GenUtils::ValueToSpectrum(T value, T maxValue) -> sf::Color
 {
-	const double a = ((double)value / (double)maxValue) / 0.2f;
+	const double a = (static_cast<double>(value) / static_cast<double>(maxValue)) / 0.2f;
 	const sf::Uint8 X = std::floor(a);
 	const sf::Uint8 Y = std::floor(255 * (a - X));
-	switch ( X )
+	switch (X)
 	{
-	case 0:
-		return sf::Color(255, Y, 0);
-	case 1:
-		return sf::Color(255 - Y, 255, 0);
-	case 2:
-		return sf::Color(0, 255, Y);
-	case 3:
-		return sf::Color(0, 255 - Y, 255);
-	case 4:
-		return sf::Color(Y, 0, 255);
-	case 5:
-		return sf::Color(255, 0, 255);
-	default:
-		return sf::Color::White;
+	case 0: return sf::Color(255, Y, 0);
+	case 1: return sf::Color(255 - Y, 255, 0);
+	case 2: return sf::Color(0, 255, Y);
+	case 3: return sf::Color(0, 255 - Y, 255);
+	case 4: return sf::Color(Y, 0, 255);
+	case 5: return sf::Color(255, 0, 255);
+	default: return sf::Color::White;
 	}
 };
 
 template <typename T>
-ArrayList<sf::Vector2<T>> GenUtils::WrapPoints(const ArrayList<sf::Vector2<T>> &points)
+auto GenUtils::WrapPoints(const ArrayList<sf::Vector2<T>>& points) -> ArrayList<sf::Vector2<T>>
 {
 	ArrayList<sf::Vector2f> finalPoints;
 
@@ -215,19 +207,15 @@ ArrayList<sf::Vector2<T>> GenUtils::WrapPoints(const ArrayList<sf::Vector2<T>> &
 	ArrayList<sf::Vector2f> bottomPoints;
 	std::pair<sf::Vector2f, sf::Vector2f> startLine;
 
-	sf::Vector2f biggestX = {
-		static_cast<T>(-std::numeric_limits<T>::infinity()), -std::numeric_limits<T>::infinity()
-	};
-	sf::Vector2f smallestX = {
-		static_cast<T>(std::numeric_limits<T>::infinity()), std::numeric_limits<T>::infinity()
-	};
-	for ( auto &point : points )
+	sf::Vector2f biggestX = {static_cast<T>(-std::numeric_limits<T>::infinity()), -std::numeric_limits<T>::infinity()};
+	sf::Vector2f smallestX = {static_cast<T>(std::numeric_limits<T>::infinity()), std::numeric_limits<T>::infinity()};
+	for (auto& point : points)
 	{
-		if ( point.x > biggestX.x )
+		if (point.x > biggestX.x)
 		{
 			biggestX = point;
 		}
-		if ( point.x < smallestX.x )
+		if (point.x < smallestX.x)
 		{
 			smallestX = point;
 		}
@@ -235,9 +223,9 @@ ArrayList<sf::Vector2<T>> GenUtils::WrapPoints(const ArrayList<sf::Vector2<T>> &
 	startLine = std::make_pair(smallestX, biggestX);
 
 	//Inital removal of center-points
-	for ( auto &point : points )
+	for (auto& point : points)
 	{
-		if ( !VecUtils::IsLeft(startLine.first, startLine.second, point) )
+		if (!VecUtils::IsLeft(startLine.first, startLine.second, point))
 		{
 			topPoints.emplace_back(point);
 		}
@@ -254,17 +242,16 @@ ArrayList<sf::Vector2<T>> GenUtils::WrapPoints(const ArrayList<sf::Vector2<T>> &
 }
 
 template <typename T>
-void GenUtils::ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>> &line,
-									  const ArrayList<sf::Vector2<T>> &points,
-									  ArrayList<sf::Vector2<T>> &finalPoints)
+void GenUtils::ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>>& line,
+                                      const ArrayList<sf::Vector2<T>>& points, ArrayList<sf::Vector2<T>>& finalPoints)
 {
 	//Find the point which is the furthest away
 	float biggestDistance = 0.0f;
 	int biggestIndex = -1;
-	for ( size_t i = 0; i < points.size(); i++ )
+	for (size_t i = 0; i < points.size(); i++)
 	{
 		const float currentCheck = VecUtils::DistanceFromLine(line.first, line.second, points[i]);
-		if ( currentCheck > biggestDistance )
+		if (currentCheck > biggestDistance)
 		{
 			biggestDistance = currentCheck;
 			biggestIndex = i;
@@ -273,21 +260,21 @@ void GenUtils::ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector
 
 	auto lineCpy = line;
 	//Continues only if it can find a new point
-	if ( biggestIndex != -1 )
+	if (biggestIndex != -1)
 	{
 		sf::Vector2f furthest = points[biggestIndex];
-		std::pair<sf::Vector2f, sf::Vector2f> newLine = { lineCpy.first, furthest };
+		std::pair<sf::Vector2f, sf::Vector2f> newLine = {lineCpy.first, furthest};
 		lineCpy.first = furthest;
 
 		ArrayList<sf::Vector2f> consideredPoints1;
 		ArrayList<sf::Vector2f> consideredPoints2;
-		for ( auto &point : points )
+		for (auto& point : points)
 		{
-			if ( !VecUtils::IsLeft(newLine.first, newLine.second, point) )
+			if (!VecUtils::IsLeft(newLine.first, newLine.second, point))
 			{
 				consideredPoints1.push_back(point);
 			}
-			else if ( !VecUtils::IsLeft(lineCpy.first, lineCpy.second, point) )
+			else if (!VecUtils::IsLeft(lineCpy.first, lineCpy.second, point))
 			{
 				consideredPoints2.push_back(point);
 			}

@@ -18,8 +18,8 @@ class LightningMgr
 private:
 	struct RenderLight
 	{
-		RenderLight(const Light::Ptr &light)
-			: light(light),
+		RenderLight(const Light::Ptr& light) :
+			light(light),
 			occluders(new sf::RenderTexture()),
 			shadowMap(new sf::RenderTexture()),
 			lightMap(new sf::RenderTexture())
@@ -29,33 +29,37 @@ private:
 			shadowMap->create(box.width, 1);
 			lightMap->create(box.width, box.height);
 		}
+
 		Light::Ptr light;
-		sf::RenderTexture *occluders;
-		sf::RenderTexture *shadowMap;
-		sf::RenderTexture *lightMap;
+		sf::RenderTexture* occluders;
+		sf::RenderTexture* shadowMap;
+		sf::RenderTexture* lightMap;
 	};
 
 public:
 	LightningMgr();
 	~LightningMgr();
-	LightningMgr(LightningMgr &) = delete;
-	LightningMgr &operator()(LightningMgr &) = delete;
+	LightningMgr(LightningMgr&) = delete;
+	auto operator()(LightningMgr&) -> LightningMgr& = delete;
 
 	static void Draw();
 
-	static void AddOccluder(const sf::Drawable &drawable, sf::FloatRect boundingBox, sf::RenderStates renderStates = sf::RenderStates::Default);
+	static void AddOccluder(const sf::Drawable& drawable, sf::FloatRect boundingBox,
+	                        sf::RenderStates renderStates = sf::RenderStates::Default);
 	static void ClearOccluders();
 	static void DisplayOccluders();
 
 	static void Render();
 
-	static void AddLight(const Light::Ptr &light);
-	static void RemoveLight(const Light::Ptr &light);
-	static void SetAmbientLight(const sf::Color &ambient) { _ambient = ambient; }
+	static void AddLight(const Light::Ptr& light);
+	static void RemoveLight(const Light::Ptr& light);
+
+	static void SetAmbientLight(const sf::Color& ambient) { _ambient = ambient; }
 
 	static void ChangeResolution(float factor) { _resolution *= factor; }
 
-	static float GetResolution() { return _resolution; }
+	static auto GetResolution() -> float { return _resolution; }
+
 	static void SetResolution(float resolution) { _resolution = resolution; }
 
 private:

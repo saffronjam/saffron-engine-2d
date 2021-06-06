@@ -7,19 +7,19 @@
 
 namespace Se
 {
-Scene::Scene(String name, ControllableRenderTexture *target, Camera *camera)
-	: _target(target),
+Scene::Scene(String name, ControllableRenderTexture* target, Camera* camera) :
+	_target(target),
 	_camera(camera),
 	_viewportPane(Move(name), *_target)
 {
 }
 
-void Scene::OnUpdate()
+void Scene::OnUpdate() const
 {
-    if(_viewportPane.IsHovered())
-    {
-        _camera->OnUpdate();
-    }
+	if (_viewportPane.IsHovered())
+	{
+		_camera->OnUpdate();
+	}
 }
 
 void Scene::OnGuiRender()
@@ -27,33 +27,30 @@ void Scene::OnGuiRender()
 	_viewportPane.OnGuiRender();
 }
 
-void Scene::OnRenderTargetResize(const sf::Vector2f &size)
+void Scene::OnRenderTargetResize(const sf::Vector2f& size) const
 {
-    _camera->OnUpdate();
+	_camera->OnUpdate();
 }
 
-void Scene::Submit(const sf::Drawable &drawable, sf::RenderStates renderStates)
+void Scene::Submit(const sf::Drawable& drawable, sf::RenderStates renderStates) const
 {
-	if ( !_screenSpaceDrawing )
+	if (!_screenSpaceDrawing)
 	{
 		renderStates.transform.combine(_camera->GetTransform());
 	}
 	_target->GetRenderTexture().draw(drawable, renderStates);
 }
 
-void Scene::Submit(const sf::Text &text, TextAlign align, sf::RenderStates renderStates)
+void Scene::Submit(const sf::Text& text, TextAlign align, sf::RenderStates renderStates)
 {
 	auto textCpy = text;
 	float offset = 0.0f;
-	switch ( align )
+	switch (align)
 	{
-	case TextAlign::Left:
+	case TextAlign::Left: break;
+	case TextAlign::Middle: offset = textCpy.getLocalBounds().width / 2.0f;
 		break;
-	case TextAlign::Middle:
-		offset = textCpy.getLocalBounds().width / 2.0f;
-		break;
-	case TextAlign::Right:
-		offset = textCpy.getLocalBounds().width;
+	case TextAlign::Right: offset = textCpy.getLocalBounds().width;
 		break;
 	}
 
@@ -61,7 +58,7 @@ void Scene::Submit(const sf::Text &text, TextAlign align, sf::RenderStates rende
 	Submit(textCpy, renderStates);
 }
 
-void Scene::Submit(const sf::Vector2f &position, sf::Color color, float radius)
+void Scene::Submit(const sf::Vector2f& position, sf::Color color, float radius)
 {
 	sf::CircleShape circle;
 	const float adjustedRadius = radius / _camera->GetZoom();
@@ -71,13 +68,13 @@ void Scene::Submit(const sf::Vector2f &position, sf::Color color, float radius)
 	Submit(circle);
 }
 
-void Scene::Submit(const sf::FloatRect &rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
+void Scene::Submit(const sf::FloatRect& rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
 {
 	sf::RectangleShape rectShape;
 	rectShape.setPosition(rect.left, rect.top);
 	rectShape.setSize(sf::Vector2f(rect.width, rect.height));
 	rectShape.setFillColor(fillColor);
-	if ( outlined )
+	if (outlined)
 	{
 		rectShape.setOutlineThickness(1.0f / _camera->GetZoom());
 		rectShape.setOutlineColor(outlineColor);
@@ -85,7 +82,7 @@ void Scene::Submit(const sf::FloatRect &rect, sf::Color fillColor, bool outlined
 	Submit(rectShape);
 }
 
-void Scene::Submit(const sf::Vector2f &first, const sf::Vector2f &second, sf::Color color)
+void Scene::Submit(const sf::Vector2f& first, const sf::Vector2f& second, sf::Color color)
 {
 	sf::VertexArray line(sf::PrimitiveType::Lines, 2);
 	line[0].color = color;

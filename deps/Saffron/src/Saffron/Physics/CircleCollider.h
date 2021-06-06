@@ -14,9 +14,9 @@ public:
 	using Ptr = std::shared_ptr<CircleCollider>;
 
 public:
-	static Ptr Create(const sf::Vector2f &position, float radius);
+	static auto Create(const sf::Vector2f& position, float radius) -> Ptr;
 
-	float GetRadius() const { return _radius; }
+	auto GetRadius() const -> float { return _radius; }
 
 private:
 	float _radius;

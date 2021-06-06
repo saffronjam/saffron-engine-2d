@@ -21,72 +21,81 @@ public:
 	class Polygon
 	{
 	public:
-		Polygon(Voronoi &parent, int lineVAIndex, int filledVAIndex, const sf::Vector2f &voronoiPoint,
-				ArrayList<sf::Vector2f> points);
+		Polygon(Voronoi& parent, int lineVAIndex, int filledVAIndex, const sf::Vector2f& voronoiPoint,
+		        ArrayList<sf::Vector2f> points);
 
-		bool operator==(const Polygon &other) const { return _uuid == other._uuid; }
+		auto operator==(const Polygon& other) const -> bool { return _uuid == other._uuid; }
 
-		int GetLineVAIndex() const { return _lineVAIndex; }
-		int GetFilledVAIndex() const { return _filledVAIndex; }
+		auto GetLineVAIndex() const -> int { return _lineVAIndex; }
 
-		const ArrayList<sf::Vector2f> &GetPoints() const { return _points; }
+		auto GetFilledVAIndex() const -> int { return _filledVAIndex; }
 
-		sf::Color GetFillColor() const { return _fillColor; }
-		void SetFillColor(sf::Color color);
+		auto GetPoints() const -> const ArrayList<sf::Vector2f>& { return _points; }
+
+		auto GetFillColor() const -> sf::Color { return _fillColor; }
+
+		void SetFillColor(sf::Color color) const;
 		void ClearFillColor(sf::Color color);
 
-		const Set<Polygon *> &GetNeighbors() const { return _neighbors; }
-		void AddNeighbor(Polygon *neighbor) { _neighbors.emplace(neighbor); }
+		auto GetNeighbors() const -> const Set<Polygon*>& { return _neighbors; }
 
-		const sf::Vector2f &GetVoronoiPoint() const { return _voronoiPoint; }
-		void SetVoronoiPoint(const sf::Vector2f &voronoiPoint) { _voronoiPoint = voronoiPoint; }
+		void AddNeighbor(Polygon* neighbor) { _neighbors.emplace(neighbor); }
 
-		Pair<sf::Vector2f, sf::Vector2f> GetClosestEdge(const sf::Vector2f &position) const;
+		auto GetVoronoiPoint() const -> const sf::Vector2f& { return _voronoiPoint; }
+
+		void SetVoronoiPoint(const sf::Vector2f& voronoiPoint) { _voronoiPoint = voronoiPoint; }
+
+		auto GetClosestEdge(const sf::Vector2f& position) const -> Pair<sf::Vector2f, sf::Vector2f>;
 
 	private:
 		UUID _uuid;
 
-		Voronoi &_parent;
+		Voronoi& _parent;
 		int _lineVAIndex;
 		int _filledVAIndex;
 
 		sf::Color _fillColor = sf::Color::Transparent;
 		ArrayList<sf::Vector2f> _points;
-		std::set<Polygon *> _neighbors;
+		std::set<Polygon*> _neighbors;
 		sf::Vector2f _voronoiPoint;
 	};
 
 public:
 	Voronoi();
-	explicit Voronoi(const sf::FloatRect &boundingBox);
-	Voronoi(const sf::FloatRect &boundingBox, ArrayList<sf::Vector2f> points);
-	Voronoi(const sf::FloatRect &boundingBox, int noRandomPoints);
+	explicit Voronoi(const sf::FloatRect& boundingBox);
+	Voronoi(const sf::FloatRect& boundingBox, ArrayList<sf::Vector2f> points);
+	Voronoi(const sf::FloatRect& boundingBox, int noRandomPoints);
 	~Voronoi() override;
 
 	void SetPoints(ArrayList<sf::Vector2f> points);
 	void SetPoints(int noRandomPoints);
-	void SetBoundingBox(const sf::FloatRect &boundingBox);
-	void SetOutlineColor(const sf::Color &color);
-	void SetFillColor(const Polygon &polygon, sf::Color color);
+	void SetBoundingBox(const sf::FloatRect& boundingBox);
+	void SetOutlineColor(const sf::Color& color);
+	void SetFillColor(const Polygon& polygon, sf::Color color);
 
 	void ShowGrid() { _shouldDrawGrid = true; }
+
 	void HideGrid() { _shouldDrawGrid = false; }
 
 	void ShowFilled() { _shouldDrawFilledPolygons = true; }
+
 	void HideFilled() { _shouldDrawFilledPolygons = false; }
 
 	void Relax(int iterations = 1);
 
-	const ArrayList<Polygon> &GetPolygons() const { return _polygons; }
-	Polygon &GetPolygon(const sf::Vector2f &position);
+	auto GetPolygons() const -> const ArrayList<Polygon>& { return _polygons; }
+
+	auto GetPolygon(const sf::Vector2f& position) -> Polygon&;
 
 	// Manual controls
 	void EnableAutomaticGeneration() { _automaticGeneration = true; }
+
 	void DisableAutomaticGeneration() { _automaticGeneration = false; }
+
 	void ForceGenerate();
 
 private:
-	static jcv_rect ConvertBoundingBox(const sf::FloatRect &boundingBox);
+	static auto ConvertBoundingBox(const sf::FloatRect& boundingBox) -> jcv_rect;
 
 	void Generate();
 	void GeneratePoints(int noPoints);
@@ -94,7 +103,7 @@ private:
 
 	void SetupUpdateCallback();
 
-	void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
 	Run::Handle _updateHandle;
@@ -106,12 +115,11 @@ private:
 	ArrayList<sf::Vector2f> _points;
 
 	ArrayList<Polygon> _polygons;
-	sf::VertexArray _polygonsVA{ sf::PrimitiveType::Lines };
-	sf::VertexArray _filledPolygonsVA{ sf::PrimitiveType::Triangles };
+	sf::VertexArray _polygonsVA{sf::PrimitiveType::Lines};
+	sf::VertexArray _filledPolygonsVA{sf::PrimitiveType::Triangles};
 	bool _wantNewPolygonVA = false;
 
 	bool _shouldDrawFilledPolygons = true;
 	bool _shouldDrawGrid = true;
 };
 }
-

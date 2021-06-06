@@ -5,7 +5,7 @@
 
 namespace Se
 {
-void Collider::BuildBase(b2BodyDef *bodyDef, b2FixtureDef *fixtureDef)
+void Collider::BuildBase(b2BodyDef* bodyDef, b2FixtureDef* fixtureDef)
 {
 	PhysicsMgr::AddCollider(this, bodyDef);
 	_fixture = _body.value()->CreateFixture(fixtureDef);

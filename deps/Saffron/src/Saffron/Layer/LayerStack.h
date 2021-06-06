@@ -3,8 +3,8 @@
 #include "Saffron/Config.h"
 #include "Layer.h"
 
-namespace Se {
-
+namespace Se
+{
 class LayerStack : public Signaller
 {
 public:
@@ -20,22 +20,23 @@ public:
 	LayerStack() = default;
 	~LayerStack();
 
-	void PushLayer(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader> &batchLoader);
-	void PushOverlay(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader> &batchLoader);
+	void PushLayer(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader>& batchLoader);
+	void PushOverlay(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader>& batchLoader);
 	void PopLayer(int count);
 	void PopOverlay(int count);
 	void EraseLayer(std::shared_ptr<Layer> layer);
 	void EraseOverlay(std::shared_ptr<Layer> overlay);
 
 	void Clear();
-	std::shared_ptr<Layer> Front();
-	std::shared_ptr<Layer> Back();
-	ArrayList<std::shared_ptr<Layer>>::iterator begin() { return _layers.begin(); }
-	ArrayList<std::shared_ptr<Layer>>::iterator end() { return _layers.end(); }
+	auto Front() -> std::shared_ptr<Layer>;
+	auto Back() -> std::shared_ptr<Layer>;
+
+	auto begin() -> ArrayList<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
+
+	auto end() -> ArrayList<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
 
 private:
 	ArrayList<std::shared_ptr<Layer>> _layers;
 	unsigned int _layerInsertIndex = 0;
 };
-
 }

@@ -4,11 +4,17 @@
 
 namespace Se
 {
-AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) : _animation(NULL), _frameTime(frameTime), _currentFrame(0), _isPaused(paused), _isLooped(looped), _texture(NULL)
+AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) :
+	_animation(nullptr),
+	_frameTime(frameTime),
+	_currentFrame(0),
+	_isPaused(paused),
+	_isLooped(looped),
+	_texture(nullptr)
 {
 }
 
-void AnimatedSprite::setAnimation(const Animation &animation)
+void AnimatedSprite::setAnimation(const Animation& animation)
 {
 	_animation = &animation;
 	_texture = _animation->getSpriteSheet();
@@ -26,10 +32,9 @@ void AnimatedSprite::play()
 	_isPaused = false;
 }
 
-void AnimatedSprite::play(const Animation &animation)
+void AnimatedSprite::play(const Animation& animation)
 {
-	if ( getAnimation() != &animation )
-		setAnimation(animation);
+	if (getAnimation() != &animation) setAnimation(animation);
 	play();
 }
 
@@ -50,7 +55,7 @@ void AnimatedSprite::setLooped(bool looped)
 	_isLooped = looped;
 }
 
-void AnimatedSprite::setColor(const sf::Color &color)
+void AnimatedSprite::setColor(const sf::Color& color)
 {
 	// OnUpdate the vertices' color
 	_vertices[0].color = color;
@@ -59,12 +64,12 @@ void AnimatedSprite::setColor(const sf::Color &color)
 	_vertices[3].color = color;
 }
 
-const Animation *AnimatedSprite::getAnimation() const
+auto AnimatedSprite::getAnimation() const -> const Animation*
 {
 	return _animation;
 }
 
-sf::FloatRect AnimatedSprite::getLocalBounds() const
+auto AnimatedSprite::getLocalBounds() const -> sf::FloatRect
 {
 	const sf::IntRect rect = _animation->getFrame(_currentFrame);
 
@@ -74,29 +79,29 @@ sf::FloatRect AnimatedSprite::getLocalBounds() const
 	return sf::FloatRect(0.f, 0.f, width, height);
 }
 
-sf::FloatRect AnimatedSprite::getGlobalBounds() const
+auto AnimatedSprite::getGlobalBounds() const -> sf::FloatRect
 {
 	return getTransform().transformRect(getLocalBounds());
 }
 
-bool AnimatedSprite::isLooped() const
+auto AnimatedSprite::isLooped() const -> bool
 {
 	return _isLooped;
 }
 
-bool AnimatedSprite::isPlaying() const
+auto AnimatedSprite::isPlaying() const -> bool
 {
 	return !_isPaused;
 }
 
-sf::Time AnimatedSprite::getFrameTime() const
+auto AnimatedSprite::getFrameTime() const -> sf::Time
 {
 	return _frameTime;
 }
 
 void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 {
-	if ( _animation )
+	if (_animation)
 	{
 		//calculate new vertex positions and texture coordiantes
 		const sf::IntRect rect = _animation->getFrame(newFrame);
@@ -117,31 +122,29 @@ void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 		_vertices[3].texCoords = sf::Vector2f(right, top);
 	}
 
-	if ( resetTime )
-		_currentTime = sf::Time::Zero;
+	if (resetTime) _currentTime = sf::Time::Zero;
 }
 
 void AnimatedSprite::update(sf::Time deltaTime)
 {
 	// if not paused and we have a valid animation
-	if ( !_isPaused && _animation )
+	if (!_isPaused && _animation)
 	{
 		// add delta time
 		_currentTime += deltaTime;
 
 		// if current time is bigger then the frame time advance one frame
-		if ( _currentTime >= _frameTime )
+		if (_currentTime >= _frameTime)
 		{
 			// reset time, but keep the remainder
 			_currentTime = sf::microseconds(_currentTime.asMicroseconds() % _frameTime.asMicroseconds());
 
 			// get next Frame index
-			if ( _currentFrame + 1 < _animation->getSize() )
-				_currentFrame++;
+			if (_currentFrame + 1 < _animation->getSize()) _currentFrame++;
 			else
 			{
 				// animation has ended
-				if ( !_isLooped )
+				if (!_isLooped)
 				{
 					_isPaused = true;
 				}
@@ -157,9 +160,9 @@ void AnimatedSprite::update(sf::Time deltaTime)
 	}
 }
 
-void AnimatedSprite::draw(sf::RenderTarget &target, sf::RenderStates states) const
+void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	if ( _animation && _texture )
+	if (_animation && _texture)
 	{
 		states.transform *= getTransform();
 		states.texture = _texture;

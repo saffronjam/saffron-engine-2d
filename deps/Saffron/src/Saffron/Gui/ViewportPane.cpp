@@ -8,9 +8,9 @@
 namespace Se
 {
 SignalAggregate<void> ViewportPane::Signals::OnPostRender;
-SignalAggregate<const sf::Vector2f &> ViewportPane::Signals::OnWantRenderTargetResize;
+SignalAggregate<const sf::Vector2f&> ViewportPane::Signals::OnWantRenderTargetResize;
 
-ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture &target) :
+ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture& target) :
 	_windowTitle(Move(windowTitle)),
 	_target(&target),
 	//_fallbackTexture(Factory::Create<Texture2D>("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
@@ -21,10 +21,10 @@ ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture &
 {
 }
 
-void ViewportPane::OnGuiRender(bool *open, UUID uuid)
+void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 {
-	const auto &tl = GetTopLeft();
-	const auto &br = GetBottomRight();
+	const auto& tl = GetTopLeft();
+	const auto& br = GetBottomRight();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
@@ -57,58 +57,77 @@ void ViewportPane::OnGuiRender(bool *open, UUID uuid)
 	minBound.y += viewportOffset.y;
 
 	const auto windowSize = ImGui::GetWindowSize();
-	const ImVec2 maxBound = { minBound.x + windowSize.x - viewportOffset.x, minBound.y + windowSize.y - viewportOffset.y };
-	_topLeft = { minBound.x, minBound.y };
-	_bottomRight = { maxBound.x, maxBound.y };
+	const ImVec2 maxBound = {
+		minBound.x + windowSize.x - viewportOffset.x, minBound.y + windowSize.y - viewportOffset.y
+	};
+	_topLeft = {minBound.x, minBound.y};
+	_bottomRight = {maxBound.x, maxBound.y};
 
 	const auto viewportSize = GetViewportSize();
 
-	if ( _target->IsEnabled() )
+	if (_target->IsEnabled())
 	{
-		Gui::Image(*_target, { viewportSize.x, viewportSize.y }, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+		Gui::Image(*_target, {viewportSize.x, viewportSize.y}, {0.0f, 1.0f}, {1.0f, 0.0f});
 	}
 	else
 	{
-		Gui::Image(_fallbackTexture, { viewportSize.x, viewportSize.y }, sf::FloatRect{ 0.0f, 0.0f, 1.0f, 1.0f });
+		Gui::Image(_fallbackTexture, {viewportSize.x, viewportSize.y}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f});
 	}
 
-	ImGui::GetWindowDrawList()->AddRect(ImVec2(_topLeft.x, tl.y), ImVec2(br.x, br.y), _focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f, ImDrawCornerFlags_All, 4);
+	ImGui::GetWindowDrawList()->AddRect(ImVec2(_topLeft.x, tl.y), ImVec2(br.x, br.y),
+	                                    _focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f,
+	                                    ImDrawCornerFlags_All, 4);
 
 	GetSignals().Emit(Signals::OnPostRender);
 
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	if ( GenUtils::ConvertTo<unsigned int>(viewportSize) != _target->GetRenderTexture().getSize() )
+	if (GenUtils::ConvertTo<unsigned int>(viewportSize) != _target->GetRenderTexture().getSize())
 	{
 		GetSignals().Emit(Signals::OnWantRenderTargetResize, viewportSize);
 	}
 }
 
-bool ViewportPane::InViewport(sf::Vector2f positionNDC) const
+auto ViewportPane::InViewport(sf::Vector2f positionNDC) const -> bool
 {
 	positionNDC.x -= _topLeft.x;
 	positionNDC.y -= _topLeft.y;
-	return positionNDC.x < _bottomRight.x &&positionNDC.y < _bottomRight.y;
+	return positionNDC.x < _bottomRight.x && positionNDC.y < _bottomRight.y;
 }
 
-sf::Vector2f ViewportPane::GetMousePosition(bool normalized) const
+auto ViewportPane::GetMousePosition(bool normalized) const -> sf::Vector2f
 {
 	sf::Vector2f position = Mouse::GetPosition(false);
 	position.x -= _topLeft.x;
 	position.y -= _topLeft.y;
 
-	if ( normalized )
+	if (normalized)
 	{
 		const auto viewportWidth = _bottomRight.x - _topLeft.x;
 		const auto viewportHeight = _bottomRight.y - _topLeft.y;
-		return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
+		return {position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f};
 	}
-	return { position.x, position.y };
+	return {position.x, position.y};
 }
 
-sf::Vector2f ViewportPane::GetViewportSize() const
+auto ViewportPane::GetViewportSize() const -> sf::Vector2f
 {
 	return GetBottomRight() - GetTopLeft();
+}
+
+auto ViewportPane::GetDockID() const -> Uint32 { return _dockID; }
+
+auto ViewportPane::GetTopLeft() const -> const sf::Vector2f& { return _topLeft; }
+
+auto ViewportPane::GetBottomRight() const -> const sf::Vector2f& { return _bottomRight; }
+
+auto ViewportPane::IsHovered() const -> bool { return _hovered; }
+
+auto ViewportPane::IsFocused() const -> bool { return _focused; }
+
+void ViewportPane::SetTarget(const ControllableRenderTexture& target)
+{
+	_target = &target;
 }
 }

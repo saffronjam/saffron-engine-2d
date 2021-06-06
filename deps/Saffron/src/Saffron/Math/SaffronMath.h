@@ -16,5 +16,4 @@ public:
 	static constexpr float E = 2.71828182845904523536f;
 	static constexpr double E_D = static_cast<double>(E);
 };
-
 }

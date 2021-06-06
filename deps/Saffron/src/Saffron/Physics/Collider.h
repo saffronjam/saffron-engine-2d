@@ -16,16 +16,17 @@ public:
 	using Ptr = std::shared_ptr<Collider>;
 
 protected:
-	void BuildBase(b2BodyDef *bodyDef, b2FixtureDef *fixtureDef);
+	void BuildBase(b2BodyDef* bodyDef, b2FixtureDef* fixtureDef);
 
 public:
-	void AssignBody(b2Body *body) { _body = body; }
+	void AssignBody(b2Body* body) { _body = body; }
 
-	b2Body *GetBody() const { return _body.value(); }
-	b2Fixture *GetFixture() const { return _fixture.value(); }
+	auto GetBody() const -> b2Body* { return _body.value(); }
+
+	auto GetFixture() const -> b2Fixture* { return _fixture.value(); }
 
 private:
-	std::optional<b2Body *> _body;
-	std::optional<b2Fixture *> _fixture;
+	std::optional<b2Body*> _body;
+	std::optional<b2Fixture*> _fixture;
 };
 }

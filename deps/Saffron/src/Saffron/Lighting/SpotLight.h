@@ -12,8 +12,9 @@ public:
 	using Ptr = std::shared_ptr<SpotLight>;
 
 public:
-	static SpotLight::Ptr Create(const sf::Vector2f &position, const sf::Vector2f &direction, float theta, float radius, sf::Color color = sf::Color::White);
+	static auto Create(const sf::Vector2f& position, const sf::Vector2f& direction, float theta, float radius,
+	                   sf::Color color = sf::Color::White) -> SpotLight::Ptr;
 
-	void SetDirection(const sf::Vector2f &newDirection, float theta);
+	void SetDirection(const sf::Vector2f& newDirection, float theta);
 };
 }

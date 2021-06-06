@@ -19,8 +19,9 @@ public:
 
 	static void Step();
 
-	static void AddCollider(Collider *collider, const b2BodyDef *bodyDef);
-	static b2World *GetWorld() { return _world.get(); }
+	static void AddCollider(Collider* collider, const b2BodyDef* bodyDef);
+
+	static auto GetWorld() -> b2World* { return _world.get(); }
 
 private:
 	static std::unique_ptr<b2World> _world;

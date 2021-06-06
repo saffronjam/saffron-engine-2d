@@ -4,7 +4,7 @@
 
 namespace Se
 {
-PolygonCollider::Ptr PolygonCollider::Create(const sf::Vector2f &position, std::vector<sf::Vector2f> points)
+auto PolygonCollider::Create(const sf::Vector2f& position, std::vector<sf::Vector2f> points) -> PolygonCollider::Ptr
 {
 	Ptr ret = std::make_shared<PolygonCollider>();
 
@@ -13,7 +13,7 @@ PolygonCollider::Ptr PolygonCollider::Create(const sf::Vector2f &position, std::
 	bodyDef.position.Set(position.x, position.y);
 
 	b2PolygonShape shape;
-	shape.Set(reinterpret_cast<b2Vec2 *>(points.data()), points.size());
+	shape.Set(reinterpret_cast<b2Vec2*>(points.data()), points.size());
 
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;

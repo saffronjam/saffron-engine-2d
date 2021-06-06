@@ -8,11 +8,10 @@
 
 namespace Se
 {
-Window::Window(const std::string &title, int width, int height)
-	: _videomode(width, height),
+Window::Window(const std::string& title, int width, int height) :
+	_videomode(width, height),
 	_style(sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
-	_nativeWindow(sf::RenderWindow(_videomode, title, _style,
-								   sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
+	_nativeWindow(sf::RenderWindow(_videomode, title, _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
 
 {
 	const auto contexSettings = sf::ContextSettings();
@@ -23,24 +22,21 @@ Window::Window(const std::string &title, int width, int height)
 	PositionCenter();
 }
 
-void Window::Draw(const sf::Drawable &drawable, sf::RenderStates renderStates)
+void Window::Draw(const sf::Drawable& drawable, sf::RenderStates renderStates)
 {
 	Render(drawable, renderStates);
 }
 
-void Window::DrawText(const sf::Text &text, TextAlign align, sf::RenderStates renderStates)
+void Window::DrawText(const sf::Text& text, TextAlign align, sf::RenderStates renderStates)
 {
 	auto textCpy = text;
 	sf::Vector2f offset(0.0f, 0.0f);
-	switch ( align )
+	switch (align)
 	{
-	case TextAlign::Left:
+	case TextAlign::Left: break;
+	case TextAlign::Middle: offset.x = textCpy.getLocalBounds().width / 2.0f;
 		break;
-	case TextAlign::Middle:
-		offset.x = textCpy.getLocalBounds().width / 2.0f;
-		break;
-	case TextAlign::Right:
-		offset.x = textCpy.getLocalBounds().width;
+	case TextAlign::Right: offset.x = textCpy.getLocalBounds().width;
 		break;
 	}
 
@@ -48,7 +44,7 @@ void Window::DrawText(const sf::Text &text, TextAlign align, sf::RenderStates re
 	Render(textCpy, renderStates);
 }
 
-void Window::DrawPoint(const sf::Vector2f &position, sf::Color color, float radius)
+void Window::DrawPoint(const sf::Vector2f& position, sf::Color color, float radius)
 {
 	sf::CircleShape circle(radius);
 	circle.setPosition(position - sf::Vector2f(radius, radius));
@@ -56,13 +52,13 @@ void Window::DrawPoint(const sf::Vector2f &position, sf::Color color, float radi
 	Draw(circle);
 }
 
-void Window::DrawRect(const sf::FloatRect &rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
+void Window::DrawRect(const sf::FloatRect& rect, sf::Color fillColor, bool outlined, sf::Color outlineColor)
 {
 	sf::RectangleShape rectShape;
 	rectShape.setPosition(rect.left, rect.top);
 	rectShape.setSize(sf::Vector2f(rect.width, rect.height));
 	rectShape.setFillColor(fillColor);
-	if ( outlined )
+	if (outlined)
 	{
 		rectShape.setOutlineThickness(1);
 		rectShape.setOutlineColor(outlineColor);
@@ -70,7 +66,7 @@ void Window::DrawRect(const sf::FloatRect &rect, sf::Color fillColor, bool outli
 	Draw(rectShape);
 }
 
-void Window::DrawLine(const sf::Vector2f &first, const sf::Vector2f &second, sf::Color color)
+void Window::DrawLine(const sf::Vector2f& first, const sf::Vector2f& second, sf::Color color)
 {
 	sf::VertexArray line(sf::PrimitiveType::Lines, 2);
 	line[0].color = color;
@@ -93,22 +89,22 @@ void Window::Display()
 void Window::HandleBufferedEvents()
 {
 	sf::Event event;
-	if ( _eventCallback.has_value() )
+	if (_eventCallback.has_value())
 	{
-		while ( _nativeWindow.pollEvent(event) )
+		while (_nativeWindow.pollEvent(event))
 		{
 			_eventCallback.value()(event);
 		}
 	}
 	else
 	{
-		while ( _nativeWindow.pollEvent(event) )
+		while (_nativeWindow.pollEvent(event))
 		{
 		}
 	}
 }
 
-void Window::SetEventCallback(Function<void(const sf::Event &)> fn)
+void Window::SetEventCallback(Function<void(const sf::Event&)> fn)
 {
 	_eventCallback = Move(fn);
 }
@@ -120,62 +116,62 @@ void Window::PositionCenter()
 	_nativeWindow.setPosition(sf::Vector2i(max.width, max.height) / 2 - halfSize);
 }
 
-sf::RenderWindow &Window::GetNativeWindow()
+auto Window::GetNativeWindow() -> sf::RenderWindow&
 {
 	return _nativeWindow;
 }
 
-const sf::RenderWindow &Window::GetNativeWindow() const
+auto Window::GetNativeWindow() const -> const sf::RenderWindow&
 {
 	return _nativeWindow;
 }
 
-sf::Vector2i Window::GetPosition()
+auto Window::GetPosition() const -> sf::Vector2i
 {
 	return _nativeWindow.getPosition();
 }
 
-sf::Vector2u Window::GetSize()
+auto Window::GetSize() const -> sf::Vector2u
 {
 	return _nativeWindow.getSize();
 }
 
-int Window::GetWidth()
+auto Window::GetWidth() const -> int
 {
 	return GetSize().x;
 }
 
-int Window::GetHeight()
+auto Window::GetHeight() const -> int
 {
 	return GetSize().y;
 }
 
-const std::string &Window::GetTitle()
+auto Window::GetTitle() const -> const std::string&
 {
 	return _title;
 }
 
-sf::IntRect Window::GetScreenRect()
+auto Window::GetScreenRect() const -> sf::IntRect
 {
 	return sf::IntRect(0, 0, GetWidth(), GetHeight());
 }
 
-void Window::SetPosition(const sf::Vector2i &pos)
+void Window::SetPosition(const sf::Vector2i& pos)
 {
 	_nativeWindow.setPosition(pos);
 }
 
-void Window::SetSize(const sf::Vector2u &size)
+void Window::SetSize(const sf::Vector2u& size)
 {
 	_nativeWindow.setSize(size);
 }
 
-void Window::SetTitle(const std::string &title)
+void Window::SetTitle(const std::string& title)
 {
 	_nativeWindow.setTitle(title);
 }
 
-void Window::SetIcon(const std::string &icon)
+void Window::SetIcon(const std::string& icon)
 {
 	sf::Image image;
 	image.loadFromFile(icon);
@@ -184,7 +180,7 @@ void Window::SetIcon(const std::string &icon)
 
 void Window::SetFullscreen(bool toggle)
 {
-	if ( toggle && !_fullscreen )
+	if (toggle && !_fullscreen)
 	{
 		_fullscreen = true;
 		_videomode.width = GetSize().x;
@@ -192,7 +188,7 @@ void Window::SetFullscreen(bool toggle)
 		_nonFullscreenPosition = GetPosition();
 		_nativeWindow.create(sf::VideoMode::getFullscreenModes()[0], GetTitle(), sf::Style::Fullscreen);
 	}
-	else if ( !toggle && _fullscreen )
+	else if (!toggle && _fullscreen)
 	{
 		_fullscreen = false;
 		_nativeWindow.create(_videomode, GetTitle(), _style);
@@ -205,33 +201,32 @@ void Window::SetVSync(bool toggle)
 	_nativeWindow.setVerticalSyncEnabled(toggle);
 }
 
-void Window::Render(const sf::Drawable &drawable, sf::RenderStates renderStates)
+void Window::Render(const sf::Drawable& drawable, sf::RenderStates renderStates)
 {
 	_nativeWindow.draw(drawable, renderStates);
 }
 
-Window::Exception::Exception(int line, const char *file, const char *errorString)
-	: IException(line, file),
+Window::Exception::Exception(int line, const char* file, const char* errorString) :
+	IException(line, file),
 	errorString(errorString)
 {
 }
 
-const char *Window::Exception::what() const noexcept
+auto Window::Exception::what() const noexcept -> const char*
 {
 	std::ostringstream oss;
-	oss << "[Type] " << GetType() << std::endl
-		<< "[Description] " << GetErrorString() << std::endl
-		<< GetOriginString();
+	oss << "[Type] " << GetType() << std::endl << "[Description] " << GetErrorString() << std::endl <<
+		GetOriginString();
 	whatBuffer = oss.str();
 	return whatBuffer.c_str();
 }
 
-const char *Window::Exception::GetType() const
+auto Window::Exception::GetType() const -> const char*
 {
 	return "V-2DFramework Window Exception";
 }
 
-const char *Window::Exception::GetErrorString() const
+auto Window::Exception::GetErrorString() const -> const char*
 {
 	return errorString.c_str();
 }

@@ -4,7 +4,7 @@
 
 namespace Se
 {
-BoxCollider::Ptr BoxCollider::Create(const sf::Vector2f &position, const sf::Vector2f &dimensions)
+auto BoxCollider::Create(const sf::Vector2f& position, const sf::Vector2f& dimensions) -> BoxCollider::Ptr
 {
 	Ptr ret = std::make_shared<BoxCollider>();
 	ret->_dimensions = dimensions;
@@ -26,7 +26,7 @@ BoxCollider::Ptr BoxCollider::Create(const sf::Vector2f &position, const sf::Vec
 	return ret;
 }
 
-sf::FloatRect BoxCollider::GetRect() const
+auto BoxCollider::GetRect() const -> sf::FloatRect
 {
 	const sf::Vector2f topLeft = VecUtils::ConvertTo<sf::Vector2f>(GetBody()->GetPosition());
 	return sf::FloatRect(topLeft, _dimensions);

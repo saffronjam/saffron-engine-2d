@@ -4,9 +4,8 @@
 
 namespace Se
 {
-SpotLight::Ptr
-SpotLight::Create(const sf::Vector2f &position, const sf::Vector2f &direction, float theta, float radius,
-				  sf::Color color)
+auto SpotLight::Create(const sf::Vector2f& position, const sf::Vector2f& direction, float theta, float radius,
+                       sf::Color color) -> SpotLight::Ptr
 {
 	Ptr ret = std::make_shared<SpotLight>();
 	ret->BuildBase(position, radius, color, direction, theta);
@@ -14,7 +13,7 @@ SpotLight::Create(const sf::Vector2f &position, const sf::Vector2f &direction, f
 	return ret;
 }
 
-void SpotLight::SetDirection(const sf::Vector2f &newDirection, float theta)
+void SpotLight::SetDirection(const sf::Vector2f& newDirection, float theta)
 {
 	ClearStaticOccluders();
 
@@ -23,12 +22,12 @@ void SpotLight::SetDirection(const sf::Vector2f &newDirection, float theta)
 	const sf::Vector2f adjustedPosition = _position + sf::Vector2f(_radius, _radius);
 	shape.append(sf::Vertex(adjustedPosition - unitDirection * 10.0f, sf::Color::Black));
 	shape.append(sf::Vertex(
-		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(theta / 2.0f), VecUtils::Null<>()) * 50.0f,
-		sf::Color::Black));
+		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(theta / 2.0f), VecUtils::Null<>()) *
+		50.0f, sf::Color::Black));
 	shape.append(sf::Vertex(adjustedPosition - unitDirection * 25.0f, sf::Color::Black));
 	shape.append(sf::Vertex(
-		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(-theta / 2.0f), VecUtils::Null<>()) * 50.0f,
-		sf::Color::Black));
+		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(-theta / 2.0f), VecUtils::Null<>()) *
+		50.0f, sf::Color::Black));
 
 	AddStaticOccluder(shape);
 }

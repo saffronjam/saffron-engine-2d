@@ -4,7 +4,7 @@
 
 namespace Se
 {
-VoidBody::Ptr VoidBody::Create(const sf::Vector2f &position)
+auto VoidBody::Create(const sf::Vector2f& position) -> VoidBody::Ptr
 {
 	Ptr ret = std::make_shared<VoidBody>();
 

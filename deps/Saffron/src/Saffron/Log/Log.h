@@ -5,8 +5,8 @@
 
 #include "Saffron/Math/SaffronMath.h"
 
-namespace Se {
-
+namespace Se
+{
 class Log
 {
 public:
@@ -30,22 +30,24 @@ public:
 	static void AddCoreSink(std::shared_ptr<class LogSink> sink);
 	static void AddClientSink(std::shared_ptr<class LogSink> sink);
 
-	static std::shared_ptr<spdlog::logger> &GetCoreLogger() { return s_CoreLogger; }
-	static std::shared_ptr<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }
+	static auto GetCoreLogger() -> std::shared_ptr<spdlog::logger>& { return s_CoreLogger; }
+
+	static auto GetClientLogger() -> std::shared_ptr<spdlog::logger>& { return s_ClientLogger; }
+
 private:
 	static std::shared_ptr<spdlog::logger> s_CoreLogger;
 	static std::shared_ptr<spdlog::logger> s_ClientLogger;
 };
 }
 
-template<typename OStream, typename t_Number>
-OStream &operator<<(OStream &os, const sf::Vector2<t_Number> &vec)
+template <typename OStream, typename t_Number>
+auto operator<<(OStream& os, const sf::Vector2<t_Number>& vec) -> OStream&
 {
 	return os << '(' << vec.x << ", " << vec.y << ')';
 }
 
-template<typename OStream, typename t_Number>
-OStream &operator<<(OStream &os, const sf::Vector3<t_Number> &vec)
+template <typename OStream, typename t_Number>
+auto operator<<(OStream& os, const sf::Vector3<t_Number>& vec) -> OStream&
 {
 	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ')';
 }

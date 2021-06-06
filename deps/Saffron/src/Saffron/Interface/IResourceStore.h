@@ -3,7 +3,6 @@
 #include <map>
 
 #include "Saffron/Interface/IException.h"
-#include "Saffron/Macros/GenericThrowMacros.h"
 
 namespace Se
 {
@@ -20,28 +19,29 @@ public:
 	class Exception : public IException
 	{
 	public:
-		Exception(int line, const char *file, const char *errorString)
-			: IException(line, file),
-              _errorString(errorString)
+		Exception(int line, const char* file, const char* errorString) :
+			IException(line, file),
+			_errorString(errorString)
 		{
 		}
-		const char *what() const noexcept override
+
+		auto what() const noexcept -> const char* override
 		{
 			std::ostringstream oss;
-			oss << "[Type] " << GetType() << std::endl
-				<< "[Description] " << GetErrorString() << std::endl
-				<< GetOriginString();
+			oss << "[Type] " << GetType() << std::endl << "[Description] " << GetErrorString() << std::endl <<
+				GetOriginString();
 			whatBuffer = oss.str();
 			return whatBuffer.c_str();
 		}
 
-		const char *GetType() const override
+		auto GetType() const -> const char* override
 		{
 			static char buffer[100];
-            snprintf(buffer, 100, "%s %s", typeid(T).name(), "Exception");
+			snprintf(buffer, 100, "%s %s", typeid(T).name(), "Exception");
 			return buffer;
 		}
-		const char *GetErrorString() const
+
+		auto GetErrorString() const -> const char*
 		{
 			return _errorString.c_str();
 		}
