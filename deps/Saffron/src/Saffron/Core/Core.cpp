@@ -5,12 +5,8 @@
 
 namespace Se
 {
-void Core::Init()
-{
-	Log::Init();
-}
-
-void Core::Shutdown()
+Core::Core() :
+	_log(std::make_unique<Log>())
 {
 }
 }

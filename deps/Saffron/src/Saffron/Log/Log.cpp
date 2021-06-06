@@ -2,32 +2,34 @@
 
 #include "Saffron/Log/Log.h"
 #include "Saffron/Log/LogSink.h"
+#include "Saffron/Log/LogManager.h"
 
 namespace Se
 {
-std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
-std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
+Log* Log::_instance = nullptr;
 
-void Log::Init()
+Log::Log()
 {
-	spdlog::set_pattern("%^[%T] %n: %v%$");
-	s_CoreLogger = spdlog::stdout_color_mt("SAFFRON");
-	s_CoreLogger->set_level(spdlog::level::trace);
+	Debug::Assert(_instance == nullptr, String(typeid(Log).name()) + " was already instansiated");;
+	_instance = this;
 
-	s_ClientLogger.reset(new spdlog::logger("APP", {}));
-	s_ClientLogger->set_pattern("%^[%H:%M:%S]: %v%$");
+	_coreLogger = LogManager::CreateLogger("Saffron");
+	_clientLogger = LogManager::CreateLogger("Client");
 }
 
-void Log::AddCoreSink(std::shared_ptr<LogSink> sink)
+auto Log::CoreLogger() -> Shared<Logger>
 {
-	auto& sinks = const_cast<ArrayList<spdlog::sink_ptr>&>(s_CoreLogger->sinks());
-	sinks.push_back(std::dynamic_pointer_cast<spdlog::sinks::sink>(sink));
+	return Instance()._coreLogger;
 }
 
-
-void Log::AddClientSink(std::shared_ptr<LogSink> sink)
+auto Log::ClientLogger() -> Shared<Logger>
 {
-	auto& sinks = const_cast<ArrayList<spdlog::sink_ptr>&>(s_ClientLogger->sinks());
-	sinks.push_back(std::reinterpret_pointer_cast<spdlog::sinks::sink>(sink));
+	return Instance()._clientLogger;
+}
+
+auto Log::Instance() -> Log&
+{
+	Debug::Assert(_instance != nullptr, String(typeid(Log).name()) + " was not instansiated");;
+	return *_instance;
 }
 }

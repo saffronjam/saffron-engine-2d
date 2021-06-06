@@ -12,8 +12,7 @@ Terminal::Terminal()
 {
 	_sink = std::make_shared<TerminalSink>();
 	Clear();
-	SetLevel(Log::Level::Info);
-	Log::AddClientSink(_sink);
+	//Log::AddClientSink(_sink);
 }
 
 void Terminal::Clear() const
@@ -95,8 +94,4 @@ void Terminal::OnGuiRender()
 	s_GuiID--;
 }
 
-void Terminal::SetLevel(Log::Level::LevelEnum level) const
-{
-	_sink->SetLevel(level);
-}
 }

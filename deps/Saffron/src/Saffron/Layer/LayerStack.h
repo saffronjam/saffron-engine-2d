@@ -31,12 +31,12 @@ public:
 	auto Front() -> std::shared_ptr<Layer>;
 	auto Back() -> std::shared_ptr<Layer>;
 
-	auto begin() -> ArrayList<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
+	auto begin() -> List<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
 
-	auto end() -> ArrayList<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
+	auto end() -> List<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
 
 private:
-	ArrayList<std::shared_ptr<Layer>> _layers;
+	List<std::shared_ptr<Layer>> _layers;
 	unsigned int _layerInsertIndex = 0;
 };
 }

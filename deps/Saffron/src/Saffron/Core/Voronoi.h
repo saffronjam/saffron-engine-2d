@@ -22,7 +22,7 @@ public:
 	{
 	public:
 		Polygon(Voronoi& parent, int lineVAIndex, int filledVAIndex, const sf::Vector2f& voronoiPoint,
-		        ArrayList<sf::Vector2f> points);
+		        List<sf::Vector2f> points);
 
 		auto operator==(const Polygon& other) const -> bool { return _uuid == other._uuid; }
 
@@ -30,7 +30,7 @@ public:
 
 		auto GetFilledVAIndex() const -> int { return _filledVAIndex; }
 
-		auto GetPoints() const -> const ArrayList<sf::Vector2f>& { return _points; }
+		auto GetPoints() const -> const List<sf::Vector2f>& { return _points; }
 
 		auto GetFillColor() const -> sf::Color { return _fillColor; }
 
@@ -55,7 +55,7 @@ public:
 		int _filledVAIndex;
 
 		sf::Color _fillColor = sf::Color::Transparent;
-		ArrayList<sf::Vector2f> _points;
+		List<sf::Vector2f> _points;
 		std::set<Polygon*> _neighbors;
 		sf::Vector2f _voronoiPoint;
 	};
@@ -63,11 +63,11 @@ public:
 public:
 	Voronoi();
 	explicit Voronoi(const sf::FloatRect& boundingBox);
-	Voronoi(const sf::FloatRect& boundingBox, ArrayList<sf::Vector2f> points);
+	Voronoi(const sf::FloatRect& boundingBox, List<sf::Vector2f> points);
 	Voronoi(const sf::FloatRect& boundingBox, int noRandomPoints);
 	~Voronoi() override;
 
-	void SetPoints(ArrayList<sf::Vector2f> points);
+	void SetPoints(List<sf::Vector2f> points);
 	void SetPoints(int noRandomPoints);
 	void SetBoundingBox(const sf::FloatRect& boundingBox);
 	void SetOutlineColor(const sf::Color& color);
@@ -83,7 +83,7 @@ public:
 
 	void Relax(int iterations = 1);
 
-	auto GetPolygons() const -> const ArrayList<Polygon>& { return _polygons; }
+	auto GetPolygons() const -> const List<Polygon>& { return _polygons; }
 
 	auto GetPolygon(const sf::Vector2f& position) -> Polygon&;
 
@@ -112,9 +112,9 @@ private:
 	sf::Color _defaultGridColor = sf::Color::Blue;
 	Optional<jcv_diagram> _diagram;
 	sf::FloatRect _boundingBox;
-	ArrayList<sf::Vector2f> _points;
+	List<sf::Vector2f> _points;
 
-	ArrayList<Polygon> _polygons;
+	List<Polygon> _polygons;
 	sf::VertexArray _polygonsVA{sf::PrimitiveType::Lines};
 	sf::VertexArray _filledPolygonsVA{sf::PrimitiveType::Triangles};
 	bool _wantNewPolygonVA = false;

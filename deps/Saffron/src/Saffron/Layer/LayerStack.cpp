@@ -29,7 +29,7 @@ void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<BatchLo
 void LayerStack::PushOverlay(std::shared_ptr<Layer> overlay, std::shared_ptr<BatchLoader>& batchLoader)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");
 	auto newOverlay = _layers.emplace_back(overlay);
 	GetSignals().Emit(Signals::OnPushOverlay, newOverlay);
 }
@@ -48,7 +48,7 @@ void LayerStack::PopLayer(int count)
 void LayerStack::PopOverlay(int count)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");
 	for (int i = 0; i < count; i++)
 	{
 		GetSignals().Emit(Signals::OnPopOverlay, _layers.back());
@@ -72,7 +72,7 @@ void LayerStack::EraseLayer(std::shared_ptr<Layer> layer)
 void LayerStack::EraseOverlay(std::shared_ptr<Layer> overlay)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");
 	const auto it = std::find(_layers.begin(), _layers.end(), overlay);
 	if (it != _layers.end())
 	{

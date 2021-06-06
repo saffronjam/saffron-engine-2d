@@ -4,7 +4,7 @@
 
 namespace Se
 {
-ArrayList<ControllableRenderTexture*> RenderTargetManager::_targets;
+List<ControllableRenderTexture*> RenderTargetManager::_targets;
 
 void RenderTargetManager::Add(ControllableRenderTexture* target)
 {

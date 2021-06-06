@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class ProjectApplication : public Application
+class ProjectApplication : public App
 {
 public:
 	explicit ProjectApplication(const Properties &properties);

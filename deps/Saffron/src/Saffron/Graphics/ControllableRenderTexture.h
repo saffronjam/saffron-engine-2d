@@ -11,26 +11,19 @@ class ControllableRenderTexture
 {
 public:
 	ControllableRenderTexture(int width, int height, sf::ContextSettings contextSettings = sf::ContextSettings());
+	operator sf::RenderTexture&();
+	operator const sf::RenderTexture&() const;
+	operator const sf::Texture&() const;
 
-	operator sf::RenderTexture&() { return _renderTexture; }
+	auto GetRenderTexture() -> sf::RenderTexture&;
+	auto GetRenderTexture() const -> const sf::RenderTexture&;
 
-	operator const sf::RenderTexture&() const { return _renderTexture; }
+	auto IsEnabled() const -> bool;
+	void Enable();
+	void Disable();
 
-	operator const sf::Texture&() const { return _renderTexture.getTexture(); }
-
-	auto GetRenderTexture() -> sf::RenderTexture& { return _renderTexture; }
-
-	auto GetRenderTexture() const -> const sf::RenderTexture& { return _renderTexture; }
-
-	auto IsEnabled() const -> bool { return _enabled; }
-
-	void Enable() { _enabled = true; }
-
-	void Disable() { _enabled = false; }
-
-	auto GetClearColor() const -> sf::Color { return _clearColor; }
-
-	void SetClearColor(sf::Color color) { _clearColor = color; }
+	auto GetClearColor() const -> sf::Color;
+	void SetClearColor(sf::Color color);
 
 private:
 	sf::RenderTexture _renderTexture;

@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/App.h"
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/Global.h"
 #include "Saffron/Core/Run.h"
@@ -13,78 +13,84 @@
 
 namespace Se
 {
+App* App::s_Instance = nullptr;
 
-Application *Application::s_Instance = nullptr;
 
-
-Application::Application(const Properties &properties)
-	: _preLoader(CreateShared<BatchLoader>("Preloader")),
+App::App(const Properties& properties) :
+	_preLoader(CreateShared<BatchLoader>("Preloader")),
 	_window(properties.Name, properties.WindowWidth, properties.WindowHeight),
 	_fadeIn(FadePane::Type::In, sf::seconds(0.5f))
 {
-	SE_ASSERT(!s_Instance, "Application already exist");
+	Debug::Assert(!s_Instance, "Application already exist");
 	s_Instance = this;
 
-	SE_CORE_INFO("--- Saffron 2D Framework ---");
-	SE_CORE_INFO("Creating application {0}", properties.Name);
+	Log::CoreInfo("--- Saffron 2D Framework ---");
+	Log::CoreInfo("Creating application {0}", properties.Name);
 
-	_window.SetEventCallback([this](const sf::Event &event)
-							 { OnEvent(event); });
+	_window.SetEventCallback([this](const sf::Event& event)
+	{
+		OnEvent(event);
+	});
 
 	FileIOManager::Init(_window);
 	Gui::Init(Filepath("../../../imgui.ini"));
 
 	_preLoader->Submit([]
-					   {
-						   Gui::SetStyle(Gui::Style::Dark);
-					   }, "Initializing GUI");
+	{
+		Gui::SetStyle(Gui::Style::Dark);
+	}, "Initializing GUI");
 
 	Global::Clock::Restart();
 }
 
-Application::~Application()
+App::~App()
 {
 	Gui::Shutdown();
-	SE_CORE_INFO("Shutting down");
+	Log::CoreInfo("Shutting down");
 }
 
-void Application::PushLayer(std::shared_ptr<Layer> layer)
+void App::PushLayer(std::shared_ptr<Layer> layer)
 {
 	_layerStack.PushLayer(layer, _preLoader);
 }
 
-void Application::PushOverlay(std::shared_ptr<Layer> overlay)
+void App::PushOverlay(std::shared_ptr<Layer> overlay)
 {
 	_layerStack.PushOverlay(overlay, _preLoader);
 }
 
-void Application::PopLayer(int count)
+void App::PopLayer(int count)
 {
 	_layerStack.PopLayer(count);
 }
 
-void Application::PopOverlay(int count)
+void App::PopOverlay(int count)
 {
 	_layerStack.PopOverlay(count);
 }
 
-void Application::EraseLayer(std::shared_ptr<Layer> layer)
+void App::EraseLayer(std::shared_ptr<Layer> layer)
 {
 	_layerStack.EraseLayer(layer);
 }
 
-void Application::EraseOverlay(std::shared_ptr<Layer> overlay)
+void App::EraseOverlay(std::shared_ptr<Layer> overlay)
 {
 	_layerStack.EraseOverlay(overlay);
 }
 
-void Application::Run()
+void App::Run()
 {
 	OnInit();
 
-	while ( _running )
+	while (_running)
 	{
-		if ( !_preLoader->IsFinished() )
+		if (Keyboard::IsDown(sf::Keyboard::Key::A))
+		{
+			Log::Info("TEST");
+		}
+
+		if (!_preLoader->IsFinished())
 		{
 			RunSplashScreen();
 			_fadeIn.Start();
@@ -94,22 +100,22 @@ void Application::Run()
 		_window.HandleBufferedEvents();
 		_window.Clear();
 		RenderTargetManager::ClearAll();
-		if ( !_minimized )
+		if (!_minimized)
 		{
 			Gui::Begin();
-			for ( const auto &layer : _layerStack )
+			for (const auto& layer : _layerStack)
 			{
 				layer->OnPreFrame();
 			}
-			for ( const auto &layer : _layerStack )
+			for (const auto& layer : _layerStack)
 			{
 				layer->OnUpdate();
 			}
-			for ( const auto &layer : _layerStack )
+			for (const auto& layer : _layerStack)
 			{
 				layer->OnGuiRender();
 			}
-			for ( const auto &layer : _layerStack )
+			for (const auto& layer : _layerStack)
 			{
 				layer->OnPostFrame();
 			}
@@ -131,19 +137,19 @@ void Application::Run()
 	OnShutdown();
 }
 
-void Application::Exit()
+void App::Exit()
 {
 	_preLoader->ForceExit();
 	_running = false;
 }
 
-void Application::OnGuiRender()
+void App::OnGuiRender()
 {
-	if ( ImGui::Begin("Stats") )
+	if (ImGui::Begin("Stats"))
 	{
 		const auto dt = Global::Clock::GetFrameTime();
 		_fpsTimer += dt;
-		if ( _fpsTimer.asSeconds() < 1.0f )
+		if (_fpsTimer.asSeconds() < 1.0f)
 		{
 			_storedFrameCount++;
 			_storedFrametime += dt;
@@ -168,9 +174,9 @@ void Application::OnGuiRender()
 	ImGui::End();
 }
 
-void Application::OnEvent(const sf::Event &event)
+void App::OnEvent(const sf::Event& event)
 {
-	if ( event.type == event.Closed )
+	if (event.type == event.Closed)
 	{
 		OnWindowClose();
 	}
@@ -179,24 +185,24 @@ void Application::OnEvent(const sf::Event &event)
 	Keyboard::OnEvent(event);
 	Mouse::OnEvent(event);
 
-	for ( auto it = _layerStack.end(); it != _layerStack.begin(); )
+	for (auto it = _layerStack.end(); it != _layerStack.begin();)
 	{
 		(*--it)->OnEvent(event);
 	}
 }
 
-bool Application::OnWindowClose()
+bool App::OnWindowClose()
 {
 	Exit();
 	return true;
 }
 
-void Application::RunSplashScreen()
+void App::RunSplashScreen()
 {
 	_preLoader->Execute();
 
 	SplashScreenPane splashScreenPane(_preLoader);
-	while ( !splashScreenPane.IsFinished() )
+	while (!splashScreenPane.IsFinished())
 	{
 		_window.Clear();
 		RenderTargetManager::ClearAll();
@@ -210,12 +216,14 @@ void Application::RunSplashScreen()
 		_window.Display();
 		Global::Clock::Restart();
 		const auto step = Global::Clock::GetFrameTime().asSeconds();
-		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished() ? 0ll : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - step));
+		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished()
+			                      ? 0ll
+			                      : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - step));
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 	}
 }
 
-String Application::GetConfigurationName()
+String App::GetConfigurationName()
 {
 #if defined(SE_DEBUG)
 	return "Debug";
@@ -228,7 +236,7 @@ String Application::GetConfigurationName()
 #endif
 }
 
-String Application::GetPlatformName()
+String App::GetPlatformName()
 {
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";

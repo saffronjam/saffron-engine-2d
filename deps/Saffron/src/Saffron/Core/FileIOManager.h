@@ -17,12 +17,12 @@ public:
 	struct Filter
 	{
 		String Description;
-		ArrayList<String> Extensions;
+		List<String> Extensions;
 
 		static Filter Empty();
 
 		Filter() = default;
-		Filter(String description, ArrayList<String> extensions)
+		Filter(String description, List<String> extensions)
 			: Description(Move(description)),
 			Extensions(Move(extensions))
 		{
@@ -36,7 +36,7 @@ public:
 	static Filepath OpenFile(const Filter &filter = Filter::Empty());
 	static Filepath SaveFile(const Filter &filter = Filter::Empty());
 
-	static ArrayList<DirectoryEntry> GetFiles(const Filepath &directoryPath, const String &extension = "");
+	static List<DirectoryEntry> GetFiles(const Filepath &directoryPath, const String &extension = "");
 	static size_t GetFileCount(const Filepath &directoryPath, const String &extension = "");
 
 	static size_t Write(const Uint8 *data, size_t size, const Filepath &filepath, bool overwrite = true);

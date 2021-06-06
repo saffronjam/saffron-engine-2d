@@ -27,7 +27,7 @@ public:
 
 		auto *dyncastSignal = dynamic_cast<Signal<t_ParamType> *>(&_signals[signalAggregate]);
 
-		SE_CORE_ASSERT(dyncastSignal);
+		Debug::Assert(dyncastSignal);
 
 		return *dyncastSignal;
 	}

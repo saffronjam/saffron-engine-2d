@@ -1,25 +1,24 @@
 #pragma once
 
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Log/LogSink.h"
 
 namespace Se
 {
-class TerminalSink : public LogSink
+class TerminalSink
 {
 public:
+	TerminalSink();
+	
 	void Clear();
 
-	auto GetTextBuffer() const -> const ImGuiTextBuffer& { return _textBuffer; }
-
-	auto GetLineOffsets() const -> const ArrayList<int>& { return _lineOffsets; }
+	auto GetTextBuffer() const -> const ImGuiTextBuffer&;
+	auto GetLineOffsets() const -> const List<int>&;
 
 protected:
-	void Sink(const LogMessage& message) override;
-	void Flush() override;
+	bool Post(const LogMessage &message);
 
 private:
 	ImGuiTextBuffer _textBuffer;
-	ArrayList<int> _lineOffsets;
+	List<int> _lineOffsets;
 };
 }

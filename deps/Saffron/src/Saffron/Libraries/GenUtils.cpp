@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Debug/Debug.h"
 #include "Saffron/Libraries/GenUtils.h"
 #include "Saffron/Etc/HSVColor.h"
 
@@ -13,9 +14,9 @@ auto GenUtils::Mid(const sf::ConvexShape& polygon) -> sf::Vector2f
 	return total / static_cast<float>(nPoints);
 }
 
-auto GenUtils::Mid(const ArrayList<sf::Vector2f>& polygonPoints) -> sf::Vector2f
+auto GenUtils::Mid(const List<sf::Vector2f>& polygonPoints) -> sf::Vector2f
 {
-	SE_CORE_ASSERT(!polygonPoints.empty());
+	Debug::Assert(!polygonPoints.empty());
 	sf::Vector2f total(0.0f, 0.0f);
 	for (const auto& point : polygonPoints)
 	{
@@ -36,9 +37,9 @@ void GenUtils::Rotate(sf::Transformable& transformable, const sf::Vector2f& dire
 	transformable.setRotation(angle);
 }
 
-auto GenUtils::CreateConvexShape(const ArrayList<sf::Vector2f>& points) -> sf::ConvexShape
+auto GenUtils::CreateConvexShape(const List<sf::Vector2f>& points) -> sf::ConvexShape
 {
-	ArrayList<sf::Vector2f> usablePoints = WrapPoints(points);
+	List<sf::Vector2f> usablePoints = WrapPoints(points);
 
 	sf::ConvexShape finalShape;
 	finalShape.setPointCount(usablePoints.size() / 2);

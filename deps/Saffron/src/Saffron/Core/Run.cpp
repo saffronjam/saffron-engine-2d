@@ -5,7 +5,7 @@
 
 namespace Se
 {
-ArrayList<Function<void()>> Run::_laterFunctions;
+List<Function<void()>> Run::_laterFunctions;
 Map<Run::Handle, Run::PeriodicFunction> Run::_periodicFunctions;
 Map<Run::Handle, Function<void()>> Run::_frameFunctions;
 

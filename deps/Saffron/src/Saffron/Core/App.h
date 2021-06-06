@@ -9,7 +9,7 @@ namespace Se
 {
 class Scene;
 
-class Application
+class App
 {
 	friend class ApplicationSerializer;
 
@@ -21,8 +21,8 @@ public:
 	};
 
 public:
-	explicit Application(const Properties &properties = { "Saffron 2D", 1280, 720 });
-	virtual ~Application();
+	explicit App(const Properties &properties = { "Saffron 2D", 1280, 720 });
+	virtual ~App();
 
 	void Run();
 	void Exit();
@@ -42,7 +42,7 @@ public:
 
 	Window &GetWindow() { return _window; }
 
-	static Application &Get() { return *s_Instance; }
+	static App &Get() { return *s_Instance; }
 
 	static String GetConfigurationName();
 	static String GetPlatformName();
@@ -69,10 +69,10 @@ private:
 
 	FadePane _fadeIn;
 
-	static Application *s_Instance;
+	static App *s_Instance;
 };
 
 // Implemented by client
-Application *CreateApplication();
+App *CreateApplication();
 
 }

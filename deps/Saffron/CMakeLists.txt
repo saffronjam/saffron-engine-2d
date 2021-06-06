@@ -3,6 +3,8 @@ project(Saffron VERSION 0.1.0)
 
 ### FLAGS ###
 set(CMAKE_CXX_STANDARD 20)
+
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -91,6 +93,7 @@ endif ()
 find_package(Threads REQUIRED)
 
 
+
 ### DEFINITIONS ###
 add_definitions(
 )
@@ -99,6 +102,8 @@ add_definitions(
 file(GLOB_RECURSE ALL_SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")
 add_library(Saffron "${ALL_SOURCES}")
 target_precompile_headers(Saffron PUBLIC "src/SaffronPCH.cpp")
+
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 ### LOCAL INCLUDES ###
 file(GLOB INCLUDES ${INCLUDE_DIR} PARENT_SCOPE)

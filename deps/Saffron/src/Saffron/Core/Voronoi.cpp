@@ -7,7 +7,7 @@
 namespace Se
 {
 Voronoi::Polygon::Polygon(Voronoi& parent, int lineVAIndex, int filledVAIndex, const sf::Vector2f& voronoiPoint,
-                          ArrayList<sf::Vector2f> points) :
+                          List<sf::Vector2f> points) :
 	_parent(parent),
 	_lineVAIndex(lineVAIndex),
 	_filledVAIndex(filledVAIndex),
@@ -70,7 +70,7 @@ Voronoi::Voronoi(const sf::FloatRect& boundingBox) :
 	SetupUpdateCallback();
 }
 
-Voronoi::Voronoi(const sf::FloatRect& boundingBox, ArrayList<sf::Vector2f> points) :
+Voronoi::Voronoi(const sf::FloatRect& boundingBox, List<sf::Vector2f> points) :
 	_boundingBox(boundingBox),
 	_points(Move(points))
 {
@@ -96,7 +96,7 @@ Voronoi::~Voronoi()
 	Run::Remove(_updateHandle);
 }
 
-void Voronoi::SetPoints(ArrayList<sf::Vector2f> points)
+void Voronoi::SetPoints(List<sf::Vector2f> points)
 {
 	_points = Move(points);
 	MarkForGeneration();
@@ -138,7 +138,7 @@ void Voronoi::SetFillColor(const Polygon& polygon, sf::Color color)
 
 void Voronoi::Relax(int iterations)
 {
-	SE_CORE_ASSERT(_diagram.has_value(), "Voronoi was not created. _diagram was not instantiated");
+	Debug::Assert(_diagram.has_value(), "Voronoi was not created. _diagram was not instantiated");
 	for (int i = 0; i < iterations; i++)
 	{
 		const jcv_site* sites = jcv_diagram_get_sites(&_diagram.value());
@@ -174,7 +174,7 @@ auto Voronoi::GetPolygon(const sf::Vector2f& position) -> Voronoi::Polygon&
 		}
 	}
 
-	SE_CORE_ASSERT(closest != nullptr,
+	Debug::Assert(closest != nullptr,
 	               "Failed to find any polygons closer than std::numeric_limits<float>::infinity() units from given position");
 	return *closest;
 }
@@ -194,8 +194,8 @@ auto Voronoi::ConvertBoundingBox(const sf::FloatRect& boundingBox) -> jcv_rect
 
 void Voronoi::Generate()
 {
-	SE_CORE_ASSERT(_boundingBox.width > 0.0f && _boundingBox.height > 0.0f, "Invalid bounding box dimensions.");
-	SE_CORE_ASSERT(!_points.empty(), "No points available");
+	Debug::Assert(_boundingBox.width > 0.0f && _boundingBox.height > 0.0f, "Invalid bounding box dimensions.");
+	Debug::Assert(!_points.empty(), "No points available");
 
 	jcv_rect rect = ConvertBoundingBox(_boundingBox);
 
@@ -248,7 +248,7 @@ void Voronoi::Generate()
 	{
 		const jcv_site* site = &sites[i];
 
-		ArrayList<sf::Vector2f> polygonPoints;
+		List<sf::Vector2f> polygonPoints;
 		for (jcv_graphedge* edge = site->edges; edge != nullptr; edge = edge->next)
 		{
 			polygonPoints.emplace_back(edge->pos[0].x, edge->pos[0].y);

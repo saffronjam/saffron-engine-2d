@@ -38,7 +38,7 @@ public:
 	static void Remove(Handle handle);
 
 private:
-	static ArrayList<Function<void()>> _laterFunctions;
+	static List<Function<void()>> _laterFunctions;
 	static Map<Handle, PeriodicFunction> _periodicFunctions;
 	static Map<Handle, Function<void()>> _frameFunctions;
 

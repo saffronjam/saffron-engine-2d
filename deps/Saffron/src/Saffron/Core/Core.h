@@ -1,11 +1,16 @@
 ﻿#pragma once
 
+#include "Saffron/Core/TypeDefs.h"
+#include "Saffron/Log/Log.h"
+
 namespace Se
 {
 class Core
 {
 public:
-	static void Init();
-	static void Shutdown();
+	Core();
+
+private:
+	Unique<Log> _log;
 };
 }

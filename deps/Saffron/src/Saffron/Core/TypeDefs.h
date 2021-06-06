@@ -44,7 +44,7 @@ typedef unsigned long long Uint64;
 #endif
 
 template<typename T>
-using ArrayList = std::vector<T>;
+using List = std::vector<T>;
 template <class _Ty, size_t _size>
 using Array = std::array<_Ty, _size>;
 template<typename Key, typename Value>
@@ -52,17 +52,17 @@ using Map = std::map<Key, Value>;
 template<typename Key, typename Value>
 using MultiMap = std::multimap<Key, Value>;
 template<typename Key, typename Value>
-using UnorderedMap = std::unordered_map<Key, Value>;
+using HashMap = std::unordered_map<Key, Value>;
 template <class T>
 using Set = std::set<T>;
 template<typename T>
-using UnorderedSet = std::unordered_set< T>;
+using HashSet = std::unordered_set< T>;
 template<typename T>
 using Deque = std::deque<T>;
 template<typename T>
 using Stack = std::stack<T>;
 template<typename T>
-using List = std::list<T>;
+using LinkedList = std::list<T>;
 
 template<class FunctionType>
 using Function = std::function<FunctionType>;

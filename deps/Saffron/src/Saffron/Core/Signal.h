@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "Saffron/Core/Assert.h"
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Core/TypeDefs.h"
+#include "Saffron/Debug/Debug.h"
 
 namespace Se
 {
@@ -235,7 +235,7 @@ public:
         if (signalIter != _signals->end())
         {
             auto *dyncastSignal = dynamic_cast<Signal<t_ParamType> *>(signalIter->second);
-            SE_CORE_ASSERT(dyncastSignal);
+            Debug::Assert(dyncastSignal);
             (*dyncastSignal)(std::forward<Param>(param)...);
         }
     }
@@ -264,7 +264,7 @@ inline void SignalContainer::Emit(const SignalAggregate<void> &signalAggregate)
     if (signalIter != _signals->end())
     {
         auto *dyncastSignal = dynamic_cast<Signal<void> *>(signalIter->second);
-        SE_CORE_ASSERT(dyncastSignal);
+        Debug::Assert(dyncastSignal);
         (*dyncastSignal)();
     }
 }

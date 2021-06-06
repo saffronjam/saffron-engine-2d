@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
+#include "Saffron/Core/TypeDefs.h"
+#include "Saffron/Log/Logger.h"
 #include "Saffron/Math/SaffronMath.h"
 
 namespace Se
@@ -10,33 +12,116 @@ namespace Se
 class Log
 {
 public:
-	struct Level
+	Log();
+
+	template <typename Arg1, typename... Args>
+	static void Info(const char* fmt, const Arg1& arg1, const Args&... args)
 	{
-		enum LevelEnum
-		{
-			Trace = 0,
-			Debug = 1,
-			Info = 2,
-			Warn = 3,
-			Err = 4,
-			Critical = 5,
-			Off = 6
-		};
-	};
+		Instance()._clientLogger->Info(fmt, arg1, args...);
+	}
 
-public:
-	static void Init();
+	template <typename T>
+	static void Info(const T& msg)
+	{
+		Instance()._clientLogger->Info(msg);
+	}
 
-	static void AddCoreSink(std::shared_ptr<class LogSink> sink);
-	static void AddClientSink(std::shared_ptr<class LogSink> sink);
+	template <typename Arg1, typename... Args>
+	static void Debug(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._coreLogger->Debug(fmt, arg1, args...);
+	}
 
-	static auto GetCoreLogger() -> std::shared_ptr<spdlog::logger>& { return s_CoreLogger; }
+	template <typename T>
+	static void Debug(const T& msg)
+	{
+		Instance()._coreLogger->Debug(msg);
+	}
 
-	static auto GetClientLogger() -> std::shared_ptr<spdlog::logger>& { return s_ClientLogger; }
+	template <typename Arg1, typename... Args>
+	static void Warn(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._clientLogger->Warn(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void Warn(const T& msg)
+	{
+		Instance()._clientLogger->Warn(msg);
+	}
+
+	template <typename Arg1, typename... Args>
+	static void Error(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._clientLogger->Error(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void Error(const T& msg)
+	{
+		Instance()._clientLogger->Error(msg);
+	}
+
+	template <typename Arg1, typename... Args>
+	static void CoreInfo(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._coreLogger->Info(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void CoreInfo(const T& msg)
+	{
+		Instance()._coreLogger->Info(msg);
+	}
+
+	template <typename Arg1, typename... Args>
+	static void CoreDebug(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._coreLogger->Debug(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void CoreDebug(const T& msg)
+	{
+		Instance()._coreLogger->Debug(msg);
+	}
+
+	template <typename Arg1, typename... Args>
+	static void CoreWarn(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._coreLogger->Warn(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void CoreWarn(const T& msg)
+	{
+		Instance()._coreLogger->Warn(msg);
+	}
+
+	template <typename Arg1, typename... Args>
+	static void CoreError(const char* fmt, const Arg1& arg1, const Args&... args)
+	{
+		Instance()._coreLogger->Error(fmt, arg1, args...);
+	}
+
+	template <typename T>
+	static void CoreError(const T& msg)
+	{
+		Instance()._coreLogger->Error(msg);
+	}
+
+	static auto CoreLogger() -> Shared<Logger>;
+	static auto ClientLogger() -> Shared<Logger>;
 
 private:
-	static std::shared_ptr<spdlog::logger> s_CoreLogger;
-	static std::shared_ptr<spdlog::logger> s_ClientLogger;
+	static auto Instance() -> Log&;
+
+private:
+	static Log* _instance;
+
+private:
+	Shared<Logger> _coreLogger;
+	Shared<Logger> _clientLogger;
 };
 }
 
@@ -51,23 +136,3 @@ auto operator<<(OStream& os, const sf::Vector3<t_Number>& vec) -> OStream&
 {
 	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ')';
 }
-
-//template<typename OStream, typename t_Number>
-//OStream &operator<<(OStream &os, const sf::Vector4<t_Number> &vec)
-//{
-//	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ')';
-//}
-
-// Core Logging Macros
-#define SE_CORE_TRACE(...)	Se::Log::GetCoreLogger()->trace(__VA_ARGS__, __LINE__);
-#define SE_CORE_INFO(...)	Se::Log::GetCoreLogger()->info(__VA_ARGS__);
-#define SE_CORE_WARN(...)	Se::Log::GetCoreLogger()->warn(__VA_ARGS__);
-#define SE_CORE_ERROR(...)	Se::Log::GetCoreLogger()->error(__VA_ARGS__);
-#define SE_CORE_FATAL(...)	Se::Log::GetCoreLogger()->critical(__VA_ARGS__);
-
-// Client Logging Macros
-#define SE_TRACE(...)	Se::Log::GetClientLogger()->trace(__VA_ARGS__);
-#define SE_INFO(...)	Se::Log::GetClientLogger()->info(__VA_ARGS__);
-#define SE_WARN(...)	Se::Log::GetClientLogger()->warn(__VA_ARGS__);
-#define SE_ERROR(...)	Se::Log::GetClientLogger()->error(__VA_ARGS__);
-#define SE_FATAL(...)	Se::Log::GetClientLogger()->critical(__VA_ARGS__);

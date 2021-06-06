@@ -66,7 +66,7 @@ void BaseLayer::OnGuiRender()
 	{
 		_camera.OnGuiRender();
 		_terminal.OnGuiRender();
-		Application::Get().OnGuiRender();
+		App::Get().OnGuiRender();
 	}
 	_scene.OnGuiRender();
 }

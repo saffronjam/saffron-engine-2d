@@ -4,7 +4,7 @@
 
 namespace Se
 {
-void LogSink::SetLevel(Log::Level::LevelEnum level)
+void LogSink::SetLevel(LogLevel level)
 {
 	set_level(static_cast<spdlog::level::level_enum>(level));
 }

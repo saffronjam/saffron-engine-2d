@@ -17,6 +17,6 @@ public:
 	static void DisplayAll();
 
 private:
-	static ArrayList<ControllableRenderTexture*> _targets;
+	static List<ControllableRenderTexture*> _targets;
 };
 }

@@ -2,7 +2,7 @@
 
 #include "Gui.h"
 
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/App.h"
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/FadePane.h"
 
@@ -60,7 +60,7 @@ void FadePane::OnGuiRender() const
 	const auto alpha = _alphaFunction(_timer, _duration);
 	const auto color = IM_COL32(0, 0, 0, alpha);
 	const ImVec2 position(0.0f, 0.0f);
-	const auto size = Application::Get().GetWindow().GetSize();
+	const auto size = App::Get().GetWindow().GetSize();
 	const ImVec2 imSize = {static_cast<float>(size.x), static_cast<float>(size.y)};
 	ImGui::GetOverlayDrawList()->AddRectFilled(position, imSize, color);
 }

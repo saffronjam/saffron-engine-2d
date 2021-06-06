@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/App.h"
 #include "Saffron/Core/Camera.h"
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"

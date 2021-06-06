@@ -35,7 +35,7 @@ public:
 private:
 	String _name;
 
-	ArrayList<Pair<Function<void()>, String>> _queue;
+	List<Pair<Function<void()>, String>> _queue;
 	size_t _noJobsDone = 0;
 
 	Atomic<float> _progress = 0.0f;

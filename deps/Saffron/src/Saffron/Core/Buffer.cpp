@@ -1,7 +1,6 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/Buffer.h"
-#include "Saffron/Core/Assert.h"
 
 namespace Se
 {
@@ -53,13 +52,13 @@ void Buffer::ZeroInitialize()
 
 void Buffer::Write(void *data, Uint32 size, Uint32 offset) const
 {
-	SE_CORE_ASSERT(offset + size <= _size, "Buffer overflow");
+	Debug::Assert(offset + size <= _size, "Buffer overflow");
 	memcpy(_data + offset, data, size);
 }
 
 void Buffer::Write(const void *data, Uint32 size, Uint32 offset) const
 {
-	SE_CORE_ASSERT(offset + size <= _size, "Buffer overflow");
+	Debug::Assert(offset + size <= _size, "Buffer overflow");
 	memcpy(_data + offset, data, size);
 }
 

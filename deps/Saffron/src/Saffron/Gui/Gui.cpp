@@ -1,6 +1,6 @@
 ﻿#include "SaffronPCH.h"
 
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/App.h"
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/GuiImpl.h"
@@ -47,7 +47,7 @@ void Gui::Init(Filepath iniFilepath)
 	AddFont("res/Fonts/segoeui.ttf", 56);
 	AddFont("res/Fonts/segoeui.ttf", 72);
 
-	Application& app = Application::Get();
+	App& app = App::Get();
 	auto& window = app.GetWindow().GetNativeWindow();
 	GuiImpl::SFML::Init(window);
 
@@ -152,14 +152,14 @@ void Gui::OnEvent(const sf::Event& event)
 
 void Gui::Begin()
 {
-	GuiImpl::SFML::Update(Application::Get().GetWindow().GetNativeWindow(), Global::Clock::GetFrameTime());
+	GuiImpl::SFML::Update(App::Get().GetWindow().GetNativeWindow(), Global::Clock::GetFrameTime());
 }
 
 void Gui::End()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	GuiImpl::SFML::Render(Application::Get().GetWindow().GetNativeWindow());
+	GuiImpl::SFML::Render(App::Get().GetWindow().GetNativeWindow());
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
@@ -632,7 +632,7 @@ void Gui::SetStyle(Style style)
 void Gui::SetFontSize(int size)
 {
 	ImFont* candidate = GetAppropriateFont(size);
-	SE_CORE_ASSERT(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");
+	Debug::Assert(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");
 	ImGui::SetCurrentFont(candidate);
 }
 

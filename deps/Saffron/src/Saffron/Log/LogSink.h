@@ -17,7 +17,7 @@ public:
 	virtual void Sink(const LogMessage& message) = 0;
 	virtual void Flush() = 0;
 
-	void SetLevel(Log::Level::LevelEnum level);
+	void SetLevel(LogLevel level);
 
 protected:
 	void log(const spdlog::details::log_msg& msg) final override

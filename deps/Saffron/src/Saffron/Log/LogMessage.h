@@ -1,20 +1,23 @@
 #pragma once
 
-#include "Saffron/Log/Log.h"
+#include <spdlog/details/log_msg.h>
+
+#include "Saffron/Log/LogLevel.h"
 
 namespace Se
 {
-struct LogMessage
+class LogMessage
 {
+public:
 	explicit LogMessage(const spdlog::details::log_msg& message) :
 		Raw(message.raw.c_str()),
 		Formatted(message.formatted.c_str()),
-		Level(static_cast<Log::Level::LevelEnum>(message.level))
+		Level(static_cast<LogLevel>(message.level))
 	{
 	}
 
 	String Raw;
 	String Formatted;
-	Log::Level::LevelEnum Level;
+	LogLevel Level;
 };
 }

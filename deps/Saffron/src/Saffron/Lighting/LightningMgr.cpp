@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/App.h"
 #include "Saffron/Lighting/LightningMgr.h"
 
 namespace Se
@@ -19,7 +19,7 @@ LightningMgr::LightningMgr()
 {
 	_shadowMapShader.loadFromFile("Resources/Shaders/vertexShader.vert", "res/shaders/shadowMap.frag");
 	_renderLightsShader.loadFromFile("Resources/Shaders/vertexShader.vert", "res/shaders/renderLights.frag");
-	const auto& size = Application::Get().GetWindow().GetSize();
+	const auto& size = App::Get().GetWindow().GetSize();
 	_collectiveLightMap.create(size.x, size.y);
 }
 
