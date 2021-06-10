@@ -2,49 +2,36 @@
 
 #include <SFML/Graphics/Font.hpp>
 
-#include "Saffron/Interface/IResourceStore.h"
+#include "Saffron/Resource/ResourceStore.h"
 
 namespace Se
 {
-class FontStore : public IResourceStore<sf::Font>
+class FontStore : public ResourceStore<sf::Font>
 {
 public:
-	FontStore() = default;
-	FontStore(const FontStore&) = delete;
-	auto operator()(const FontStore&) -> const FontStore& = delete;
-
-	static auto Get(const std::string& filepath) -> sf::Font*
+	static auto Get(const Path& Path, bool copy = false) -> Shared<sf::Font>
 	{
-		if (_resources.find(filepath) == _resources.end())
-		{
-			Load(filepath);
-		}
-		return &_resources[filepath];
+		return Instance().Fetch(Path, copy);
 	}
 
-	// Returns copy of resource from cache, if not existing, call Load();
-	static auto GetCopy(const std::string& filepath) -> const sf::Font&
+private:
+	auto Copy(const Shared<sf::Font>& value) -> Shared<sf::Font> override
 	{
-		if (_resources.find(filepath) == _resources.end())
-		{
-			Load(filepath);
-		}
-		return _resources[filepath];
+		return CreateShared<sf::Font>(*value);
 	}
 
-	// Load resource into memory
-	static void Load(const std::string& filepath)
+	auto Location() -> Path override
 	{
-		sf::Font resource;
-		if (!resource.loadFromFile(filepath))
-		{
-			{
-				char buf[200];
-				sprintf(buf, "Failed to load font: %s", filepath.c_str());
-				throw Exception(__LINE__, __FILE__, buf);
-			}
-		}
-		_resources.emplace(std::make_pair(filepath, resource));
+		return "res/Fonts/";
+	}
+
+private:
+	auto Load(Path Path) -> Shared<sf::Font> override
+	{
+		auto resource = CreateShared<sf::Font>();
+		const auto result = resource->loadFromFile(Path.string());
+		Debug::Assert(result, "Failed to load Font");
+		return resource;
 	}
 };
 }

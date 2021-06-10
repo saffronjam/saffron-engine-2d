@@ -1,21 +1,12 @@
 #pragma once
 
-#include "Saffron/Config.h"
-#include "Layer.h"
+#include "Saffron/Base.h"
+#include "Saffron/Layer/Layer.h"
 
 namespace Se
 {
-class LayerStack : public Signaller
+class LayerStack
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<std::shared_ptr<Layer>> OnPushLayer;
-		static SignalAggregate<std::shared_ptr<Layer>> OnPushOverlay;
-		static SignalAggregate<std::shared_ptr<Layer>> OnPopLayer;
-		static SignalAggregate<std::shared_ptr<Layer>> OnPopOverlay;
-	};
-
 public:
 	LayerStack() = default;
 	~LayerStack();
@@ -31,12 +22,17 @@ public:
 	auto Front() -> std::shared_ptr<Layer>;
 	auto Back() -> std::shared_ptr<Layer>;
 
-	auto begin() -> List<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
+	auto begin() -> List<std::shared_ptr<Layer>>::iterator;
+	auto end() -> List<std::shared_ptr<Layer>>::iterator;
 
-	auto end() -> List<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
+public:
+	EventSubscriberList<const Shared<Layer>&> OnPushLayer;
+	EventSubscriberList<const Shared<Layer>&> OnPushOverlay;
+	EventSubscriberList<const Shared<Layer>&> OnPopLayer;
+	EventSubscriberList<const Shared<Layer>&> OnPopOverlay;
 
 private:
-	List<std::shared_ptr<Layer>> _layers;
+	List<Shared<Layer>> _layers;
 	unsigned int _layerInsertIndex = 0;
 };
 }

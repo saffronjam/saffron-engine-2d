@@ -83,9 +83,9 @@ typedef __m128d SIMD_Double;  //for doubles
 #ifdef SIMD_AVX2
 
 // m256 will be our base type
-typedef __m256 SIMD_Float;    //for floats
+typedef __m256 SIMD_Float; //for floats
 typedef __m256i SIMD_Integer; //for integers
-typedef __m256d SIMD_Double;  //for doubles
+typedef __m256d SIMD_Double; //for doubles
 
 //process 8 at t time
 #define SIMD_VECTOR_SIZE 8

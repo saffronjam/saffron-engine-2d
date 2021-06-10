@@ -1,12 +1,18 @@
 #pragma once
 
+#include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 
 #include "Saffron/Base.h"
-#include "Saffron/Core/TextAlign.h"
+#include "Saffron/Core/Enums.h"
 #include "Saffron/Libraries/GenUtils.h"
 #include "Saffron/Interface/IException.h"
+
+#ifdef DrawText
+#undef DrawText
+#define HadDrawText
+#endif
 
 namespace Se
 {
@@ -32,28 +38,49 @@ public:
 	void Display();
 
 	void HandleBufferedEvents();
-	void SetEventCallback(Function<void(const sf::Event&)> fn);
 
 	void PositionCenter();
 
-	auto GetNativeWindow() -> sf::RenderWindow&;
-	auto GetNativeWindow() const -> const sf::RenderWindow&;
+	auto NativeWindow() -> sf::RenderWindow&;
+	auto NativeWindow() const -> const sf::RenderWindow&;
 
-	auto GetPosition() const -> sf::Vector2i;
-	auto GetSize() const -> sf::Vector2u;
-	auto GetWidth() const -> int;
-	auto GetHeight() const -> int;
-	auto GetTitle() const -> const std::string&;
-	auto GetScreenRect() const -> sf::IntRect;
+	auto Position() const -> sf::Vector2i;
+	auto Size() const -> sf::Vector2u;
+	auto Width() const -> int;
+	auto Height() const -> int;
+	auto Title() const -> const std::string&;
+	auto ScreenRect() const -> sf::IntRect;
 
 	auto IsFullscreen() const -> bool { return _fullscreen; }
 
 	void SetPosition(const sf::Vector2i& pos);
-	void SetSize(const sf::Vector2u& size);
+	void Resize(const sf::Vector2u& size);
 	void SetTitle(const std::string& title);
 	void SetIcon(const std::string& icon);
 	void SetFullscreen(bool toggle);
 	void SetVSync(bool toggle);
+
+public:
+	EventSubscriberList<const sf::Event&> AnyEvent;
+
+	// Window events
+	EventSubscriberList<void> Closed;
+	EventSubscriberList<const sf::Event::SizeEvent&> Resized;
+	EventSubscriberList<void> LostFocus;
+	EventSubscriberList<void> GainedFocus;
+
+	// Keyboard events
+	EventSubscriberList<const sf::Event::TextEvent&> TextEntered;
+	EventSubscriberList<const sf::Event::KeyEvent&> KeyPressed;
+	EventSubscriberList<const sf::Event::KeyEvent&> KeyReleased;
+
+	// Mouse events
+	EventSubscriberList<const sf::Event::MouseWheelScrollEvent&> MouseWheelScrolled;
+	EventSubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonPressed;
+	EventSubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonReleased;
+	EventSubscriberList<const sf::Event::MouseMoveEvent&> MouseMoved;
+	EventSubscriberList<void> MouseEntered;
+	EventSubscriberList<void> MouseLeft;
 
 private:
 	void Render(const sf::Drawable& drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
@@ -61,27 +88,17 @@ private:
 private:
 	// Used after exiting fullscreen
 	sf::VideoMode _videomode;
-	std::string _title;
+	String _title;
 	sf::Uint32 _style;
 	sf::RenderWindow _nativeWindow;
 	// Used after exiting fullscreen
 	sf::Vector2i _nonFullscreenPosition;
 
 	bool _fullscreen;
-
-	Optional<Function<void(const sf::Event&)>> _eventCallback;
-
-public:
-	class Exception : public IException
-	{
-	public:
-		Exception(int line, const char* file, const char* errorString);
-		auto what() const noexcept -> const char* override;
-		auto GetType() const -> const char* override;
-		auto GetErrorString() const -> const char*;
-
-	private:
-		std::string errorString;
-	};
 };
 }
+
+#if defined(HadDrawText)
+#define DrawText DrawTextA
+#undef HadDrawText
+#endif

@@ -1,20 +1,12 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Math/SaffronMath.h"
 #include "Saffron/Graphics/ControllableRenderTexture.h"
 
 namespace Se
 {
-class ViewportPane : public Signaller
+class ViewportPane
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<void> OnPostRender;
-		static SignalAggregate<const sf::Vector2f&> OnWantRenderTargetResize;
-	};
-
 public:
 	explicit ViewportPane(String windowTitle, const ControllableRenderTexture& target);
 
@@ -22,18 +14,22 @@ public:
 
 	auto InViewport(sf::Vector2f positionNDC) const -> bool;
 
-	auto GetMousePosition(bool normalized = false) const -> sf::Vector2f;
-	auto GetViewportSize() const -> sf::Vector2f;
+	auto MousePosition(bool normalized = false) const -> sf::Vector2f;
+	auto ViewportSize() const -> sf::Vector2f;
 
-	auto GetDockID() const -> Uint32;
+	auto DockID() const -> Uint32;
 
-	auto GetTopLeft() const -> const sf::Vector2f&;
-	auto GetBottomRight() const -> const sf::Vector2f&;
+	auto TopLeft() const -> const sf::Vector2f&;
+	auto BottomRight() const -> const sf::Vector2f&;
 
-	auto IsHovered() const -> bool;
-	auto IsFocused() const -> bool;
+	auto Hovered() const -> bool;
+	auto Focused() const -> bool;
 
 	void SetTarget(const ControllableRenderTexture& target);
+
+public:
+	EventSubscriberList<void> Rendered;
+	EventSubscriberList<const sf::Vector2f&> Resized;
 
 private:
 	String _windowTitle;

@@ -10,6 +10,9 @@
 #include <filesystem>
 #include <bitset>
 #include <iostream>
+#include <ranges>
+#include <algorithm>	
+#include <numeric>	
 
 #include <atomic>
 #include <sstream>

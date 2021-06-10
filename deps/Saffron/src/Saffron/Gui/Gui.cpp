@@ -9,17 +9,12 @@
 
 namespace Se
 {
-Filepath Gui::_iniFilepath;
-Gui::Style Gui::_currentStyle = Style::Light;
-Map<int, ImFont*> Gui::_fonts;
-Pair<int, ImFont*> Gui::_currentFont;
-
 static int s_UIContextID = 0;
 
-void Gui::Init(Filepath iniFilepath)
+Gui::Gui(Path iniFilepath) :
+	SingleTon(this),
+	_iniFilepath(Move(iniFilepath))
 {
-	_iniFilepath = Move(iniFilepath);
-
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -47,119 +42,40 @@ void Gui::Init(Filepath iniFilepath)
 	AddFont("res/Fonts/segoeui.ttf", 56);
 	AddFont("res/Fonts/segoeui.ttf", 72);
 
-	App& app = App::Get();
-	auto& window = app.GetWindow().GetNativeWindow();
-	GuiImpl::SFML::Init(window);
+	auto& win = App::Instance().Window();
+	GuiImpl::SFML::Init(win.NativeWindow());
+	win.AnyEvent += [](const sf::Event& event)
+	{
+		GuiImpl::SFML::ProcessEvent(event);
+		return false;
+	};
 
 	ImGui::StyleColorsDark();
 	ImGuiStyle& style = ImGui::GetStyle();
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		style.WindowRounding = 0.0f;
+		style.TabRounding = 0.0f;
 	}
 
-	// Main Blue
-	//const sf::Vector3f mainVibrant = { 0.26f, 0.59f, 0.98f };
-	//const sf::Vector3f mainVibrantDark = { 0.24f, 0.52f, 0.88f };
-	//const sf::Vector3f mainLessVibrant = { 0.06f, 0.53f, 0.98f
-
-	// Main Orange
-	//const sf::Vector3f mainVibrant = { 0.89f, 0.46f, 0.16f };
-	//const sf::Vector3f mainVibrantDark = { 0.79f, 0.38f, 0.14f };
-	//const sf::Vector3f mainLessVibrant = { 0.89f, 0.39f, 0.02f };
-
-	// Main Purple
-	const sf::Vector3f mainVibrant = {0.29f, 0.13f, 0.42f};
-	const sf::Vector3f mainVibrantDark = {0.19f, 0.15f, 0.23f};
-	const sf::Vector3f mainLessVibrant = {0.33f, 0.18f, 0.48f};
-
-	const sf::Vector4f mainNoTint = {mainVibrant, 1.00f}; //3	Main no tint
-	const sf::Vector4f mainTint1 = {mainVibrant, 0.95f}; //9	Main tinted1
-	const sf::Vector4f mainTint2 = {mainVibrant, 0.80f}; //8	Main tinted2
-	const sf::Vector4f mainTint3 = {mainVibrant, 0.67f}; //2	Main tinted3
-	const sf::Vector4f mainTint4 = {mainVibrant, 0.40f}; //1	Main tinted4
-	const sf::Vector4f mainTint5 = {mainVibrant, 0.35f}; //13	Main tinted5
-
-	const sf::Vector4f mainDark = {mainVibrantDark, 1.00f}; //4	Main dark1 no tint
-
-	const sf::Vector4f mainLessVibrantNoTint = {mainLessVibrant, 1.00f}; //6	Less blue no tint
-	const sf::Vector4f mainLessVibrantTint1 = {mainLessVibrant, 0.60f}; //14 Less blue tinted1
-
-	const sf::Vector4f coMain = {1.00f, 0.43f, 0.35f, 1.00f}; //10	2ndMain no tint
-	const sf::Vector4f coMainDark = {0.90f, 0.70f, 0.00f, 1.00f}; //11	3rdMain no tint
-	const sf::Vector4f coMainRed = {1.00f, 0.60f, 0.00f, 1.00f}; //12	Co3rdMain
-
-	const auto ToImVec4 = [](const sf::Vector4f& vector)
-	{
-		return ImVec4{vector.x, vector.y, vector.z, vector.w};
-	};
-
-	style.Alpha = 1.0f;
-	style.FrameRounding = 3.0f;
-	style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-	style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.94f);
-	style.Colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-	style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.39f);
-	style.Colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.10f);
-	style.Colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-	style.Colors[ImGuiCol_FrameBgHovered] = ToImVec4(mainTint4); //1
-	style.Colors[ImGuiCol_FrameBgActive] = ToImVec4(mainTint3); //2
-	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-	style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
-	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
-	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.59f, 0.59f, 1.00f);
-	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-	style.Colors[ImGuiCol_CheckMark] = ToImVec4(mainNoTint); //3
-	style.Colors[ImGuiCol_SliderGrab] = ToImVec4(mainDark); //4
-	style.Colors[ImGuiCol_SliderGrabActive] = ToImVec4(mainDark); //4
-	style.Colors[ImGuiCol_Button] = ToImVec4(mainTint2); //1
-	style.Colors[ImGuiCol_ButtonHovered] = ToImVec4(mainNoTint); //3
-	style.Colors[ImGuiCol_ButtonActive] = ToImVec4(mainLessVibrantNoTint); //6
-	style.Colors[ImGuiCol_Header] = ToImVec4(mainTint4); //7
-	style.Colors[ImGuiCol_HeaderHovered] = ToImVec4(mainTint2); //8
-	style.Colors[ImGuiCol_HeaderActive] = ToImVec4(mainNoTint); //3
-	style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
-	style.Colors[ImGuiCol_ResizeGripHovered] = ToImVec4(mainTint3); //2
-	style.Colors[ImGuiCol_ResizeGripActive] = ToImVec4(mainTint1); //9
-	style.Colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-	style.Colors[ImGuiCol_PlotLinesHovered] = ToImVec4(coMain); //10
-	style.Colors[ImGuiCol_PlotHistogram] = ToImVec4(coMainDark); //11
-	style.Colors[ImGuiCol_PlotHistogramHovered] = ToImVec4(coMainRed); //12
-	style.Colors[ImGuiCol_TextSelectedBg] = ToImVec4(mainTint5); //13
-	style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
-	style.Colors[ImGuiCol_Tab] = ToImVec4(mainTint4); //1
-	style.Colors[ImGuiCol_TabHovered] = ToImVec4(mainNoTint); //3
-	style.Colors[ImGuiCol_TabActive] = ToImVec4(mainLessVibrantNoTint); //6
-	style.Colors[ImGuiCol_TabUnfocused] = ToImVec4(mainTint4); //1
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ToImVec4(mainLessVibrantNoTint); //14
-
-	SetStyle(Style::Dark);
+	SetStyle(GuiStyle::Dark);
 }
 
-void Gui::Shutdown()
+Gui::~Gui()
 {
 	GuiImpl::SFML::Shutdown();
 }
 
-void Gui::OnEvent(const sf::Event& event)
-{
-	GuiImpl::SFML::ProcessEvent(event);
-}
-
 void Gui::Begin()
 {
-	GuiImpl::SFML::Update(App::Get().GetWindow().GetNativeWindow(), Global::Clock::GetFrameTime());
+	GuiImpl::SFML::Update(App::Instance().Window().NativeWindow(), Global::Clock::FrameTime());
 }
 
 void Gui::End()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	GuiImpl::SFML::Render(App::Get().GetWindow().GetNativeWindow());
+	GuiImpl::SFML::Render(App::Instance().Window().NativeWindow());
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
@@ -301,27 +217,27 @@ auto Gui::Property(const String& name, const String& text, const String& buttonN
 	return changed;
 }
 
-auto Gui::Property(const String& name, int& value, int min, int max, float step, PropertyFlag flags) -> bool
+auto Gui::Property(const String& name, int& value, int min, int max, float step, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%d", min, max, step, flags);
 }
 
 auto Gui::Property(const String& name, int& value, const char* format, int min, int max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = GetImGuiSliderFlags(flags);
+	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
-	if (flags & PropertyFlag_Slider)
+	if (flags & GuiPropertyFlag_Slider)
 	{
 		changed = ImGui::SliderInt(id.c_str(), &value, min, max, format, imGuiFlags);
 	}
-	else if (flags & PropertyFlag_Drag)
+	else if (flags & GuiPropertyFlag_Drag)
 	{
 		changed = ImGui::DragInt(id.c_str(), &value, step, min, max, format, imGuiFlags);
 	}
@@ -332,27 +248,27 @@ auto Gui::Property(const String& name, int& value, const char* format, int min, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, float& value, float min, float max, float step, PropertyFlag flags) -> bool
+auto Gui::Property(const String& name, float& value, float min, float max, float step, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
 auto Gui::Property(const String& name, float& value, const char* format, float min, float max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = GetImGuiSliderFlags(flags);
+	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
-	if (flags & PropertyFlag_Slider)
+	if (flags & GuiPropertyFlag_Slider)
 	{
 		changed = ImGui::SliderFloat(id.c_str(), &value, min, max, format, imGuiFlags);
 	}
-	else if (flags & PropertyFlag_Drag)
+	else if (flags & GuiPropertyFlag_Drag)
 	{
 		changed = ImGui::DragFloat(id.c_str(), &value, step, min, max, format, imGuiFlags);
 	}
@@ -363,33 +279,33 @@ auto Gui::Property(const String& name, float& value, const char* format, float m
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector2f& value, PropertyFlag flags) -> bool
+auto Gui::Property(const String& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
 auto Gui::Property(const String& name, sf::Vector2f& value, float min, float max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.03f", min, max, step, flags);
 }
 
 auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, float min, float max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = GetImGuiSliderFlags(flags);
+	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
-	if (flags & PropertyFlag_Slider)
+	if (flags & GuiPropertyFlag_Slider)
 	{
 		changed = ImGui::SliderFloat2(id.c_str(), reinterpret_cast<float*>(&value), min, max, format, imGuiFlags);
 	}
-	else if (flags & PropertyFlag_Drag)
+	else if (flags & GuiPropertyFlag_Drag)
 	{
 		changed = ImGui::DragFloat2(id.c_str(), reinterpret_cast<float*>(&value), step, min, max, format, imGuiFlags);
 	}
@@ -400,24 +316,24 @@ auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector3f& value, PropertyFlag flags) -> bool
+auto Gui::Property(const String& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector3f& value, float min, float max, float step, PropertyFlag flags,
+auto Gui::Property(const String& name, sf::Vector3f& value, float min, float max, float step, GuiPropertyFlag flags,
                    Optional<std::function<void()>> fn) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
 auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, float min, float max, float step,
-                   PropertyFlag flags, Optional<std::function<void()>> fn) -> bool
+                   GuiPropertyFlag flags, Optional<std::function<void()>> fn) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 
-	const auto imGuiFlags = GetImGuiSliderFlags(flags);
+	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
 
 	if (fn.has_value())
 	{
@@ -430,15 +346,15 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 
 	const String id = "##" + name;
 	bool changed = false;
-	if (flags & PropertyFlag_Color)
+	if (flags & GuiPropertyFlag_Color)
 	{
 		changed = ImGui::ColorEdit3(id.c_str(), reinterpret_cast<float*>(&value), ImGuiColorEditFlags_NoInputs);
 	}
-	else if (flags & PropertyFlag_Slider)
+	else if (flags & GuiPropertyFlag_Slider)
 	{
 		changed = ImGui::SliderFloat3(id.c_str(), reinterpret_cast<float*>(&value), min, max, format, imGuiFlags);
 	}
-	else if (flags & PropertyFlag_Drag)
+	else if (flags & GuiPropertyFlag_Drag)
 	{
 		changed = ImGui::DragFloat3(id.c_str(), reinterpret_cast<float*>(&value), step, min, max, format, imGuiFlags);
 	}
@@ -460,37 +376,37 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector4f& value, PropertyFlag flags) -> bool
+auto Gui::Property(const String& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
 auto Gui::Property(const String& name, sf::Vector4f& value, float min, float max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
 auto Gui::Property(const String& name, sf::Vector4f& value, const char* format, float min, float max, float step,
-                   PropertyFlag flags) -> bool
+                   GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = GetImGuiSliderFlags(flags);
+	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
-	if (flags & PropertyFlag_Color)
+	if (flags & GuiPropertyFlag_Color)
 	{
 		changed = ImGui::ColorEdit4(id.c_str(), reinterpret_cast<float*>(&value), ImGuiColorEditFlags_NoInputs);
 	}
-	else if (flags & PropertyFlag_Slider)
+	else if (flags & GuiPropertyFlag_Slider)
 	{
 		changed = ImGui::SliderFloat4(id.c_str(), reinterpret_cast<float*>(&value), min, max, "%.3f", imGuiFlags);
 	}
-	else if (flags & PropertyFlag_Drag)
+	else if (flags & GuiPropertyFlag_Drag)
 	{
 		changed = ImGui::DragFloat4(id.c_str(), reinterpret_cast<float*>(&value), step, min, max, "%.3f", imGuiFlags);
 	}
@@ -580,7 +496,7 @@ void Gui::HelpMarker(const String& desc)
 
 void Gui::InfoModal(const char* title, const char* text, bool& open)
 {
-	const auto prevFontSize = GetFontSize();
+	const auto prevFontSize = FontSize();
 	SetFontSize(20);
 	if (open && !ImGui::IsPopupOpen(title))
 	{
@@ -602,44 +518,182 @@ void Gui::InfoModal(const char* title, const char* text, bool& open)
 	SetFontSize(prevFontSize);
 }
 
-auto Gui::GetFontSize() -> int
+auto Gui::FontSize() -> int
 {
-	return _currentFont.first;
+	return Instance()._currentFont.first;
 }
 
-void Gui::SetStyle(Style style)
+void Gui::SetStyle(GuiStyle guiStyle)
 {
 	ImGuiStyle& imguiStyle = ImGui::GetStyle();
+	auto& currentStyle = Instance()._currentStyle;
 
-	if (_currentStyle != style)
+	if (currentStyle != guiStyle)
 	{
-		for (int i = 0; i <= ImGuiCol_COUNT; i++)
+		switch (guiStyle)
 		{
-			ImVec4& col = imguiStyle.Colors[i];
-			float H, S, V;
-			ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
+		case GuiStyle::Dark:
+		{
+			ImGui::GetStyle().FrameRounding = 4.0f;
+			ImGui::GetStyle().GrabRounding = 4.0f;
 
-			if (S < 0.1f)
-			{
-				V = 1.0f - V;
-			}
-			ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
+			ImVec4* colors = ImGui::GetStyle().Colors;
+			colors[ImGuiCol_Text] = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
+			colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
+			colors[ImGuiCol_WindowBg] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+			colors[ImGuiCol_ChildBg] = ImVec4(0.15f, 0.18f, 0.22f, 1.00f);
+			colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+			colors[ImGuiCol_Border] = ImVec4(0.08f, 0.10f, 0.12f, 1.00f);
+			colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+			colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+			colors[ImGuiCol_FrameBgHovered] = ImVec4(0.12f, 0.20f, 0.28f, 1.00f);
+			colors[ImGuiCol_FrameBgActive] = ImVec4(0.09f, 0.12f, 0.14f, 1.00f);
+			colors[ImGuiCol_TitleBg] = ImVec4(0.09f, 0.12f, 0.14f, 0.65f);
+			colors[ImGuiCol_TitleBgActive] = ImVec4(0.08f, 0.10f, 0.12f, 1.00f);
+			colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+			colors[ImGuiCol_MenuBarBg] = ImVec4(0.15f, 0.18f, 0.22f, 1.00f);
+			colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.39f);
+			colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.18f, 0.22f, 0.25f, 1.00f);
+			colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.09f, 0.21f, 0.31f, 1.00f);
+			colors[ImGuiCol_CheckMark] = ImVec4(0.28f, 0.56f, 1.00f, 1.00f);
+			colors[ImGuiCol_SliderGrab] = ImVec4(0.28f, 0.56f, 1.00f, 1.00f);
+			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.37f, 0.61f, 1.00f, 1.00f);
+			colors[ImGuiCol_Button] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+			colors[ImGuiCol_ButtonHovered] = ImVec4(0.28f, 0.56f, 1.00f, 1.00f);
+			colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
+			colors[ImGuiCol_Header] = ImVec4(0.20f, 0.25f, 0.29f, 0.55f);
+			colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+			colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_Separator] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+			colors[ImGuiCol_SeparatorHovered] = ImVec4(0.10f, 0.40f, 0.75f, 0.78f);
+			colors[ImGuiCol_SeparatorActive] = ImVec4(0.10f, 0.40f, 0.75f, 1.00f);
+			colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.25f);
+			colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+			colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+			colors[ImGuiCol_Tab] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+			colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
+			colors[ImGuiCol_TabActive] = ImVec4(0.20f, 0.25f, 0.29f, 1.00f);
+			colors[ImGuiCol_TabUnfocused] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+			colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
+			colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+			colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+			colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+			colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+			colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+			colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+			colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+			colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+			colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+			colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+			break;
 		}
-		_currentStyle = style;
+		case GuiStyle::Light:
+		{
+			ImGui::StyleColorsLight();
+
+			auto& style = ImGui::GetStyle();
+			auto* colors = style.Colors;
+			colors[ImGuiCol_ChildBg] = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
+			colors[ImGuiCol_Separator] = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
+
+			break;
+		}
+		case GuiStyle::VisualStudio:
+		{
+			constexpr auto ColorFromBytes = [](uint8_t r, uint8_t g, uint8_t b)
+			{
+				return ImVec4(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f,
+				              static_cast<float>(b) / 255.0f, 1.0f);
+			};
+
+			auto& style = ImGui::GetStyle();
+			ImVec4* colors = style.Colors;
+
+			const ImVec4 bgColor = ColorFromBytes(37, 37, 38);
+			const ImVec4 lightBgColor = ColorFromBytes(82, 82, 85);
+			const ImVec4 veryLightBgColor = ColorFromBytes(90, 90, 95);
+
+			const ImVec4 panelColor = ColorFromBytes(51, 51, 55);
+			const ImVec4 panelHoverColor = ColorFromBytes(29, 151, 236);
+			const ImVec4 panelActiveColor = ColorFromBytes(0, 119, 200);
+
+			const ImVec4 textColor = ColorFromBytes(255, 255, 255);
+			const ImVec4 textDisabledColor = ColorFromBytes(151, 151, 151);
+			const ImVec4 borderColor = ColorFromBytes(78, 78, 78);
+
+			colors[ImGuiCol_Text] = textColor;
+			colors[ImGuiCol_TextDisabled] = textDisabledColor;
+			colors[ImGuiCol_TextSelectedBg] = panelActiveColor;
+			colors[ImGuiCol_WindowBg] = bgColor;
+			colors[ImGuiCol_ChildBg] = bgColor;
+			colors[ImGuiCol_PopupBg] = bgColor;
+			colors[ImGuiCol_Border] = borderColor;
+			colors[ImGuiCol_BorderShadow] = borderColor;
+			colors[ImGuiCol_FrameBg] = panelColor;
+			colors[ImGuiCol_FrameBgHovered] = panelHoverColor;
+			colors[ImGuiCol_FrameBgActive] = panelActiveColor;
+			colors[ImGuiCol_TitleBg] = bgColor;
+			colors[ImGuiCol_TitleBgActive] = bgColor;
+			colors[ImGuiCol_TitleBgCollapsed] = bgColor;
+			colors[ImGuiCol_MenuBarBg] = panelColor;
+			colors[ImGuiCol_ScrollbarBg] = panelColor;
+			colors[ImGuiCol_ScrollbarGrab] = lightBgColor;
+			colors[ImGuiCol_ScrollbarGrabHovered] = veryLightBgColor;
+			colors[ImGuiCol_ScrollbarGrabActive] = veryLightBgColor;
+			colors[ImGuiCol_CheckMark] = panelActiveColor;
+			colors[ImGuiCol_SliderGrab] = ImVec4(0.10f, 0.42f, 0.64f, 1.0f);
+			colors[ImGuiCol_SliderGrabActive] = ImVec4(0.00f, 0.32f, 0.54f, 1.0f);
+			colors[ImGuiCol_Button] = panelColor;
+			colors[ImGuiCol_ButtonHovered] = panelHoverColor;
+			colors[ImGuiCol_ButtonActive] = panelHoverColor;
+			colors[ImGuiCol_Header] = panelColor;
+			colors[ImGuiCol_HeaderHovered] = panelHoverColor;
+			colors[ImGuiCol_HeaderActive] = panelActiveColor;
+			colors[ImGuiCol_Separator] = borderColor;
+			colors[ImGuiCol_SeparatorHovered] = borderColor;
+			colors[ImGuiCol_SeparatorActive] = borderColor;
+			colors[ImGuiCol_ResizeGrip] = bgColor;
+			colors[ImGuiCol_ResizeGripHovered] = panelColor;
+			colors[ImGuiCol_ResizeGripActive] = lightBgColor;
+			colors[ImGuiCol_PlotLines] = panelActiveColor;
+			colors[ImGuiCol_PlotLinesHovered] = panelHoverColor;
+			colors[ImGuiCol_PlotHistogram] = panelActiveColor;
+			colors[ImGuiCol_PlotHistogramHovered] = panelHoverColor;
+			colors[ImGuiCol_DragDropTarget] = bgColor;
+			colors[ImGuiCol_NavHighlight] = bgColor;
+			colors[ImGuiCol_DockingPreview] = panelActiveColor;
+			colors[ImGuiCol_Tab] = bgColor;
+			colors[ImGuiCol_TabActive] = panelActiveColor;
+			colors[ImGuiCol_TabUnfocused] = bgColor;
+			colors[ImGuiCol_TabUnfocusedActive] = panelActiveColor;
+			colors[ImGuiCol_TabHovered] = panelHoverColor;
+
+			style.WindowRounding = 0.0f;
+			style.ChildRounding = 0.0f;
+			style.FrameRounding = 0.0f;
+			style.GrabRounding = 0.0f;
+			style.PopupRounding = 0.0f;
+			style.ScrollbarRounding = 0.0f;
+			style.TabRounding = 0.0f;
+			break;
+		}
+		}
 	}
+	currentStyle = guiStyle;
 }
 
 void Gui::SetFontSize(int size)
 {
-	ImFont* candidate = GetAppropriateFont(size);
+	ImFont* candidate = AppropriateFont(size);
 	Debug::Assert(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");
 	ImGui::SetCurrentFont(candidate);
 }
 
-auto Gui::AddFont(const Filepath& path, int size) -> Font*
+auto Gui::AddFont(const Path& path, int size) -> Font*
 {
 	auto* newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(path.string().c_str(), static_cast<float>(size));
-	_fonts.emplace(size, newFont);
+	Instance()._fonts.emplace(size, newFont);
 	return newFont;
 }
 
@@ -658,12 +712,12 @@ void Gui::ForceHideBarTab()
 	}
 }
 
-auto Gui::GetSaffronOrange(float opacity) -> sf::Vector4f
+auto Gui::SaffronOrange(float opacity) -> sf::Vector4f
 {
 	return sf::Vector4f(0.89f, 0.46f, 0.16f, opacity);
 }
 
-auto Gui::GetSaffronPurple(float opacity) -> sf::Vector4f
+auto Gui::SaffronPurple(float opacity) -> sf::Vector4f
 {
 	return sf::Vector4f(0.29f, 0.13f, 0.42f, opacity);
 }
@@ -679,11 +733,11 @@ void Gui::PopID()
 	s_UIContextID--;
 }
 
-auto Gui::GetAppropriateFont(int size) -> Font*
+auto Gui::AppropriateFont(int size) -> Font*
 {
 	ImFont* candidate = nullptr;
 	int bestDiff = std::numeric_limits<int>::max();
-	for (auto& [fontSize, font] : _fonts)
+	for (auto& [fontSize, font] : Instance()._fonts)
 	{
 		if (std::abs(fontSize - size) > bestDiff)
 		{
@@ -695,10 +749,10 @@ auto Gui::GetAppropriateFont(int size) -> Font*
 	return candidate;
 }
 
-auto Gui::GetImGuiSliderFlags(PropertyFlag flags) -> ImGuiSliderFlags
+auto Gui::ToImGuiSliderFlags(GuiPropertyFlag flags) -> ImGuiSliderFlags
 {
 	ImGuiSliderFlags imGuiSliderFlags = 0;
-	if (flags & PropertyFlag_Logarithmic)
+	if (flags & GuiPropertyFlag_Logarithmic)
 	{
 		imGuiSliderFlags |= ImGuiSliderFlags_Logarithmic;
 	}

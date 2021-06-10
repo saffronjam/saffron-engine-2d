@@ -3,8 +3,6 @@ project(Saffron VERSION 0.1.0)
 
 ### FLAGS ###
 set(CMAKE_CXX_STANDARD 20)
-
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -68,6 +66,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     ### EXTERNAL INCLUDES AND LIBRARIES ###
     file(GLOB INCLUDES_EXT
             ${LIBRARY_DIR}/Box2D/include
+            ${LIBRARY_DIR}/Glad/include
             ${LIBRARY_DIR}/entt/include
             ${LIBRARY_DIR}/imgui/include
             ${LIBRARY_DIR}/jcv/include
@@ -93,7 +92,6 @@ endif ()
 find_package(Threads REQUIRED)
 
 
-
 ### DEFINITIONS ###
 add_definitions(
 )
@@ -117,6 +115,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             ${LIBRARY_DIR}/Box2D/lib
             ${LIBRARY_DIR}/imgui/lib/${COMPILER_LIB_DIR}
             ${LIBRARY_DIR}/SFML/lib/${COMPILER_LIB_DIR}
+            ${LIBRARY_DIR}/Glad/lib
             )
     target_link_libraries(Saffron PUBLIC
             ## Box2D
@@ -142,6 +141,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 
             ## imgui
             imgui${LIB_SUFFIX}
+            
+			## Glad
+			Glad
+
             )
 else ()
     target_include_directories(Saffron PRIVATE

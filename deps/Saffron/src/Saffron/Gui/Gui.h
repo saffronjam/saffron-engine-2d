@@ -1,46 +1,26 @@
 #pragma once
 
 #include <imgui.h>
-#include <imgui_internal.h>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/Enums.h"
 #include "Saffron/Math/SaffronMath.h"
 
 namespace Se
 {
 using Font = ImFont;
 
-class Gui
-{
+class Gui : public SingleTon<Gui>
+{;
 public:
-	enum class Style : int
-	{
-		Dark = 0,
-		Light = 1
-	};
+	explicit Gui(Path iniFilepath);
+	virtual ~Gui();
 
-	typedef Uint32 PropertyFlag;
-
-	enum PropertyFlag_ : Uint32
-	{
-		PropertyFlag_None = 0u,
-		PropertyFlag_Color = 1u << 4u,
-		PropertyFlag_Drag = 1u << 5u,
-		PropertyFlag_Slider = 1u << 6u,
-		PropertyFlag_Logarithmic = 1u << 7u
-	};
-
-public:
-	static void Init(Filepath iniFilepath);
-	static void Shutdown();
-
-	static void OnEvent(const sf::Event& event);
-
-	static void Begin();
-	static void End();
+	void Begin();
+	void End();
 
 	static void BeginPropertyGrid(String id = "", float width = -1.0);
 	static void EndPropertyGrid();
@@ -68,54 +48,54 @@ public:
 	////////////////////////////////
 
 	static auto Property(const String& name, int& value, int min = -1, int max = 1, float step = 1,
-	                     PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	static auto Property(const String& name, int& value, const char* format, int min = -1, int max = 1, float step = 1,
-	                     PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	static auto Property(const String& name, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
-	                     PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	static auto Property(const String& name, float& value, const char* format, float min = -1.0f, float max = 1.0f,
-	                     float step = 1.0f, PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	////////////////////////////////
 	/// Vector2
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector2f& value, PropertyFlag flags) -> bool;
+	static auto Property(const String& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool;
 
 	static auto Property(const String& name, sf::Vector2f& value, float min = -1.0f, float max = 1.0f,
-	                     float step = 1.0f, PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	static auto Property(const String& name, sf::Vector2f& value, const char* format, float min = -1.0f,
-	                     float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	////////////////////////////////
 	/// Vector3
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector3f& value, PropertyFlag flags) -> bool;
+	static auto Property(const String& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool;
 
 	static auto Property(const String& name, sf::Vector3f& value, float min = -1.0f, float max = 1.0f,
-	                     float step = 1.0f, PropertyFlag flags = PropertyFlag_None,
+	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None,
 	                     Optional<std::function<void()>> fn = {}) -> bool;
 
 	static auto Property(const String& name, sf::Vector3f& value, const char* format, float min = -1.0f,
-	                     float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag_None,
+	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None,
 	                     Optional<std::function<void()>> fn = {}) -> bool;
 
 	////////////////////////////////
 	/// Vector4
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector4f& value, PropertyFlag flags) -> bool;
+	static auto Property(const String& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool;
 
 	static auto Property(const String& name, sf::Vector4f& value, float min = -1.0f, float max = 1.0f,
-	                     float step = 1.0f, PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	static auto Property(const String& name, sf::Vector4f& value, const char* format, float min = -1.0f,
-	                     float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag_None) -> bool;
+	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 
 	static void Image(const sf::Texture& texture, const sf::Color& tintColor = sf::Color::White,
@@ -164,28 +144,28 @@ public:
 
 	static void InfoModal(const char* title, const char* text, bool& open);
 
-	static auto GetFontSize() -> int;
-	static void SetStyle(Style style);
+	static auto FontSize() -> int;
+	static void SetStyle(GuiStyle guiStyle);
 	static void SetFontSize(int size);
-	static auto AddFont(const Filepath& path, int size) -> Font*;
+	static auto AddFont(const Path& path, int size) -> Font*;
 
 	static void ForceHideBarTab();
 
-	static auto GetSaffronOrange(float opacity = 1.0f) -> sf::Vector4f;
-	static auto GetSaffronPurple(float opacity = 1.0f) -> sf::Vector4f;
+	static auto SaffronOrange(float opacity = 1.0f) -> sf::Vector4f;
+	static auto SaffronPurple(float opacity = 1.0f) -> sf::Vector4f;
 
 private:
 	static void PushID();
 	static void PopID();
 
-	static auto GetAppropriateFont(int size) -> Font*;
+	static auto AppropriateFont(int size) -> Font*;
 
-	static auto GetImGuiSliderFlags(PropertyFlag flags) -> ImGuiSliderFlags;
+	static auto ToImGuiSliderFlags(GuiPropertyFlag flags) -> ImGuiSliderFlags;
 
 private:
-	static Filepath _iniFilepath;
-	static Style _currentStyle;
-	static Map<int, ImFont*> _fonts;
-	static Pair<int, ImFont*> _currentFont;
+	Path _iniFilepath;
+	GuiStyle _currentStyle = GuiStyle::Light;
+	TreeMap<int, ImFont*> _fonts;
+	Pair<int, ImFont*> _currentFont;
 };
 }

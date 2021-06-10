@@ -1,70 +1,95 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/App.h"
 #include "Saffron/Input/Keyboard.h"
 
 namespace Se
 {
-std::map<sf::Keyboard::Key, bool> Keyboard::_keymap;
-std::map<sf::Keyboard::Key, bool> Keyboard::_prevKeymap;
-std::string Keyboard::_textInputBuffer;
+Keyboard::Keyboard() :
+	SingleTon(this)
+{
+	auto& win = App::Instance().Window();
+
+	win.KeyPressed += SE_EV_ACTION(Keyboard::OnPress);
+	win.KeyReleased += SE_EV_ACTION(Keyboard::OnRelease);
+	win.TextEntered += SE_EV_ACTION(Keyboard::OnTextInput);
+}
 
 void Keyboard::OnUpdate()
 {
-	for (auto& [key, state] : _keymap) _prevKeymap[key] = state;
-	_textInputBuffer.clear();
-}
+	auto& inst = Instance();
 
-
-void Keyboard::OnEvent(const sf::Event& event)
-{
-	switch (event.type)
+	for (auto& [key, state] : inst._keymap)
 	{
-	case sf::Event::EventType::KeyPressed: OnPress(event.key);
-		break;
-	case sf::Event::EventType::KeyReleased: OnRelease(event.key);
-		break;
-	case sf::Event::EventType::TextEntered: OnTextInput(event.text.unicode);
-		break;
-	default: break;
+		inst._prevKeymap[key] = state;
 	}
+
+	inst._textInputBuffer.clear();
 }
 
 auto Keyboard::IsDown(const sf::Keyboard::Key& key) -> bool
 {
-	return _keymap[key];
+	auto& inst = Instance();
+
+	return inst._keymap[key];
 }
 
 auto Keyboard::IsPressed(const sf::Keyboard::Key& key) -> bool
 {
-	return _keymap[key] && !_prevKeymap[key];
+	auto& inst = Instance();
+
+	return inst._keymap[key] && !inst._prevKeymap[key];
 }
 
 auto Keyboard::IsReleased(const sf::Keyboard::Key& key) -> bool
 {
-	return !_keymap[key] && _prevKeymap[key];
+	auto& inst = Instance();
+
+	return !inst._keymap[key] && inst._prevKeymap[key];
 }
 
 auto Keyboard::IsAnyDown() -> bool
 {
-	for (auto& [key, state] : _keymap)
+	auto& inst = Instance();
+
+	for (const auto& key : inst._keymap | std::views::keys)
 	{
-		if (_keymap[key]) return true;
+		if (inst._keymap[key])
+		{
+			return true;
+		}
 	}
 	return false;
 }
 
+auto Keyboard::TextInput() -> std::u32string
+{
+	auto& inst = Instance();
+
+	return inst._textInputBuffer;
+}
+
 void Keyboard::OnPress(const sf::Event::KeyEvent& event)
 {
-	_keymap[event.code] = true;
+	auto& inst = Instance();
+
+	inst._keymap[event.code] = true;
+	inst.Pressed.Invoke(event);
 }
 
 void Keyboard::OnRelease(const sf::Event::KeyEvent& event)
 {
-	_keymap[event.code] = false;
+	auto& inst = Instance();
+
+	inst._keymap[event.code] = false;
+	inst.Released.Invoke(event);
 }
 
-void Keyboard::OnTextInput(unsigned char character)
+void Keyboard::OnTextInput(const sf::Event::TextEvent& event)
 {
-	_textInputBuffer += character;
+	auto& inst = Instance();
+
+	inst._textInputBuffer += event.unicode;
+	inst.TextEntered.Invoke(event);
 }
 }

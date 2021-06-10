@@ -1,10 +1,13 @@
 #include "SaffronPCH.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
-#include <SFML/Window/Event.hpp>
 
 #include "Saffron/Core/Window.h"
 #include "Saffron/Lighting/LightningMgr.h"
+
+#ifdef DrawText
+#undef DrawText
+#endif
 
 namespace Se
 {
@@ -20,6 +23,8 @@ Window::Window(const std::string& title, int width, int height) :
 	_nativeWindow.resetGLStates();
 	SetTitle(title);
 	PositionCenter();
+
+	SetVSync(true);
 }
 
 void Window::Draw(const sf::Drawable& drawable, sf::RenderStates renderStates)
@@ -89,24 +94,52 @@ void Window::Display()
 void Window::HandleBufferedEvents()
 {
 	sf::Event event;
-	if (_eventCallback.has_value())
+	while (_nativeWindow.pollEvent(event))
 	{
-		while (_nativeWindow.pollEvent(event))
+		switch (event.type)
 		{
-			_eventCallback.value()(event);
-		}
-	}
-	else
-	{
-		while (_nativeWindow.pollEvent(event))
-		{
-		}
-	}
-}
+#define CASE(eventType, arg)  case sf::Event:: ## eventType: { (eventType).Invoke(arg); break; }
 
-void Window::SetEventCallback(Function<void(const sf::Event&)> fn)
-{
-	_eventCallback = Move(fn);
+			// Window events
+		CASE(Closed, );
+		CASE(Resized, event.size);
+		CASE(LostFocus, );
+		CASE(GainedFocus, );
+
+			// Keyboard events
+		CASE(TextEntered, event.text);
+		CASE(KeyPressed, event.key);
+		CASE(KeyReleased, event.key);
+
+			// Mouse events
+		CASE(MouseWheelScrolled, event.mouseWheelScroll);
+		CASE(MouseButtonPressed, event.mouseButton);
+		CASE(MouseButtonReleased, event.mouseButton);
+		CASE(MouseMoved, event.mouseMove);
+		CASE(MouseEntered, );
+		CASE(MouseLeft, );
+
+#undef CASE
+
+			// Unhandled at the time
+		case sf::Event::MouseWheelMoved:
+		case sf::Event::JoystickButtonPressed:
+		case sf::Event::JoystickButtonReleased:
+		case sf::Event::JoystickMoved:
+		case sf::Event::JoystickConnected:
+		case sf::Event::JoystickDisconnected:
+		case sf::Event::TouchBegan:
+		case sf::Event::TouchMoved:
+		case sf::Event::TouchEnded:
+		case sf::Event::SensorChanged:
+		case sf::Event::Count: default:
+		{
+			// Avoid "AnyEvent" invoke
+			continue;
+		}
+		}
+		AnyEvent.Invoke(event);
+	}
 }
 
 void Window::PositionCenter()
@@ -116,44 +149,44 @@ void Window::PositionCenter()
 	_nativeWindow.setPosition(sf::Vector2i(max.width, max.height) / 2 - halfSize);
 }
 
-auto Window::GetNativeWindow() -> sf::RenderWindow&
+auto Window::NativeWindow() -> sf::RenderWindow&
 {
 	return _nativeWindow;
 }
 
-auto Window::GetNativeWindow() const -> const sf::RenderWindow&
+auto Window::NativeWindow() const -> const sf::RenderWindow&
 {
 	return _nativeWindow;
 }
 
-auto Window::GetPosition() const -> sf::Vector2i
+auto Window::Position() const -> sf::Vector2i
 {
 	return _nativeWindow.getPosition();
 }
 
-auto Window::GetSize() const -> sf::Vector2u
+auto Window::Size() const -> sf::Vector2u
 {
 	return _nativeWindow.getSize();
 }
 
-auto Window::GetWidth() const -> int
+auto Window::Width() const -> int
 {
-	return GetSize().x;
+	return Size().x;
 }
 
-auto Window::GetHeight() const -> int
+auto Window::Height() const -> int
 {
-	return GetSize().y;
+	return Size().y;
 }
 
-auto Window::GetTitle() const -> const std::string&
+auto Window::Title() const -> const std::string&
 {
 	return _title;
 }
 
-auto Window::GetScreenRect() const -> sf::IntRect
+auto Window::ScreenRect() const -> sf::IntRect
 {
-	return sf::IntRect(0, 0, GetWidth(), GetHeight());
+	return sf::IntRect(0, 0, Width(), Height());
 }
 
 void Window::SetPosition(const sf::Vector2i& pos)
@@ -161,7 +194,7 @@ void Window::SetPosition(const sf::Vector2i& pos)
 	_nativeWindow.setPosition(pos);
 }
 
-void Window::SetSize(const sf::Vector2u& size)
+void Window::Resize(const sf::Vector2u& size)
 {
 	_nativeWindow.setSize(size);
 }
@@ -183,15 +216,15 @@ void Window::SetFullscreen(bool toggle)
 	if (toggle && !_fullscreen)
 	{
 		_fullscreen = true;
-		_videomode.width = GetSize().x;
-		_videomode.height = GetSize().y;
-		_nonFullscreenPosition = GetPosition();
-		_nativeWindow.create(sf::VideoMode::getFullscreenModes()[0], GetTitle(), sf::Style::Fullscreen);
+		_videomode.width = Size().x;
+		_videomode.height = Size().y;
+		_nonFullscreenPosition = Position();
+		_nativeWindow.create(sf::VideoMode::getFullscreenModes()[0], Title(), sf::Style::Fullscreen);
 	}
 	else if (!toggle && _fullscreen)
 	{
 		_fullscreen = false;
-		_nativeWindow.create(_videomode, GetTitle(), _style);
+		_nativeWindow.create(_videomode, Title(), _style);
 		SetPosition(_nonFullscreenPosition);
 	}
 }
@@ -204,30 +237,5 @@ void Window::SetVSync(bool toggle)
 void Window::Render(const sf::Drawable& drawable, sf::RenderStates renderStates)
 {
 	_nativeWindow.draw(drawable, renderStates);
-}
-
-Window::Exception::Exception(int line, const char* file, const char* errorString) :
-	IException(line, file),
-	errorString(errorString)
-{
-}
-
-auto Window::Exception::what() const noexcept -> const char*
-{
-	std::ostringstream oss;
-	oss << "[Type] " << GetType() << std::endl << "[Description] " << GetErrorString() << std::endl <<
-		GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-auto Window::Exception::GetType() const -> const char*
-{
-	return "V-2DFramework Window Exception";
-}
-
-auto Window::Exception::GetErrorString() const -> const char*
-{
-	return errorString.c_str();
 }
 }

@@ -11,26 +11,25 @@ namespace Se
 class SplashScreenPane
 {
 public:
-	explicit SplashScreenPane(const std::shared_ptr<BatchLoader>& batchLoader);
+	explicit SplashScreenPane(const std::shared_ptr<class BatchLoader>& batchLoader);
 
 	void OnUpdate();
 	void OnGuiRender();
 
-	auto GetBatchLoader() const -> const std::shared_ptr<BatchLoader>& { return _batchLoader; }
+	auto BatchLoader() const -> const std::shared_ptr<class BatchLoader>&;
 
 	void Show();
 	void Hide();
-	auto IsIdle() const -> bool;
-
-	auto IsFinished() const -> bool { return _finished; }
-
-	auto IsHidden() const -> bool { return _hidden; }
+	
+	auto Idle() const -> bool;
+	auto Finished() const -> bool;
+	auto Hidden() const -> bool;
 
 private:
 	String _title = "<Project Name>";
 
-	std::shared_ptr<BatchLoader> _batchLoader;
-	sf::Texture _texture;
+	std::shared_ptr<class BatchLoader> _batchLoader;
+	Shared<sf::Texture> _texture;
 	bool _hidden = false;
 	bool _finished = false;
 	String _finalizingStatus;

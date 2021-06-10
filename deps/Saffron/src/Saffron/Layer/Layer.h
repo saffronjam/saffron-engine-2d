@@ -2,6 +2,7 @@
 
 #include <SFML/Window/Event.hpp>
 
+#include "Saffron/Base.h"
 #include "Saffron/Core/BatchLoader.h"
 
 namespace Se
@@ -9,7 +10,7 @@ namespace Se
 class Layer
 {
 public:
-	Layer(const String& name = "Layer");
+	explicit Layer(const String& name = "Layer");
 	virtual ~Layer() = default;
 
 	virtual void OnAttach(std::shared_ptr<BatchLoader>& loader)
@@ -40,7 +41,7 @@ public:
 	{
 	}
 
-	auto GetName() const -> const String& { return _debugName; }
+	auto Name() const -> const String&;
 
 protected:
 	String _debugName;

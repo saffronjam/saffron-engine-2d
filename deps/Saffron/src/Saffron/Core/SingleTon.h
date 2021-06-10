@@ -10,7 +10,7 @@ class SingleTon : public NonCopyable
 {
 public:
 	explicit SingleTon(Class* instance);
-	~SingleTon();
+	virtual ~SingleTon();
 
 	static auto Instance() -> Class&;
 
@@ -21,7 +21,7 @@ protected:
 template <class Class>
 SingleTon<Class>::SingleTon(Class* instance)
 {
-	Debug::Assert(_instance == nullptr, String(typeid(Class).name()) + " was already instansiated");;
+	Debug::Assert(_instance == nullptr, String(typeid(Class).name()) + " was already instansiated");
 	_instance = instance;
 }
 
@@ -34,7 +34,7 @@ SingleTon<Class>::~SingleTon()
 template <class Class>
 auto SingleTon<Class>::Instance() -> Class&
 {
-	Debug::Assert(_instance != nullptr, String(typeid(Class).name()) + " was not instansiated");;
+	Debug::Assert(_instance != nullptr, String(typeid(Class).name()) + " was not instansiated");
 	return *_instance;
 }
 

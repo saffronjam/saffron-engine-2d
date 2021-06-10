@@ -12,9 +12,9 @@ public:
 	public:
 		using LocalClock = Se::Clock;
 
-		static sf::Time GetFrameTime() { return _localClock.GetFrameTime(); }
-		static sf::Time GetElapsedTime() { return _localClock.GetElapsedTime(); }
-		static sf::Time Restart() { return _localClock.Restart(); }
+		static auto FrameTime() -> sf::Time;
+		static auto ElapsedTime() -> sf::Time;
+		static auto Restart() -> sf::Time;
 
 	private:
 		static LocalClock _localClock;

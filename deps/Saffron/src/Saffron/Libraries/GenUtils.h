@@ -58,10 +58,10 @@ public:
 	static void Rotate(sf::Transformable& transformable, const sf::Vector2f& direction);
 
 	template <typename T>
-	static auto ToDegress(const T& radians) -> T;
+	static auto Degress(const T& radians) -> T;
 
 	template <typename T>
-	static auto ToRadians(const T& degress) -> T;
+	static auto Radians(const T& degress) -> T;
 
 	template <typename T>
 	static auto ValueToSpectrum(T value, T maxValue) -> sf::Color;
@@ -168,13 +168,13 @@ auto GenUtils::Clamped(const T& value, T from, T to) -> T
 }
 
 template <typename T>
-auto GenUtils::ToDegress(const T& radians) -> T
+auto GenUtils::Degress(const T& radians) -> T
 {
 	return (radians * static_cast<T>(180)) / static_cast<T>(PI<>);
 }
 
 template <typename T>
-auto GenUtils::ToRadians(const T& degress) -> T
+auto GenUtils::Radians(const T& degress) -> T
 {
 	return static_cast<T>(degress * PI<>) / static_cast<T>(180);
 }

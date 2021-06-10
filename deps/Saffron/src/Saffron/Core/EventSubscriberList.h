@@ -17,6 +17,7 @@ public:
 
 	auto Subscribe(Handler handler) -> CancellationToken;
 	void Unsubscribe(CancellationToken token);
+	auto Empty() -> bool;
 
 	auto operator +=(Handler handler) -> CancellationToken;
 	void operator -=(CancellationToken token);
@@ -37,6 +38,7 @@ public:
 
 	auto Subscribe(Handler handler) -> CancellationToken;
 	void Unsubscribe(CancellationToken token);
+	auto Empty() const -> bool;
 
 	auto operator +=(Handler handler) -> CancellationToken;
 	void operator -=(CancellationToken token);
@@ -58,8 +60,7 @@ void EventSubscriberList<EventArgs>::Invoke(EventArgs args)
 }
 
 template <typename EventArgs>
-auto EventSubscriberList<EventArgs>::Subscribe(
-	Handler handler) -> typename EventSubscriberList<EventArgs>::CancellationToken
+auto EventSubscriberList<EventArgs>::Subscribe(Handler handler) -> CancellationToken
 {
 	const CancellationToken token;
 	_subscribers.emplace(token, Move(handler));
@@ -73,8 +74,13 @@ void EventSubscriberList<EventArgs>::Unsubscribe(CancellationToken token)
 }
 
 template <typename EventArgs>
-auto EventSubscriberList<EventArgs>::operator+=(
-	Handler handler) -> typename EventSubscriberList<EventArgs>::CancellationToken
+auto EventSubscriberList<EventArgs>::Empty() -> bool
+{
+	return _subscribers.empty();
+}
+
+template <typename EventArgs>
+auto EventSubscriberList<EventArgs>::operator+=(Handler handler) -> CancellationToken
 {
 	return Subscribe(handler);
 }

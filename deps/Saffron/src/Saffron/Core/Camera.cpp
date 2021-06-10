@@ -8,10 +8,17 @@
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Lighting/LightningMgr.h"
 
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/Text.hpp>
+
+#include "Saffron/Base.h"
+#include "Saffron/Core/Window.h"
+#include "Saffron/Libraries/GenUtils.h"
+
 namespace Se
 {
-Camera::Camera()
-	: _transform(sf::Transform::Identity),
+Camera::Camera() :
+	_transform(sf::Transform::Identity),
 	_positionTransform(sf::Transform::Identity),
 	_rotationTransform(sf::Transform::Identity),
 	_zoomTransform(sf::Transform::Identity),
@@ -24,42 +31,43 @@ Camera::Camera()
 
 void Camera::OnUpdate()
 {
-	const auto dt = Global::Clock::GetFrameTime();
+	const auto dt = Global::Clock::FrameTime();
 
-	if ( _follow.has_value() )
+	if (_follow.has_value())
 	{
 		SetCenter(*_follow.value());
 	}
 	else
 	{
-		if ( Mouse::IsDown(sf::Mouse::Button::Left) && Mouse::IsDown(sf::Mouse::Button::Right) )
+		if (Mouse::IsDown(sf::Mouse::Button::Left) && Mouse::IsDown(sf::Mouse::Button::Right))
 		{
-			sf::Vector2f delta = Mouse::GetSwipe();
-			if ( VecUtils::LengthSq(delta) > 0.0f )
+			
+			sf::Vector2f delta = Mouse::Swipe();
+			if (VecUtils::LengthSq(delta) > 0.0f)
 			{
 				delta = _rotationTransform.getInverse().transformPoint(delta);
 				delta = _zoomTransform.getInverse().transformPoint(delta);
 				delta *= -1.0f;
-				Move(delta);
+				ApplyMovement(delta);
 			}
 		}
 	}
 
-	Zoom((Mouse::GetVerticalScroll() / 100.0f) + 1.0f);
+	ApplyZoom((Mouse::VerticalScroll() / 100.0f) + 1.0f);
 
 	float angle = 0.0f;
 
-	if ( Keyboard::IsDown(sf::Keyboard::Q) )
+	if (Keyboard::IsDown(sf::Keyboard::Q))
 	{
 		angle += _rps * 360.0f * dt.asSeconds();
 	}
-	if ( Keyboard::IsDown(sf::Keyboard::E) )
+	if (Keyboard::IsDown(sf::Keyboard::E))
 	{
 		angle -= _rps * 360.0f * dt.asSeconds();
 	}
-	Rotate(angle);
+	ApplyRotation(angle);
 
-	if ( Keyboard::IsPressed(sf::Keyboard::R) )
+	if (Keyboard::IsPressed(sf::Keyboard::R))
 	{
 		ResetTransformation();
 	}
@@ -67,21 +75,21 @@ void Camera::OnUpdate()
 
 void Camera::OnGuiRender()
 {
-	if ( ImGui::Begin("Camera") )
+	if (ImGui::Begin("Camera"))
 	{
 		Gui::BeginPropertyGrid();
-		Gui::Property("Position", _position, -10000.0f, 10000.0f, 10.0f, Gui::PropertyFlag_Drag);
-		if ( Gui::Property("Zoom", _zoom.x, 0.01f, 10.0f, 0.01f, Gui::PropertyFlag_Slider) )
+		Gui::Property("Position", _position, -10000.0f, 10000.0f, 10.0f, GuiPropertyFlag_Drag);
+		if (Gui::Property("Zoom", _zoom.x, 0.01f, 10.0f, 0.01f, GuiPropertyFlag_Slider))
 		{
 			_zoom.y = _zoom.x;
 		}
-		Gui::Property("Rotation", _rotation, -180.0f, 180.0f, 1.0f, Gui::PropertyFlag_Slider);
-		Gui::Property("Rotation Speed", _rps, 0.0f, 10.0f, 0.1f, Gui::PropertyFlag_Slider);
+		Gui::Property("Rotation", _rotation, -180.0f, 180.0f, 1.0f, GuiPropertyFlag_Slider);
+		Gui::Property("Rotation Speed", _rps, 0.0f, 10.0f, 0.1f, GuiPropertyFlag_Slider);
 
-		if ( _follow.has_value() )
+		if (_follow.has_value())
 		{
 			auto follow = *_follow.value();
-			Gui::Property("Follow", follow, Gui::PropertyFlag_Drag);
+			Gui::Property("Follow", follow, GuiPropertyFlag_Drag);
 		}
 		else
 		{
@@ -89,29 +97,28 @@ void Camera::OnGuiRender()
 		}
 
 		Gui::EndPropertyGrid();
-
 	}
 	ImGui::End();
 }
 
-void Camera::Move(const sf::Vector2f &offset)
+void Camera::ApplyMovement(const sf::Vector2f& offset)
 {
 	SetCenter(_position + offset);
 }
 
-void Camera::Zoom(float factor)
+void Camera::ApplyZoom(float factor)
 {
 	_zoom *= factor;
 	_zoomTransform.scale(factor, factor);
 	UpdateTransform();
 }
 
-void Camera::Rotate(float angle)
+void Camera::ApplyRotation(float angle)
 {
 	SetRotation(_rotation + angle);
 }
 
-void Camera::SetCenter(const sf::Vector2f &center)
+void Camera::SetCenter(const sf::Vector2f& center)
 {
 	_position = center;
 	_positionTransform = sf::Transform().translate(_position);
@@ -120,7 +127,7 @@ void Camera::SetCenter(const sf::Vector2f &center)
 
 void Camera::SetZoom(float zoom)
 {
-	if ( zoom != 0.0f )
+	if (zoom != 0.0f)
 	{
 		LightningMgr::ChangeResolution(zoom / _zoom.x);
 		_zoom = sf::Vector2f(zoom, zoom);
@@ -136,44 +143,74 @@ void Camera::SetRotation(float angle)
 	UpdateTransform();
 }
 
-sf::Vector2f Camera::ScreenToWorld(const sf::Vector2f &point)
+void Camera::Follow(const sf::Vector2f* follow)
+{
+	_follow = follow;
+}
+
+void Camera::Unfollow()
+{
+	_follow.reset();
+}
+
+auto Camera::ScreenToWorld(const sf::Vector2f& point) const -> sf::Vector2f
 {
 	return _transform.getInverse().transformPoint(point);
 }
 
-sf::FloatRect Camera::ScreenToWorld(const sf::FloatRect &rect)
+auto Camera::ScreenToWorld(const sf::FloatRect& rect) const -> sf::FloatRect
 {
 	return _transform.getInverse().transformRect(rect);
 }
 
-sf::Vector2f Camera::WorldToScreen(const sf::Vector2f &point)
+auto Camera::WorldToScreen(const sf::Vector2f& point) const -> sf::Vector2f
 {
 	return _transform.transformPoint(point);
 }
 
-sf::FloatRect Camera::WorldToScreen(const sf::FloatRect &rect)
+auto Camera::WorldToScreen(const sf::FloatRect& rect) const -> sf::FloatRect
 {
 	return _transform.transformRect(rect);
 }
 
-Pair<sf::Vector2f, sf::Vector2f> Camera::GetViewport() const
+auto Camera::Transform() const -> const sf::Transform&
 {
-	const sf::FloatRect screenRect = { {0.0f, 0.0f}, _viewportSize };
+	return _transform;
+}
+
+auto Camera::Zoom() const -> float
+{
+	return _zoom.x;
+}
+
+void Camera::SetViewportSize(const sf::Vector2f& viewportSize)
+{
+	_viewportSize = viewportSize;
+}
+
+void Camera::SetRotationSpeed(float rps)
+{
+	_rps = rps;
+}
+
+auto Camera::Viewport() const -> Pair<sf::Vector2f, sf::Vector2f>
+{
+	const sf::FloatRect screenRect = {{0.0f, 0.0f}, _viewportSize};
 	const auto TL = sf::Vector2f(screenRect.left, screenRect.top);
 	const auto BR = sf::Vector2f(screenRect.left + screenRect.width, screenRect.top + screenRect.height);
 
 	return std::make_pair(_transform.getInverse().transformPoint(TL), _transform.getInverse().transformPoint(BR));
 }
 
-sf::Vector2f Camera::GetOffset() const
+auto Camera::Offset() const -> sf::Vector2f
 {
-	return _viewportSize / 2.0f;;
+	return _viewportSize / 2.0f;
 }
 
 void Camera::UpdateTransform()
 {
 	_transform = sf::Transform::Identity;
-	_transform.translate(GetOffset());
+	_transform.translate(Offset());
 	_transform.scale(_zoom);
 	_transform.rotate(_rotation);
 	_transform.translate(-_position);

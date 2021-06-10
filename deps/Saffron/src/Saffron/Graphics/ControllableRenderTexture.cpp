@@ -24,9 +24,9 @@ ControllableRenderTexture::operator const sf::Texture&() const
 	return _renderTexture.getTexture();
 }
 
-auto ControllableRenderTexture::GetRenderTexture() -> sf::RenderTexture& { return _renderTexture; }
+auto ControllableRenderTexture::RenderTexture() -> sf::RenderTexture& { return _renderTexture; }
 
-auto ControllableRenderTexture::GetRenderTexture() const -> const sf::RenderTexture& { return _renderTexture; }
+auto ControllableRenderTexture::RenderTexture() const -> const sf::RenderTexture& { return _renderTexture; }
 
 auto ControllableRenderTexture::IsEnabled() const -> bool { return _enabled; }
 
@@ -40,7 +40,7 @@ void ControllableRenderTexture::Disable()
 	_enabled = false;
 }
 
-auto ControllableRenderTexture::GetClearColor() const -> sf::Color { return _clearColor; }
+auto ControllableRenderTexture::ClearColor() const -> sf::Color { return _clearColor; }
 
 void ControllableRenderTexture::SetClearColor(sf::Color color)
 {

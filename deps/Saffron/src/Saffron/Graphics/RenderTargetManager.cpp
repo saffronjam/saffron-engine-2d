@@ -1,22 +1,29 @@
 ﻿#include "SaffronPCH.h"
 
+#include <ranges>
+
 #include "Saffron/Graphics/RenderTargetManager.h"
 
 namespace Se
 {
-List<ControllableRenderTexture*> RenderTargetManager::_targets;
+RenderTargetManager::RenderTargetManager() :
+	SingleTon(this)
+{
+}
 
 void RenderTargetManager::Add(ControllableRenderTexture* target)
 {
-	_targets.push_back(target);
+	Instance()._targets.push_back(target);
 }
 
 void RenderTargetManager::Remove(ControllableRenderTexture* target)
 {
-	const auto result = std::find(_targets.begin(), _targets.end(), target);
-	if (result != _targets.end())
+	auto& targets = Instance()._targets;
+
+	const auto result = std::ranges::find(targets, target);
+	if (result != targets.end())
 	{
-		_targets.erase(result);
+		targets.erase(result);
 	}
 }
 
@@ -26,7 +33,7 @@ void RenderTargetManager::ClearAll()
 	{
 		if (target->IsEnabled())
 		{
-			target->GetRenderTexture().clear(target->GetClearColor());
+			target->RenderTexture().clear(target->ClearColor());
 		}
 	}
 }
@@ -37,7 +44,7 @@ void RenderTargetManager::DisplayAll()
 	{
 		if (target->IsEnabled())
 		{
-			target->GetRenderTexture().display();
+			target->RenderTexture().display();
 		}
 	}
 }

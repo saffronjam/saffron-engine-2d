@@ -4,15 +4,8 @@
 
 namespace Se
 {
-class BatchLoader : public Signaller
+class BatchLoader
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<void> OnStart;
-		static SignalAggregate<void> OnFinish;
-	};
-
 public:
 	explicit BatchLoader(String name);
 	~BatchLoader();
@@ -22,15 +15,19 @@ public:
 	void ForceExit();
 	void Reset();
 
-	float GetProgress() const { return _progress; }
-	const String *GetStatus() const { return _status; }
-	size_t GetNoJobs() const { return _queue.size(); }
-	size_t GetNoJobsDone() const { return _noJobsDone; }
-	size_t GetNoJobsLeft() const { return GetNoJobs() - _noJobsDone; }
+	auto Progress() const -> float;
+	auto Status() const -> const String*;
+	auto JobCount() const -> size_t;
+	auto JobsDone() const -> size_t;
+	auto JobsLeft() const -> size_t;
 
-	bool IsFinished() const { return _progress >= 100.0f; }
+	auto IsFinished() const -> bool;
 
-	Mutex &GetExecutionMutex() { return _executionMutex; }
+	auto ExecutionMutex() -> Mutex&;
+
+public:
+	EventSubscriberList<void> OnStarted;
+	EventSubscriberList<void> OnFinished;
 
 private:
 	String _name;
@@ -39,10 +36,9 @@ private:
 	size_t _noJobsDone = 0;
 
 	Atomic<float> _progress = 0.0f;
-	Atomic<const String *> _status = nullptr;
+	Atomic<const String*> _status = nullptr;
 	Atomic<bool> _running = false, _shouldExit = false;
 	Mutex _queueMutex, _executionMutex;
 	Thread _worker;
 };
 }
-

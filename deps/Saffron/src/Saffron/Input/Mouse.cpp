@@ -2,130 +2,169 @@
 
 #include <imgui.h>
 
+#include "Saffron/Core/App.h"
 #include "Saffron/Input/Mouse.h"
 
 namespace Se
 {
-std::map<sf::Mouse::Button, bool> Mouse::_buttonmap;
-std::map<sf::Mouse::Button, bool> Mouse::_prevButtonmap;
-sf::Vector2f Mouse::_mousePosition = sf::Vector2f(0.0f, 0.0f);
-sf::Vector2f Mouse::_mousePositionNDC = sf::Vector2f(0.0f, 0.0f);
-bool Mouse::_inWindow = true;
-sf::Vector2f Mouse::_mouseSwipe = sf::Vector2f(0.0f, 0.0f);
-float Mouse::_verticalScrollBuffer = 0.0f;
-float Mouse::_horizontalScrollBuffer = 0.0f;
+Mouse::Mouse() :
+	SingleTon(this)
+{
+	auto& win = App::Instance().Window();
+	win.MouseWheelScrolled += SE_EV_ACTION(Mouse::OnScroll);
+	win.MouseButtonPressed += SE_EV_ACTION(Mouse::OnPress);
+	win.MouseButtonReleased += SE_EV_ACTION(Mouse::OnRelease);
+	win.MouseMoved += SE_EV_ACTION(Mouse::OnMove);
+	win.MouseEntered += SE_EV_ACTION(Mouse::OnEnter);
+	win.MouseLeft += SE_EV_ACTION(Mouse::OnLeave);
+}
 
 void Mouse::OnUpdate()
 {
-	for (auto& [key, state] : _buttonmap)
+	auto& inst = Instance();
+
+	for (auto& [key, state] : inst._buttonmap)
 	{
-		_prevButtonmap[key] = state;
+		inst._prevButtonmap[key] = state;
 	}
 
-	_horizontalScrollBuffer = 0.0f;
-	_verticalScrollBuffer = 0.0f;
-	_mouseSwipe = {0.0f, 0.0f};
+	inst._horizontalScrollBuffer = 0.0f;
+	inst._verticalScrollBuffer = 0.0f;
+	inst._mouseSwipe = {0.0f, 0.0f};
 }
 
-void Mouse::OnEvent(const sf::Event& event)
-{
-	switch (event.type)
-	{
-	case sf::Event::EventType::MouseButtonPressed: OnPress(event.mouseButton);
-		break;
-	case sf::Event::EventType::MouseButtonReleased: OnRelease(event.mouseButton);
-		break;
-	case sf::Event::EventType::MouseMoved: OnMove(event.mouseMove);
-		break;
-	case sf::Event::EventType::MouseEntered: OnEnter();
-		break;
-	case sf::Event::EventType::MouseLeft: OnLeave();
-		break;
-	case sf::Event::EventType::MouseWheelScrolled: OnScroll(event.mouseWheelScroll);
-		break;
-	default: break;
-	}
-}
 
 auto Mouse::IsDown(const sf::Mouse::Button& button) -> bool
 {
-	return _buttonmap[button];
+	auto& inst = Instance();
+
+	return inst._buttonmap[button];
 }
 
 auto Mouse::IsPressed(const sf::Mouse::Button& button) -> bool
 {
-	return _buttonmap[button] && !_prevButtonmap[button];
+	auto& inst = Instance();
+
+	return inst._buttonmap[button] && !inst._prevButtonmap[button];
 }
 
 auto Mouse::IsReleased(const sf::Mouse::Button& button) -> bool
 {
-	return !_buttonmap[button] && _prevButtonmap[button];
+	auto& inst = Instance();
+
+	return !inst._buttonmap[button] && inst._prevButtonmap[button];
 }
 
 auto Mouse::AnyButtonDown() -> bool
 {
-	for (auto& [button, state] : _buttonmap)
-		if (state) return true;
+	auto& inst = Instance();
+	
+	for (auto& state : inst._buttonmap | std::views::values)
+	{
+		if (state)
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
-auto Mouse::GetPosition(bool normalized) -> const sf::Vector2f&
+auto Mouse::CursorPosition(bool normalized) -> const sf::Vector2f&
 {
+	auto& inst = Instance();
+
 	if (!normalized)
 	{
-		return _mousePosition;
+		return inst._mousePosition;
 	}
 
 	const ImVec2 imMousePosition = ImGui::GetMousePos();
-	_mousePosition.x = imMousePosition.x;
-	_mousePosition.y = imMousePosition.y;
-	return _mousePosition;
+	inst._mousePosition.x = imMousePosition.x;
+	inst._mousePosition.y = imMousePosition.y;
+	return inst._mousePosition;
 }
 
-auto Mouse::GetSwipe() -> const sf::Vector2f&
+auto Mouse::Swipe() -> const sf::Vector2f&
 {
-	return _mouseSwipe;
+	auto& inst = Instance();
+
+	return inst._mouseSwipe;
+}
+
+auto Mouse::VerticalScroll() -> float
+{
+	auto& inst = Instance();
+
+	return inst._verticalScrollBuffer;
+}
+
+auto Mouse::HorizontalScroll() -> float
+{
+	auto& inst = Instance();
+
+	return inst._horizontalScrollBuffer;
 }
 
 void Mouse::OnPress(const sf::Event::MouseButtonEvent& event)
 {
-	_buttonmap[event.button] = true;
+	auto& inst = Instance();
+
+	inst._buttonmap[event.button] = true;
+	inst.Pressed.Invoke(event);
 }
 
 void Mouse::OnRelease(const sf::Event::MouseButtonEvent& event)
 {
-	_buttonmap[event.button] = false;
+	auto& inst = Instance();
+
+	inst._buttonmap[event.button] = false;
+	inst.Released.Invoke(event);
 }
 
 void Mouse::OnMove(const sf::Event::MouseMoveEvent& event)
 {
-	if (!_inWindow && AnyButtonDown() || _inWindow)
+	auto& inst = Instance();
+
+	if (!inst._inWindow && AnyButtonDown() || inst._inWindow)
 	{
-		const auto oldPosition = _mousePosition;
-		_mousePosition = sf::Vector2f(event.x, event.y);
-		_mouseSwipe = _mousePosition - oldPosition;
+		const auto oldPosition = inst._mousePosition;
+		inst._mousePosition = sf::Vector2f(event.x, event.y);
+		inst._mouseSwipe = inst._mousePosition - oldPosition;
 	}
+	
+	inst.Moved.Invoke(event);
 }
 
 void Mouse::OnEnter()
 {
-	_inWindow = true;
+	auto& inst = Instance();
+
+	inst._inWindow = true;
+	inst.Entered.Invoke();
 }
 
 void Mouse::OnLeave()
 {
-	_inWindow = false;
+	auto& inst = Instance();
+
+	inst._inWindow = false;
+	inst.Left.Invoke();
 }
 
 void Mouse::OnScroll(const sf::Event::MouseWheelScrollEvent& event)
 {
+	auto& inst = Instance();
+
 	if (event.wheel == sf::Mouse::Wheel::HorizontalWheel)
 	{
-		_horizontalScrollBuffer += event.delta;
+		inst._horizontalScrollBuffer += event.delta;
 	}
 	else if (event.wheel == sf::Mouse::Wheel::VerticalWheel)
 	{
-		_verticalScrollBuffer += event.delta;
+		inst._verticalScrollBuffer += event.delta;
 	}
+	
+	inst.Scrolled.Invoke(event);
 }
 }

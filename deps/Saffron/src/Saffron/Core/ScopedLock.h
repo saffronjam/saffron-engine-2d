@@ -4,34 +4,34 @@
 
 namespace Se
 {
-template<class... MutexTypes>
+template <class... MutexTypes>
 class ScopedLock
 {
 public:
-	explicit ScopedLock(MutexTypes&... mutexes)
-		: _mutexes(mutexes...)
+	explicit ScopedLock(MutexTypes&... mutexes) :
+		_mutexes(mutexes...)
 	{
 		std::lock(_mutexes);
 	}
 
 	~ScopedLock()
 	{
-		std::apply([](MutexTypes&... mutexTypes) {(..., (void)mutexTypes.unlock()); }, _mutexes);
+		std::apply([](MutexTypes&... mutexTypes) { (..., (void)mutexTypes.unlock()); }, _mutexes);
 	}
 
-	ScopedLock(const ScopedLock &) = delete;
-	ScopedLock &operator=(const ScopedLock &) = delete;
+	ScopedLock(const ScopedLock&) = delete;
+	auto operator=(const ScopedLock&) -> ScopedLock& = delete;
 
 private:
 	Tuple<MutexTypes&...> _mutexes;
 };
 
-template<class MutexType>
+template <class MutexType>
 class ScopedLock<MutexType>
 {
 public:
-	explicit ScopedLock(MutexType &mutex)
-		: _mutex(mutex)
+	explicit ScopedLock(MutexType& mutex) :
+		_mutex(mutex)
 	{
 		_mutex.lock();
 	}
@@ -41,10 +41,10 @@ public:
 		_mutex.unlock();
 	}
 
-	ScopedLock(const ScopedLock &) = delete;
-	ScopedLock &operator=(const ScopedLock &) = delete;
+	ScopedLock(const ScopedLock&) = delete;
+	auto operator=(const ScopedLock&) -> ScopedLock& = delete;
 
 private:
-	MutexType &_mutex;
+	MutexType& _mutex;
 };
 }

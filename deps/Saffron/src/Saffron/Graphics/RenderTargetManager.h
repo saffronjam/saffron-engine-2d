@@ -5,18 +5,18 @@
 
 namespace Se
 {
-class RenderTargetManager
+class RenderTargetManager : SingleTon<RenderTargetManager>
 {
 public:
+	RenderTargetManager();
+	
 	static void Add(ControllableRenderTexture* target);
-
 	static void Remove(ControllableRenderTexture* target);
 
-	static void ClearAll();
-
-	static void DisplayAll();
+	void ClearAll();
+	void DisplayAll();
 
 private:
-	static List<ControllableRenderTexture*> _targets;
+	List<ControllableRenderTexture*> _targets;
 };
 }

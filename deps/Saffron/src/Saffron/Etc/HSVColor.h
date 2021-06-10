@@ -14,11 +14,11 @@ public:
 	HSVColor(const Color& color);
 	HSVColor(const HSVColor& hsvColor);
 
-	auto GetRGBA() const -> const sf::Color&;
+	auto RGBA() const -> const sf::Color&;
 
-	auto GetHue() const -> int;
-	auto GetSaturation() const -> float;
-	auto GetValue() const -> float;
+	auto Hue() const -> int;
+	auto Saturation() const -> float;
+	auto Value() const -> float;
 
 	void SetHue(int hue);
 	void SetSaturation(float saturation);

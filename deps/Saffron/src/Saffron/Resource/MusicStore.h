@@ -1,44 +1,32 @@
 #pragma once
 
-#include <memory>
-
 #include <SFML/Audio/Music.hpp>
 
-#include "Saffron/Interface/IResourceStore.h"
+#include "Saffron/Resource/ResourceStore.h"
 
 namespace Se
 {
-class MusicStore : public IResourceStore<std::shared_ptr<sf::Music>>
+class MusicStore : public ResourceStore<sf::Music>
 {
 public:
-	MusicStore() = default;
-	MusicStore(const MusicStore&) = delete;
-	auto operator()(const MusicStore&) -> const MusicStore& = delete;
-
-public:
-	// Returns copy of resource from cache, if not existing, call Load();
-	static auto GetCopy(const std::string& filepath) -> const std::shared_ptr<sf::Music>&
+	static auto Get(const Path& Path) -> Shared<sf::Music>
 	{
-		if (_resources.find(filepath) == _resources.end())
-		{
-			Load(filepath);
-		}
-		return _resources[filepath];
+		return Instance().Fetch(Path, false);
 	}
 
-	// Load resource into memory
-	static void Load(const std::string& filepath)
+private:
+	auto Location() -> Path override
 	{
-		std::shared_ptr<sf::Music> resource = std::make_shared<sf::Music>();
-		if (!resource->openFromFile(filepath))
-		{
-			{
-				char buf[200];
-				sprintf(buf, "Failed to open music: %s", filepath.c_str());
-				throw Exception(__LINE__, __FILE__, buf);
-			}
-		}
-		_resources.emplace(std::make_pair(filepath, resource));
+		return "res/Sounds/";
+	}
+
+private:
+	auto Load(Path Path) -> Shared<sf::Music> override
+	{
+		auto resource = CreateShared<sf::Music>();
+		const auto result = resource->openFromFile(Path.string());
+		Debug::Assert(result, "Failed to load Music");
+		return resource;
 	}
 };
 }

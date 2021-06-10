@@ -4,7 +4,6 @@
 
 namespace Se
 {
-
 class DateTime
 {
 	using TimePoint = std::chrono::system_clock::time_point;
@@ -27,22 +26,21 @@ public:
 	explicit DateTime(TimePoint timePoint);
 	DateTime(int year, int month, int day, int weekday, int hour, int minutes, int seconds);
 
-	bool operator<(const DateTime &rhs) const;
-	bool operator>(const DateTime &rhs) const;
+	auto operator<(const DateTime& rhs) const -> bool;
+	auto operator>(const DateTime& rhs) const -> bool;
 
-	int Seconds() const { return _date.Seconds; }
-	int Minutes() const { return _date.Minutes; }
-	int Hour() const { return _date.Hour; }
-	int Weekday() const { return _date.Weekday; }
-	int Day() const { return _date.Day; }
-	int Month() const { return _date.Month; }
-	int Year() const { return _date.Year; }
+	auto Seconds() const -> int;
+	auto Minutes() const -> int;
+	auto Hour() const -> int;
+	auto Weekday() const -> int;
+	auto Day() const -> int;
+	auto Month() const -> int;
+	auto Year() const -> int;
 
-	String WeekdayString(bool abbreviation = false) const;
-	String MonthString(bool abbreviation = false) const;
-	String TimeString() const;
-	String ANSIDateString() const;
-
+	auto WeekdayString(bool abbreviation = false) const -> String;
+	auto MonthString(bool abbreviation = false) const -> String;
+	auto TimeString() const -> String;
+	auto ANSIDateString() const -> String;
 
 private:
 	void Clamp();
@@ -50,5 +48,4 @@ private:
 private:
 	Date _date{};
 };
-
 }

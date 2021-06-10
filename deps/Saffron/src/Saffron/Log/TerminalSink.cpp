@@ -6,7 +6,7 @@ namespace Se
 {
 TerminalSink::TerminalSink()
 {
-	Log::ClientLogger()->OnAll += SE_FUNCTION(TerminalSink::Post);
+	Log::ClientLogger()->OnAll += SE_EV_FUNCTION(TerminalSink::Post);
 }
 
 void TerminalSink::Clear()
@@ -16,12 +16,12 @@ void TerminalSink::Clear()
 	_lineOffsets.push_back(0);
 }
 
-auto TerminalSink::GetTextBuffer() const -> const ImGuiTextBuffer&
+auto TerminalSink::TextBuffer() const -> const ImGuiTextBuffer&
 {
 	return _textBuffer;
 }
 
-auto TerminalSink::GetLineOffsets() const -> const List<int>&
+auto TerminalSink::LineOffsets() const -> const List<int>&
 {
 	return _lineOffsets;
 }

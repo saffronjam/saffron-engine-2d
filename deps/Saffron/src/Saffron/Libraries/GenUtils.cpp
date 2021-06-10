@@ -29,7 +29,7 @@ void GenUtils::Rotate(sf::Transformable& transformable, const sf::Vector2f& dire
 {
 	const sf::Vector2f right(1.0f, 0.0f);
 
-	float angle = ToDegress(VecUtils::Angle(right, direction));
+	float angle = Degress(VecUtils::Angle(right, direction));
 	if (direction.y < 0.0f)
 	{
 		angle = 360.0f - angle;
@@ -83,7 +83,7 @@ auto GenUtils::HSVtoRGB(int hue, float saturation, float value) -> sf::Color
 
 auto GenUtils::HSVtoRGB(const HSVColor& hsvColor) -> sf::Color
 {
-	return HSVtoRGB(hsvColor.GetHue(), hsvColor.GetSaturation(), hsvColor.GetValue());
+	return HSVtoRGB(hsvColor.Hue(), hsvColor.Saturation(), hsvColor.Value());
 }
 
 auto GenUtils::RGBtoHSV(sf::Uint8 r, sf::Uint8 g, sf::Uint8 b) -> class HSVColor

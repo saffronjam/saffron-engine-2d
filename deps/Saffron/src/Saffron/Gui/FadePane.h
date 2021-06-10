@@ -3,43 +3,36 @@
 #include <SFML/Graphics/Color.hpp>
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/Enums.h"
 
 namespace Se
 {
-class FadePane : public Signaller
+class FadePane
 {
 public:
-	struct Signals
-	{
-		static SignalAggregate<void> OnFinish;
-	};
-
 	using FadeFn = Function<Uint8(sf::Time, sf::Time)>;
 
-	enum class Type
-	{
-		Out = 0,
-		In = 1
-	};
 
 public:
-	FadePane(Type type, sf::Time duration, sf::Time delay = sf::Time::Zero, bool startOnCreation = false,
+	FadePane(FadeType type, sf::Time duration, sf::Time delay = sf::Time::Zero, bool startOnCreation = false,
 	         sf::Color color = sf::Color::Black);
-	FadePane(Type type, sf::Time duration, FadeFn alphaFunction, sf::Time delay = sf::Time::Zero,
+	FadePane(FadeType type, sf::Time duration, FadeFn alphaFunction, sf::Time delay = sf::Time::Zero,
 	         bool startOnCreation = false, sf::Color color = sf::Color::Black);
 
 	void OnUpdate();
 	void OnGuiRender() const;
 
 	void Start();
+	auto IsActive() const -> bool;
 
-	auto IsActive() const -> bool { return _wantFade; }
+public:
+	EventSubscriberList<void> Finished;
 
 private:
 	auto DefaultAlphaFunction(sf::Time timer, sf::Time duration) const -> Uint8;
 
 private:
-	Type _type;
+	FadeType _type;
 
 	FadeFn _alphaFunction;
 

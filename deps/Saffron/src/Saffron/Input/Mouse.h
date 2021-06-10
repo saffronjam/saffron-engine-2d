@@ -1,35 +1,30 @@
 #pragma once
 
-#include <map>
-
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Mouse.hpp>
 
+#include "Saffron/Base.h"
+
 namespace Se
 {
-class Mouse
+class Mouse : public SingleTon<Mouse>
 {
 public:
-	Mouse() = default;
-	~Mouse() = default;
-	Mouse(const Mouse&) = delete;
-	auto operator=(const Mouse&) -> Mouse& = delete;
+	Mouse();
 
 	// Move buttonMap into prev-buttonMap
-	static void OnUpdate();
-	static void OnEvent(const sf::Event& event);
+	void OnUpdate();
 
 	static auto IsDown(const sf::Mouse::Button& button) -> bool;
 	static auto IsPressed(const sf::Mouse::Button& button) -> bool;
 	static auto IsReleased(const sf::Mouse::Button& button) -> bool;
 	static auto AnyButtonDown() -> bool;
 
-	static auto GetPosition(bool normalized = false) -> const sf::Vector2f&;
-	static auto GetSwipe() -> const sf::Vector2f&;
+	static auto CursorPosition(bool normalized = false) -> const sf::Vector2f&;
+	static auto Swipe() -> const sf::Vector2f&;
 
-	static auto GetVerticalScroll() -> float { return _verticalScrollBuffer; }
-
-	static auto GetHorizontalScroll() -> float { return _horizontalScrollBuffer; }
+	static auto VerticalScroll() -> float;
+	static auto HorizontalScroll() -> float;
 
 private:
 	static void OnPress(const sf::Event::MouseButtonEvent& event);
@@ -39,17 +34,25 @@ private:
 	static void OnLeave();
 	static void OnScroll(const sf::Event::MouseWheelScrollEvent& event);
 
+public:
+	EventSubscriberList<const sf::Event::MouseWheelScrollEvent&> Scrolled;
+	EventSubscriberList<const sf::Event::MouseButtonEvent&> Pressed;
+	EventSubscriberList<const sf::Event::MouseButtonEvent&> Released;
+	EventSubscriberList<const sf::Event::MouseMoveEvent&> Moved;
+	EventSubscriberList<void> Entered;
+	EventSubscriberList<void> Left;
+
 private:
-	static std::map<sf::Mouse::Button, bool> _buttonmap;
-	static std::map<sf::Mouse::Button, bool> _prevButtonmap;
+	HashMap<sf::Mouse::Button, bool> _buttonmap;
+	HashMap<sf::Mouse::Button, bool> _prevButtonmap;
 
-	static sf::Vector2f _mousePosition;
-	static sf::Vector2f _mousePositionNDC;
-	static bool _inWindow;
+	sf::Vector2f _mousePosition = sf::Vector2f(0.0f, 0.0f);
+	sf::Vector2f _mousePositionNDC = sf::Vector2f(0.0f, 0.0f);
+	bool _inWindow = true;
 
-	static sf::Vector2f _mouseSwipe;
+	sf::Vector2f _mouseSwipe = sf::Vector2f(0.0f, 0.0f);
 
-	static float _verticalScrollBuffer;
-	static float _horizontalScrollBuffer;
+	float _verticalScrollBuffer = 0.0f;
+	float _horizontalScrollBuffer = 0.0f;
 };
 }

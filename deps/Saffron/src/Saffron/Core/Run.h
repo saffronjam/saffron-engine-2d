@@ -2,45 +2,41 @@
 
 #include <SFML/System/Time.hpp>
 
-#include "Saffron/Core/UUID.h"
+#include "Saffron/Core/SingleTon.h"
+#include "Saffron/Core/TypeDefs.h"
 
 namespace Se
 {
-class Run
+class Run : public SingleTon<Run>
 {
 public:
-	struct Handle
-	{
-		bool operator<(const Handle &other) const { return _uuid < other._uuid; }
-		bool operator==(const Handle &other) const { return _uuid == other._uuid; }
-	private:
-		UUID _uuid;
-	};
+	using Handle = UUID;
 
 private:
 	struct PeriodicFunction
 	{
-		void operator()() { function(); }
-		void operator()() const { function(); }
+		void operator()();
+		void operator()() const;
 
-		Function<void()> function;
-		sf::Time interval;
-		sf::Time currentCounter;
+		Function<void()> Function;
+		sf::Time Interval;
+		sf::Time Counter;
 	};
 
 public:
-	static void Execute();
+	Run();
+
+	void Execute();
 
 	static void Later(Function<void()> function);
-	static Handle Periodically(Function<void()> function, sf::Time interval);
-	static Handle EveryFrame(Function<void()> function);
+	static auto Periodically(Function<void()> function, sf::Time interval) -> Handle;
+	static auto EveryFrame(Function<void()> function) -> Handle;
 
 	static void Remove(Handle handle);
 
 private:
-	static List<Function<void()>> _laterFunctions;
-	static Map<Handle, PeriodicFunction> _periodicFunctions;
-	static Map<Handle, Function<void()>> _frameFunctions;
-
+	List<Function<void()>> _laterFunctions;
+	HashMap<Handle, PeriodicFunction> _periodicFunctions;
+	HashMap<Handle, Function<void()>> _frameFunctions;
 };
 }

@@ -4,14 +4,9 @@
 
 namespace Se
 {
-SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPushLayer;
-SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPushOverlay;
-SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPopLayer;
-SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPopOverlay;
-
 LayerStack::~LayerStack()
 {
-	for (std::shared_ptr<Layer> layer : _layers)
+	for (const auto& layer : _layers)
 	{
 		layer->OnDetach();
 	}
@@ -20,9 +15,9 @@ LayerStack::~LayerStack()
 
 void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<BatchLoader>& batchLoader)
 {
-	auto newLayer = *_layers.emplace(_layers.begin() + _layerInsertIndex, layer);
+	const auto& newLayer = *_layers.emplace(_layers.begin() + _layerInsertIndex, layer);
 	_layerInsertIndex++;
-	GetSignals().Emit(Signals::OnPushOverlay, newLayer);
+	OnPushLayer.Invoke(newLayer);
 	newLayer->OnAttach(batchLoader);
 }
 
@@ -30,15 +25,15 @@ void LayerStack::PushOverlay(std::shared_ptr<Layer> overlay, std::shared_ptr<Bat
 {
 	// TODO: Implement
 	Debug::Assert("NOT IMPLEMETED");
-	auto newOverlay = _layers.emplace_back(overlay);
-	GetSignals().Emit(Signals::OnPushOverlay, newOverlay);
+	const auto& newOverlay = _layers.emplace_back(overlay);
+	OnPushOverlay.Invoke(newOverlay);
 }
 
 void LayerStack::PopLayer(int count)
 {
 	for (int i = 0; i < count; i++)
 	{
-		GetSignals().Emit(Signals::OnPopLayer, _layers.back());
+		OnPopLayer.Invoke(_layers.back());
 		_layers.back()->OnDetach();
 		_layers.pop_back();
 		_layerInsertIndex--;
@@ -51,7 +46,7 @@ void LayerStack::PopOverlay(int count)
 	Debug::Assert("NOT IMPLEMETED");
 	for (int i = 0; i < count; i++)
 	{
-		GetSignals().Emit(Signals::OnPopOverlay, _layers.back());
+		OnPopOverlay.Invoke(_layers.back());
 		_layers.back()->OnDetach();
 		_layers.pop_back();
 	}
@@ -62,7 +57,7 @@ void LayerStack::EraseLayer(std::shared_ptr<Layer> layer)
 	const auto it = std::find(_layers.begin(), _layers.end(), layer);
 	if (it != _layers.end())
 	{
-		GetSignals().Emit(Signals::OnPopOverlay, *it);
+		OnPopLayer.Invoke(*it);
 		(*it)->OnDetach();
 		_layers.erase(it);
 		_layerInsertIndex--;
@@ -98,4 +93,8 @@ auto LayerStack::Back() -> std::shared_ptr<Layer>
 {
 	return _layers.back();
 }
+
+auto LayerStack::begin() -> List<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
+
+auto LayerStack::end() -> List<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
 }

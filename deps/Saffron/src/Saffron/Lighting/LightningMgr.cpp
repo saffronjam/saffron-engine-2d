@@ -19,7 +19,7 @@ LightningMgr::LightningMgr()
 {
 	_shadowMapShader.loadFromFile("Resources/Shaders/vertexShader.vert", "res/shaders/shadowMap.frag");
 	_renderLightsShader.loadFromFile("Resources/Shaders/vertexShader.vert", "res/shaders/renderLights.frag");
-	const auto& size = App::Get().GetWindow().GetSize();
+	const auto& size = App::Instance().Window().Size();
 	_collectiveLightMap.create(size.x, size.y);
 }
 

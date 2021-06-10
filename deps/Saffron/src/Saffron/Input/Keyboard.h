@@ -1,39 +1,39 @@
 #pragma once
 
-#include <map>
-
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
+#include "Saffron/Base.h"
+
 namespace Se
 {
-class Keyboard
+class Keyboard : public SingleTon<Keyboard>
 {
 public:
-	Keyboard() = default;
-	~Keyboard() = default;
-	Keyboard(const Keyboard&) = delete;
-	auto operator=(const Keyboard&) -> Keyboard& = delete;
+	Keyboard();
 
-	static void OnUpdate();
-	static void OnEvent(const sf::Event& event);
+	void OnUpdate();
 
 	static auto IsDown(const sf::Keyboard::Key& key) -> bool;
 	static auto IsPressed(const sf::Keyboard::Key& key) -> bool;
 	static auto IsReleased(const sf::Keyboard::Key& key) -> bool;
 	static auto IsAnyDown() -> bool;
 
-	static auto GetTextInput() -> std::string { return _textInputBuffer; }
+	static auto TextInput() -> std::u32string;
 
 private:
-
 	static void OnPress(const sf::Event::KeyEvent& event);
 	static void OnRelease(const sf::Event::KeyEvent& event);
-	static void OnTextInput(unsigned char character);
+	static void OnTextInput(const sf::Event::TextEvent& event);
+
+public:
+	EventSubscriberList<const sf::Event::KeyEvent &> Pressed;
+	EventSubscriberList<const sf::Event::KeyEvent &> Released;
+	EventSubscriberList<const sf::Event::TextEvent> TextEntered;
 
 private:
-	static std::map<sf::Keyboard::Key, bool> _keymap;
-	static std::map<sf::Keyboard::Key, bool> _prevKeymap;
-	static std::string _textInputBuffer;
+	HashMap<sf::Keyboard::Key, bool> _keymap;
+	HashMap<sf::Keyboard::Key, bool> _prevKeymap;
+	std::u32string _textInputBuffer;
 };
 }

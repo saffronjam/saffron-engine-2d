@@ -2,12 +2,13 @@
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include "Saffron/Graphics/Scene.h"
 
 namespace Se
 {
-Scene::Scene(String name, ControllableRenderTexture* target, Camera* camera) :
+Scene::Scene(String name, ControllableRenderTexture* target, class Camera* camera) :
 	_target(target),
 	_camera(camera),
 	_viewportPane(Move(name), *_target)
@@ -16,7 +17,7 @@ Scene::Scene(String name, ControllableRenderTexture* target, Camera* camera) :
 
 void Scene::OnUpdate() const
 {
-	if (_viewportPane.IsHovered())
+	if (_viewportPane.Hovered())
 	{
 		_camera->OnUpdate();
 	}
@@ -32,13 +33,31 @@ void Scene::OnRenderTargetResize(const sf::Vector2f& size) const
 	_camera->OnUpdate();
 }
 
+void Scene::ActivateScreenSpaceDrawing()
+{
+	_screenSpaceDrawing = true;
+}
+
+void Scene::DeactivateScreenSpaceDrawing()
+{
+	_screenSpaceDrawing = false;
+}
+
+auto Scene::Camera() -> class Camera& { return *_camera; }
+
+auto Scene::Camera() const -> const class Camera& { return *_camera; }
+
+auto Scene::ViewportPane() -> class ViewportPane& { return _viewportPane; }
+
+auto Scene::ViewportPane() const -> const class ViewportPane& { return _viewportPane; }
+
 void Scene::Submit(const sf::Drawable& drawable, sf::RenderStates renderStates) const
 {
 	if (!_screenSpaceDrawing)
 	{
-		renderStates.transform.combine(_camera->GetTransform());
+		renderStates.transform.combine(_camera->Transform());
 	}
-	_target->GetRenderTexture().draw(drawable, renderStates);
+	_target->RenderTexture().draw(drawable, renderStates);
 }
 
 void Scene::Submit(const sf::Text& text, TextAlign align, sf::RenderStates renderStates)
@@ -61,7 +80,7 @@ void Scene::Submit(const sf::Text& text, TextAlign align, sf::RenderStates rende
 void Scene::Submit(const sf::Vector2f& position, sf::Color color, float radius)
 {
 	sf::CircleShape circle;
-	const float adjustedRadius = radius / _camera->GetZoom();
+	const float adjustedRadius = radius / _camera->Zoom();
 	circle.setPosition(position - sf::Vector2f(adjustedRadius, adjustedRadius));
 	circle.setFillColor(color);
 	circle.setRadius(adjustedRadius);
@@ -76,7 +95,7 @@ void Scene::Submit(const sf::FloatRect& rect, sf::Color fillColor, bool outlined
 	rectShape.setFillColor(fillColor);
 	if (outlined)
 	{
-		rectShape.setOutlineThickness(1.0f / _camera->GetZoom());
+		rectShape.setOutlineThickness(1.0f / _camera->Zoom());
 		rectShape.setOutlineColor(outlineColor);
 	}
 	Submit(rectShape);

@@ -22,7 +22,7 @@ void Terminal::Clear() const
 
 void Terminal::OnGuiRender()
 {
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << "Terminal##" << s_GuiID++;
 
 	if (!ImGui::Begin("Terminal"))
@@ -54,15 +54,15 @@ void Terminal::OnGuiRender()
 	if (copy) ImGui::LogToClipboard();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	const char* buf = _sink->GetTextBuffer().begin();
-	const char* buf_end = _sink->GetTextBuffer().end();
+	const char* buf = _sink->TextBuffer().begin();
+	const char* buf_end = _sink->TextBuffer().end();
 	if (_filter.IsActive())
 	{
-		for (int line_no = 0; line_no < _sink->GetLineOffsets().size(); line_no++)
+		for (int line_no = 0; line_no < _sink->LineOffsets().size(); line_no++)
 		{
-			const char* line_start = buf + _sink->GetLineOffsets()[line_no];
-			const char* line_end = line_no + 1 < _sink->GetLineOffsets().size()
-				                       ? buf + _sink->GetLineOffsets()[line_no + 1] - 1
+			const char* line_start = buf + _sink->LineOffsets()[line_no];
+			const char* line_end = line_no + 1 < _sink->LineOffsets().size()
+				                       ? buf + _sink->LineOffsets()[line_no + 1] - 1
 				                       : buf_end;
 			if (_filter.PassFilter(line_start, line_end)) ImGui::TextUnformatted(line_start, line_end);
 		}
@@ -70,14 +70,14 @@ void Terminal::OnGuiRender()
 	else
 	{
 		ImGuiListClipper clipper;
-		clipper.Begin(_sink->GetLineOffsets().size());
+		clipper.Begin(_sink->LineOffsets().size());
 		while (clipper.Step())
 		{
 			for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 			{
-				const char* line_start = buf + _sink->GetLineOffsets()[line_no];
-				const char* line_end = line_no + 1 < _sink->GetLineOffsets().size()
-					                       ? buf + _sink->GetLineOffsets()[line_no + 1] - 1
+				const char* line_start = buf + _sink->LineOffsets()[line_no];
+				const char* line_end = line_no + 1 < _sink->LineOffsets().size()
+					                       ? buf + _sink->LineOffsets()[line_no + 1] - 1
 					                       : buf_end;
 				ImGui::TextUnformatted(line_start, line_end);
 			}

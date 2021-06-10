@@ -11,8 +11,8 @@ public:
 	
 	void Clear();
 
-	auto GetTextBuffer() const -> const ImGuiTextBuffer&;
-	auto GetLineOffsets() const -> const List<int>&;
+	auto TextBuffer() const -> const ImGuiTextBuffer&;
+	auto LineOffsets() const -> const List<int>&;
 
 protected:
 	bool Post(const LogMessage &message);

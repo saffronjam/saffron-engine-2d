@@ -33,22 +33,22 @@ HSVColor::HSVColor(const HSVColor& hsvColor) :
 {
 }
 
-auto HSVColor::GetRGBA() const -> const sf::Color&
+auto HSVColor::RGBA() const -> const sf::Color&
 {
 	return *this;
 }
 
-auto HSVColor::GetHue() const -> int
+auto HSVColor::Hue() const -> int
 {
 	return _hue;
 }
 
-auto HSVColor::GetSaturation() const -> float
+auto HSVColor::Saturation() const -> float
 {
 	return _saturation;
 }
 
-auto HSVColor::GetValue() const -> float
+auto HSVColor::Value() const -> float
 {
 	return _value;
 }

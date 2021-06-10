@@ -7,24 +7,28 @@
 
 namespace Se
 {
-SplashScreenPane::SplashScreenPane(const std::shared_ptr<BatchLoader>& batchLoader) :
+SplashScreenPane::SplashScreenPane(const std::shared_ptr<class BatchLoader>& batchLoader) :
 	_batchLoader(batchLoader),
-	_texture(TextureStore::GetCopy("res/Editor/Saffron.png")),
+	_texture(TextureStore::Get("Editor/Saffron.png", true)),
 	_finalizingStatus("Finalizing"),
-	_fadeIn(FadePane::Type::In, sf::seconds(0.4f), sf::seconds(0.5f), true),
-	_fadeOut(FadePane::Type::Out, sf::seconds(0.4f), [](sf::Time timer, sf::Time duration)
+	_fadeIn(FadeType::In, sf::seconds(0.4f), sf::seconds(0.5f), true),
+	_fadeOut(FadeType::Out, sf::seconds(0.4f), [](sf::Time timer, sf::Time duration)
 	{
 		return std::min(duration, timer * 2.0f) / duration * 255.0f;
 	})
 {
-	_fadeOut.GetSignal(FadePane::Signals::OnFinish).Connect([this] { _finished = true; });
+	_fadeOut.Finished += [this]
+	{
+		_finished = true;
+		return false;
+	};
 }
 
 void SplashScreenPane::OnUpdate()
 {
 	if (_hidden) return;
 
-	const auto dt = Global::Clock::GetFrameTime();
+	const auto dt = Global::Clock::FrameTime();
 
 	_fadeIn.OnUpdate();
 
@@ -40,14 +44,14 @@ void SplashScreenPane::OnUpdate()
 		}
 	}
 
-	if (_batchLoader->GetProgress() > 99.9f)
+	if (_batchLoader->Progress() > 99.9f)
 	{
 		_fadeOut.Start();
 	}
 
-	if (std::abs(_batchLoader->GetProgress() - _progressViewFinished) > 0.1f)
+	if (std::abs(_batchLoader->Progress() - _progressViewFinished) > 0.1f)
 	{
-		_progressViewFinished = _batchLoader->GetProgress();
+		_progressViewFinished = _batchLoader->Progress();
 		_progressTimer = sf::Time::Zero;
 	}
 	else
@@ -66,7 +70,7 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << "Loading Screen##";
 	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
@@ -78,7 +82,7 @@ void SplashScreenPane::OnGuiRender()
 	const auto logoWidth = 200;
 	const auto logoHeight = 200;
 	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
-	Gui::Image(_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f}, sf::Color(255, 255, 255, 255));
+	Gui::Image(*_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f}, sf::Color(255, 255, 255, 255));
 
 	Gui::SetFontSize(36);
 	ImGui::NewLine();
@@ -107,7 +111,7 @@ void SplashScreenPane::OnGuiRender()
 
 	Gui::SetFontSize(18);
 
-	const String* status = _progressViewFinished < 100.0f ? _batchLoader->GetStatus() : &_finalizingStatus;
+	const String* status = _progressViewFinished < 100.0f ? _batchLoader->Status() : &_finalizingStatus;
 	if (status && !status->empty())
 	{
 		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
@@ -122,6 +126,8 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::End();
 }
 
+auto SplashScreenPane::BatchLoader() const -> const std::shared_ptr<Se::BatchLoader>& { return _batchLoader; }
+
 void SplashScreenPane::Show()
 {
 	_hidden = false;
@@ -132,8 +138,18 @@ void SplashScreenPane::Hide()
 	_hidden = true;
 }
 
-auto SplashScreenPane::IsIdle() const -> bool
+auto SplashScreenPane::Idle() const -> bool
 {
 	return static_cast<int>(std::round(_progressView)) == static_cast<int>(std::round(_progressViewFinished));
+}
+
+auto SplashScreenPane::Finished() const -> bool
+{
+	return _finished;
+}
+
+auto SplashScreenPane::Hidden() const -> bool
+{
+	return _hidden;
 }
 }

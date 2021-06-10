@@ -5,11 +5,8 @@
 
 namespace Se
 {
-SignalAggregate<void> BatchLoader::Signals::OnStart;
-SignalAggregate<void> BatchLoader::Signals::OnFinish;
-
-BatchLoader::BatchLoader(String name)
-	: _name(Move(name))
+BatchLoader::BatchLoader(String name) :
+	_name(Move(name))
 {
 }
 
@@ -27,22 +24,22 @@ void BatchLoader::Submit(Function<void()> function, String shortDescription)
 void BatchLoader::Execute()
 {
 	ScopedLock queueLock(_queueMutex);
-	if ( _worker.joinable() )
+	if (_worker.joinable())
 	{
 		_worker.join();
 	}
 
-	const auto &workerFn = [this]
+	const auto& workerFn = [this]
 	{
 		ScopedLock queueLock(_queueMutex);
 
 		_running = true;
-		GetSignals().Emit(Signals::OnStart);
+		OnStarted.Invoke();
 
 		_progress = 0.0f;
-		for ( const auto &[function, shortDescription] : _queue )
+		for (const auto& [function, shortDescription] : _queue)
 		{
-			if ( _shouldExit )
+			if (_shouldExit)
 			{
 				break;
 			}
@@ -54,7 +51,7 @@ void BatchLoader::Execute()
 		_progress = 100.0f;
 		_queue.clear();
 
-		GetSignals().Emit(Signals::OnFinish);
+		OnFinished.Invoke();
 	};
 
 	_worker = Thread(workerFn);
@@ -63,7 +60,7 @@ void BatchLoader::Execute()
 void BatchLoader::ForceExit()
 {
 	_shouldExit = true;
-	if ( _worker.joinable() )
+	if (_worker.joinable())
 	{
 		_worker.join();
 	}
@@ -78,5 +75,40 @@ void BatchLoader::Reset()
 	_noJobsDone = 0;
 	_progress = 0.0f;
 	_shouldExit = false;
+}
+
+auto BatchLoader::Progress() const -> float
+{
+	return _progress;
+}
+
+auto BatchLoader::Status() const -> const String*
+{
+	return _status;
+}
+
+auto BatchLoader::JobCount() const -> size_t
+{
+	return _queue.size();
+}
+
+auto BatchLoader::JobsDone() const -> size_t
+{
+	return _noJobsDone;
+}
+
+auto BatchLoader::JobsLeft() const -> size_t
+{
+	return JobCount() - _noJobsDone;
+}
+
+auto BatchLoader::IsFinished() const -> bool
+{
+	return _progress >= 100.0f;
+}
+
+auto BatchLoader::ExecutionMutex() -> Mutex&
+{
+	return _executionMutex;
 }
 }

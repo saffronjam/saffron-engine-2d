@@ -7,9 +7,6 @@
 
 namespace Se
 {
-SignalAggregate<void> ViewportPane::Signals::OnPostRender;
-SignalAggregate<const sf::Vector2f&> ViewportPane::Signals::OnWantRenderTargetResize;
-
 ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture& target) :
 	_windowTitle(Move(windowTitle)),
 	_target(&target),
@@ -23,12 +20,12 @@ ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture& 
 
 void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 {
-	const auto& tl = GetTopLeft();
-	const auto& br = GetBottomRight();
+	const auto& tl = TopLeft();
+	const auto& br = BottomRight();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << _windowTitle << "##" << uuid;
 
 	ImGui::Begin(oss.str().c_str(), open);
@@ -63,7 +60,7 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	_topLeft = {minBound.x, minBound.y};
 	_bottomRight = {maxBound.x, maxBound.y};
 
-	const auto viewportSize = GetViewportSize();
+	const auto viewportSize = ViewportSize();
 
 	if (_target->IsEnabled())
 	{
@@ -78,14 +75,14 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	                                    _focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f,
 	                                    ImDrawCornerFlags_All, 4);
 
-	GetSignals().Emit(Signals::OnPostRender);
+	Rendered.Invoke();
 
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	if (GenUtils::ConvertTo<unsigned int>(viewportSize) != _target->GetRenderTexture().getSize())
+	if (GenUtils::ConvertTo<unsigned int>(viewportSize) != _target->RenderTexture().getSize())
 	{
-		GetSignals().Emit(Signals::OnWantRenderTargetResize, viewportSize);
+		Resized.Invoke(viewportSize);
 	}
 }
 
@@ -96,9 +93,9 @@ auto ViewportPane::InViewport(sf::Vector2f positionNDC) const -> bool
 	return positionNDC.x < _bottomRight.x && positionNDC.y < _bottomRight.y;
 }
 
-auto ViewportPane::GetMousePosition(bool normalized) const -> sf::Vector2f
+auto ViewportPane::MousePosition(bool normalized) const -> sf::Vector2f
 {
-	sf::Vector2f position = Mouse::GetPosition(false);
+	sf::Vector2f position = Mouse::CursorPosition(false);
 	position.x -= _topLeft.x;
 	position.y -= _topLeft.y;
 
@@ -111,20 +108,20 @@ auto ViewportPane::GetMousePosition(bool normalized) const -> sf::Vector2f
 	return {position.x, position.y};
 }
 
-auto ViewportPane::GetViewportSize() const -> sf::Vector2f
+auto ViewportPane::ViewportSize() const -> sf::Vector2f
 {
-	return GetBottomRight() - GetTopLeft();
+	return BottomRight() - TopLeft();
 }
 
-auto ViewportPane::GetDockID() const -> Uint32 { return _dockID; }
+auto ViewportPane::DockID() const -> Uint32 { return _dockID; }
 
-auto ViewportPane::GetTopLeft() const -> const sf::Vector2f& { return _topLeft; }
+auto ViewportPane::TopLeft() const -> const sf::Vector2f& { return _topLeft; }
 
-auto ViewportPane::GetBottomRight() const -> const sf::Vector2f& { return _bottomRight; }
+auto ViewportPane::BottomRight() const -> const sf::Vector2f& { return _bottomRight; }
 
-auto ViewportPane::IsHovered() const -> bool { return _hovered; }
+auto ViewportPane::Hovered() const -> bool { return _hovered; }
 
-auto ViewportPane::IsFocused() const -> bool { return _focused; }
+auto ViewportPane::Focused() const -> bool { return _focused; }
 
 void ViewportPane::SetTarget(const ControllableRenderTexture& target)
 {

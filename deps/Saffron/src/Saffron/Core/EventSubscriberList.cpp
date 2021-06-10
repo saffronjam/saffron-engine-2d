@@ -27,6 +27,11 @@ void EventSubscriberList<void>::Unsubscribe(CancellationToken token)
 	_subscribers.erase(token);
 }
 
+auto EventSubscriberList<void>::Empty() const -> bool
+{
+	return _subscribers.empty();
+}
+
 auto EventSubscriberList<void>::operator+=(Handler handler) -> CancellationToken
 {
 	return Subscribe(handler);

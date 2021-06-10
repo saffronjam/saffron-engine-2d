@@ -10,9 +10,9 @@ class Clock
 public:
 	Clock();
 
-	sf::Time GetFrameTime() const { return _dt; }
-	sf::Time GetElapsedTime() const { return _clock.getElapsedTime(); }
-	sf::Time Restart();
+	auto FrameTime() const -> sf::Time;
+	auto ElapsedTime() const -> sf::Time;
+	auto Restart() -> sf::Time;
 
 private:
 	sf::Clock _clock;

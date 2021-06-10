@@ -1,43 +1,40 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/App.h"
-#include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/Global.h"
-#include "Saffron/Core/Run.h"
-#include "Saffron/Input/Keyboard.h"
-#include "Saffron/Input/Mouse.h"
-#include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/SplashScreenPane.h"
 #include "Saffron/Graphics/Scene.h"
-#include "Saffron/Graphics/RenderTargetManager.h"
+
 
 namespace Se
 {
-App* App::s_Instance = nullptr;
-
-
 App::App(const Properties& properties) :
+	SingleTon(this),
 	_preLoader(CreateShared<BatchLoader>("Preloader")),
-	_window(properties.Name, properties.WindowWidth, properties.WindowHeight),
-	_fadeIn(FadePane::Type::In, sf::seconds(0.5f))
+	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
+	_filesystem(CreateUnique<Filesystem>(*_window)),
+	_gui(CreateUnique<Gui>(Path("../../../imgui.ini"))),
+	_keyboard(CreateUnique<Keyboard>()),
+	_mouse(CreateUnique<Mouse>()),
+	_renderTargetManager(CreateUnique<RenderTargetManager>()),
+	_run(CreateUnique<class Run>()),
+	_computeShaderStore(CreateUnique<ComputeShaderStore>()),
+	_fontStore(CreateUnique<FontStore>()),
+	_imageStore(CreateUnique<ImageStore>()),
+	_musicStore(CreateUnique<MusicStore>()),
+	_shaderStore(CreateUnique<ShaderStore>()),
+	_soundBufferStore(CreateUnique<SoundBufferStore>()),
+	_textureStore(CreateUnique<TextureStore>()),
+	_fadeIn(FadeType::In, sf::seconds(0.5f))
 {
-	Debug::Assert(!s_Instance, "Application already exist");
-	s_Instance = this;
-
 	Log::CoreInfo("--- Saffron 2D Framework ---");
 	Log::CoreInfo("Creating application {0}", properties.Name);
 
-	_window.SetEventCallback([this](const sf::Event& event)
-	{
-		OnEvent(event);
-	});
-
-	FileIOManager::Init(_window);
-	Gui::Init(Filepath("../../../imgui.ini"));
+	_window->Closed += SE_EV_ACTION(App::OnWindowClose);
 
 	_preLoader->Submit([]
 	{
-		Gui::SetStyle(Gui::Style::Dark);
+		Gui::SetStyle(GuiStyle::Dark);
 	}, "Initializing GUI");
 
 	Global::Clock::Restart();
@@ -45,7 +42,6 @@ App::App(const Properties& properties) :
 
 App::~App()
 {
-	Gui::Shutdown();
 	Log::CoreInfo("Shutting down");
 }
 
@@ -79,17 +75,17 @@ void App::EraseOverlay(std::shared_ptr<Layer> overlay)
 	_layerStack.EraseOverlay(overlay);
 }
 
+auto App::Window() const -> class Window&
+{
+	return *_window;
+}
+
 void App::Run()
 {
 	OnInit();
 
 	while (_running)
 	{
-		if (Keyboard::IsDown(sf::Keyboard::Key::A))
-		{
-			Log::Info("TEST");
-		}
-
 		if (!_preLoader->IsFinished())
 		{
 			RunSplashScreen();
@@ -97,12 +93,12 @@ void App::Run()
 		}
 
 		Global::Clock::Restart();
-		_window.HandleBufferedEvents();
-		_window.Clear();
-		RenderTargetManager::ClearAll();
+		_window->HandleBufferedEvents();
+		_window->Clear();
+		_renderTargetManager->ClearAll();
 		if (!_minimized)
 		{
-			Gui::Begin();
+			_gui->Begin();
 			for (const auto& layer : _layerStack)
 			{
 				layer->OnPreFrame();
@@ -121,15 +117,15 @@ void App::Run()
 			}
 			_fadeIn.OnUpdate();
 			_fadeIn.OnGuiRender();
-			Gui::End();
+			_gui->End();
 
-			Keyboard::OnUpdate();
-			Mouse::OnUpdate();
+			_keyboard->OnUpdate();
+			_mouse->OnUpdate();
 		}
 		OnUpdate();
-		Run::Execute();
-		RenderTargetManager::DisplayAll();
-		_window.Display();
+		_run->Execute();
+		_renderTargetManager->DisplayAll();
+		_window->Display();
 	}
 
 	_layerStack.Clear();
@@ -147,7 +143,7 @@ void App::OnGuiRender()
 {
 	if (ImGui::Begin("Stats"))
 	{
-		const auto dt = Global::Clock::GetFrameTime();
+		const auto dt = Global::Clock::FrameTime();
 		_fpsTimer += dt;
 		if (_fpsTimer.asSeconds() < 1.0f)
 		{
@@ -169,61 +165,67 @@ void App::OnGuiRender()
 		Gui::Property("Frametime", std::to_string(_cachedSpf.asMicroseconds() / 1000.0f) + " ms");
 		Gui::Property("FPS", std::to_string(_cachedFps));
 
+
 		Gui::EndPropertyGrid();
+
+		static Array<float, 90> values = {};
+		static int values_offset = 0;
+		static constexpr auto cap = 5.0f * 1.0f / 144.0f;
+		
+		static float phase = 0.0f;
+		values[values_offset] = GenUtils::Map(dt.asSeconds(), 1.0f / 144.0f, cap, -1.0f, 1.0f);
+		values_offset = (values_offset + 1) % values.size();
+		phase += 0.10f * values_offset;
+
+		auto shouldPop = false;
+		if (cap - dt.asSeconds() < 0.001f)
+		{
+			ImGui::PushStyleColor(ImGuiCol_PlotLines, ImVec4(1.0f, 0.0f, 0.0f, 1.00f));
+			shouldPop = true;
+		}
+		const auto size = ImVec2(ImGui::GetContentRegionAvailWidth(), 80);
+		ImGui::PlotLines("", values.data(), values.size(), values_offset, nullptr, -1.0f, 1.0f, size);
+		if (shouldPop)
+		{
+			ImGui::PopStyleColor();
+		}
 	}
 	ImGui::End();
 }
 
-void App::OnEvent(const sf::Event& event)
-{
-	if (event.type == event.Closed)
-	{
-		OnWindowClose();
-	}
-
-	Gui::OnEvent(event);
-	Keyboard::OnEvent(event);
-	Mouse::OnEvent(event);
-
-	for (auto it = _layerStack.end(); it != _layerStack.begin();)
-	{
-		(*--it)->OnEvent(event);
-	}
-}
-
-bool App::OnWindowClose()
+auto App::OnWindowClose() -> bool
 {
 	Exit();
 	return true;
 }
 
-void App::RunSplashScreen()
+void App::RunSplashScreen() const
 {
 	_preLoader->Execute();
 
 	SplashScreenPane splashScreenPane(_preLoader);
-	while (!splashScreenPane.IsFinished())
+	while (!splashScreenPane.Finished())
 	{
-		_window.Clear();
-		RenderTargetManager::ClearAll();
-		Gui::Begin();
+		_window->Clear();
+		_renderTargetManager->ClearAll();
+		_gui->Begin();
 		splashScreenPane.OnUpdate();
 		splashScreenPane.OnGuiRender();
-		_window.HandleBufferedEvents();
-		Gui::End();
-		Run::Execute();
-		RenderTargetManager::DisplayAll();
-		_window.Display();
+		_window->HandleBufferedEvents();
+		_gui->End();
+		_run->Execute();
+		_renderTargetManager->DisplayAll();
+		_window->Display();
 		Global::Clock::Restart();
-		const auto step = Global::Clock::GetFrameTime().asSeconds();
-		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished()
+		const auto step = Global::Clock::FrameTime().asSeconds();
+		const auto duration = splashScreenPane.BatchLoader()->IsFinished()
 			                      ? 0ll
 			                      : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - step));
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 	}
 }
 
-String App::GetConfigurationName()
+auto App::ConfigurationName() -> String
 {
 #if defined(SE_DEBUG)
 	return "Debug";
@@ -236,7 +238,7 @@ String App::GetConfigurationName()
 #endif
 }
 
-String App::GetPlatformName()
+auto App::PlatformName() -> String
 {
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";

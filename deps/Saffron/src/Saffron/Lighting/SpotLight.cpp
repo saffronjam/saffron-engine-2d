@@ -22,11 +22,11 @@ void SpotLight::SetDirection(const sf::Vector2f& newDirection, float theta)
 	const sf::Vector2f adjustedPosition = _position + sf::Vector2f(_radius, _radius);
 	shape.append(sf::Vertex(adjustedPosition - unitDirection * 10.0f, sf::Color::Black));
 	shape.append(sf::Vertex(
-		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(theta / 2.0f), VecUtils::Null<>()) *
+		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::Radians(theta / 2.0f), VecUtils::Null<>()) *
 		50.0f, sf::Color::Black));
 	shape.append(sf::Vertex(adjustedPosition - unitDirection * 25.0f, sf::Color::Black));
 	shape.append(sf::Vertex(
-		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::ToRadians(-theta / 2.0f), VecUtils::Null<>()) *
+		adjustedPosition + VecUtils::Rotate(unitDirection, GenUtils::Radians(-theta / 2.0f), VecUtils::Null<>()) *
 		50.0f, sf::Color::Black));
 
 	AddStaticOccluder(shape);

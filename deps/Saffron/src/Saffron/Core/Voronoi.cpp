@@ -2,6 +2,8 @@
 
 #define JC_VORONOI_IMPLEMENTATION
 
+#include <SFML/Graphics/ConvexShape.hpp>
+
 #include "Saffron/Core/Voronoi.h"
 
 namespace Se
@@ -16,17 +18,41 @@ Voronoi::Polygon::Polygon(Voronoi& parent, int lineVAIndex, int filledVAIndex, c
 {
 }
 
+auto Voronoi::Polygon::operator==(const Polygon& other) const -> bool { return _uuid == other._uuid; }
+
+auto Voronoi::Polygon::LineVAIndex() const -> int { return _lineVAIndex; }
+
+auto Voronoi::Polygon::FilledVAIndex() const -> int { return _filledVAIndex; }
+
+auto Voronoi::Polygon::Points() const -> const List<sf::Vector2f>& { return _points; }
+
+auto Voronoi::Polygon::FillColor() const -> sf::Color { return _fillColor; }
+
+auto Voronoi::Polygon::Neighbors() const -> const TreeSet<Polygon*>& { return _neighbors; }
+
+void Voronoi::Polygon::AddNeighbor(Polygon* neighbor)
+{
+	_neighbors.emplace(neighbor);
+}
+
+auto Voronoi::Polygon::VoronoiPoint() const -> const sf::Vector2f& { return _voronoiPoint; }
+
+void Voronoi::Polygon::SetVoronoiPoint(const sf::Vector2f& voronoiPoint)
+{
+	_voronoiPoint = voronoiPoint;
+}
+
 void Voronoi::Polygon::SetFillColor(sf::Color color) const
 {
 	_parent.SetFillColor(*this, color);
 }
 
-void Voronoi::Polygon::ClearFillColor(sf::Color color)
+void Voronoi::Polygon::ClearFillColor(sf::Color color) const
 {
 	SetFillColor(sf::Color::Transparent);
 }
 
-auto Voronoi::Polygon::GetClosestEdge(const sf::Vector2f& position) const -> Pair<sf::Vector2f, sf::Vector2f>
+auto Voronoi::Polygon::ClosestEdge(const sf::Vector2f& position) const -> Pair<sf::Vector2f, sf::Vector2f>
 {
 	constexpr float inf = std::numeric_limits<float>::infinity();
 	Pair<float, float> distCache{inf, inf};
@@ -127,13 +153,45 @@ void Voronoi::SetFillColor(const Polygon& polygon, sf::Color color)
 	const auto result = std::find(_polygons.begin(), _polygons.end(), polygon);
 	if (result != _polygons.end())
 	{
-		const size_t noPoints = polygon.GetPoints().size();
-		const int VAIndex = polygon.GetFilledVAIndex();
+		const size_t noPoints = polygon.Points().size();
+		const int VAIndex = polygon.FilledVAIndex();
 		for (int i = 0; i < noPoints * 3; i++)
 		{
 			_filledPolygonsVA[VAIndex + i].color = color;
 		}
 	}
+}
+
+void Voronoi::ShowGrid()
+{
+	_shouldDrawGrid = true;
+}
+
+void Voronoi::HideGrid()
+{
+	_shouldDrawGrid = false;
+}
+
+void Voronoi::ShowFilled()
+{
+	_shouldDrawFilledPolygons = true;
+}
+
+void Voronoi::HideFilled()
+{
+	_shouldDrawFilledPolygons = false;
+}
+
+auto Voronoi::Polygons() const -> const List<Polygon>& { return _polygons; }
+
+void Voronoi::EnableAutomaticGeneration()
+{
+	_automaticGeneration = true;
+}
+
+void Voronoi::DisableAutomaticGeneration()
+{
+	_automaticGeneration = false;
 }
 
 void Voronoi::Relax(int iterations)
@@ -160,13 +218,13 @@ void Voronoi::Relax(int iterations)
 	}
 }
 
-auto Voronoi::GetPolygon(const sf::Vector2f& position) -> Voronoi::Polygon&
+auto Voronoi::PolygonAt(const sf::Vector2f& position) -> Polygon&
 {
 	float minDistance = std::numeric_limits<float>::infinity();
 	Polygon* closest = nullptr;
 	for (auto& polygon : _polygons)
 	{
-		const float distance = VecUtils::LengthSq(polygon.GetVoronoiPoint() - position);
+		const float distance = VecUtils::LengthSq(polygon.VoronoiPoint() - position);
 		if (distance < minDistance)
 		{
 			minDistance = distance;
@@ -175,7 +233,7 @@ auto Voronoi::GetPolygon(const sf::Vector2f& position) -> Voronoi::Polygon&
 	}
 
 	Debug::Assert(closest != nullptr,
-	               "Failed to find any polygons closer than std::numeric_limits<float>::infinity() units from given position");
+	              "Failed to find any polygons closer than std::numeric_limits<float>::infinity() units from given position");
 	return *closest;
 }
 
@@ -218,7 +276,7 @@ void Voronoi::Generate()
 
 	const auto setupPolygon = [this](Polygon& polygon, int& currentLineVAIndex, int& currentFilledVAIndex)
 	{
-		const auto& points = polygon.GetPoints();
+		const auto& points = polygon.Points();
 		for (int i = 0; i < points.size() - 1; i++)
 		{
 			_polygonsVA.append({points[i], _defaultGridColor});
@@ -227,7 +285,7 @@ void Voronoi::Generate()
 		_polygonsVA.append({points.back(), _defaultGridColor});
 		_polygonsVA.append({points.front(), _defaultGridColor});
 
-		const auto& voronoiPoint = polygon.GetVoronoiPoint();
+		const auto& voronoiPoint = polygon.VoronoiPoint();
 		const sf::Color fillColor = sf::Color::Transparent; // = polygon.GetFillColor();
 		for (int i = 0; i < points.size() - 1; i++)
 		{
@@ -269,7 +327,7 @@ void Voronoi::Generate()
 		{
 			if (edge->neighbor)
 			{
-				Polygon& neighbor = GetPolygon(VecUtils::ConvertTo<sf::Vector2f>(edge->neighbor->p));
+				Polygon& neighbor = PolygonAt(VecUtils::ConvertTo<sf::Vector2f>(edge->neighbor->p));
 				_polygons[i].AddNeighbor(&neighbor);
 			}
 		}

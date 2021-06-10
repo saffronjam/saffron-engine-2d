@@ -4,11 +4,11 @@
 
 #include <commdlg.h>
 
-#include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Core/Filesystem.h"
 
 namespace Se
 {
-auto FormatFilter(const FileIOManager::Filter& filter) -> const char*
+auto FormatFilter(const Filesystem::Filter& filter) -> const char*
 {
 	static char buffer[1000] = {0};
 	char* bufferP = buffer;
@@ -26,10 +26,8 @@ auto FormatFilter(const FileIOManager::Filter& filter) -> const char*
 	return buffer;
 }
 
-auto FileIOManager::OpenFile(const Filter& filter) -> Filepath
+auto Filesystem::OpenFile(const Filter& filter) -> Path
 {
-	Debug::Assert(_window, "FileIOManager was not initialized");
-
 	const char* formattedFilter = FormatFilter(filter);
 
 	OPENFILENAMEA ofn; // common dialog box structure
@@ -38,7 +36,7 @@ auto FileIOManager::OpenFile(const Filter& filter) -> Filepath
 	// Initialize OPENFILENAME
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = _window->GetNativeWindow().getSystemHandle();
+	ofn.hwndOwner = Instance()._window.NativeWindow().getSystemHandle();
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof szFile;
 	ofn.lpstrFilter = formattedFilter;
@@ -49,13 +47,11 @@ auto FileIOManager::OpenFile(const Filter& filter) -> Filepath
 	{
 		return ofn.lpstrFile;
 	}
-	return Filepath();
+	return Path();
 }
 
-auto FileIOManager::SaveFile(const Filter& filter) -> Filepath
+auto Filesystem::SaveFile(const Filter& filter) -> Path
 {
-	Debug::Assert(_window, "FileIOManager was not initialized");
-
 	const char* formattedFilter = FormatFilter(filter);
 	const char* fallbackExtension = filter.Extensions.front() == "*.*" ? "" : filter.Extensions.front().c_str();
 
@@ -65,7 +61,7 @@ auto FileIOManager::SaveFile(const Filter& filter) -> Filepath
 	// Initialize OPENFILENAME
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = _window->GetNativeWindow().getSystemHandle();
+	ofn.hwndOwner = Instance()._window.NativeWindow().getSystemHandle();
 	ofn.lpstrFile = szFile;
 	ofn.lpstrDefExt = fallbackExtension;
 	ofn.nMaxFile = sizeof szFile;
@@ -77,7 +73,7 @@ auto FileIOManager::SaveFile(const Filter& filter) -> Filepath
 	{
 		return ofn.lpstrFile;
 	}
-	return Filepath();
+	return Path();
 }
 }
 
