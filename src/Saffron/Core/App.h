@@ -109,5 +109,5 @@ private:
 };
 
 // Implemented by client
-auto CreateApplication() -> App*;
+auto CreateApplication() -> Unique<App>;
 }
