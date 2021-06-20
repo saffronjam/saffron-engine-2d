@@ -38,6 +38,7 @@ public:
 	void Display();
 
 	void HandleBufferedEvents();
+	void HandleBufferedMessages();
 
 	void PositionCenter();
 
@@ -95,6 +96,9 @@ private:
 	sf::Vector2i _nonFullscreenPosition;
 
 	bool _fullscreen;
+
+	OStringStream _sfmlStreamBuffer;
+	inline static const String _sfmlLogFmt = Log::Fmt::OnGreen + Log::Fmt::White;
 };
 }
 

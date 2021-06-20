@@ -1,10 +1,14 @@
 #include "SaffronPCH.h"
 
+#include <glad/glad.h>
+
 #include <SFML/Graphics/CircleShape.hpp>
 
 #include "Saffron/Core/Window.h"
 #include "Saffron/Lighting/LightningMgr.h"
 #include "Saffron/Resource/ImageStore.h"
+
+#include <SFML/System/Err.hpp>
 
 #ifdef DrawText
 #undef DrawText
@@ -17,7 +21,6 @@ Window::Window(String title, int width, int height) :
 	_title(Move(title)),
 	_style(sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
 	_nativeWindow(sf::RenderWindow(_videomode, Move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
-
 {
 	_nativeWindow.setKeyRepeatEnabled(false);
 	_nativeWindow.resetGLStates();
@@ -25,6 +28,13 @@ Window::Window(String title, int width, int height) :
 	PositionCenter();
 
 	SetVSync(true);
+
+	if (!gladLoadGL())
+	{
+		Debug::Break("Failed to initialize OpenGL context");
+	}
+
+	sf::err().rdbuf(_sfmlStreamBuffer.rdbuf());
 }
 
 void Window::Draw(const sf::Drawable& drawable, sf::RenderStates renderStates)
@@ -139,6 +149,16 @@ void Window::HandleBufferedEvents()
 		}
 		}
 		AnyEvent.Invoke(event);
+	}
+}
+
+void Window::HandleBufferedMessages()
+{
+	if (!_sfmlStreamBuffer.view().empty())
+	{
+		Log::CoreInfo("{0}[SFML Log]{1} {2}", _sfmlLogFmt, Log::Fmt::Reset,_sfmlStreamBuffer.view());
+		_sfmlStreamBuffer = OStringStream();
+		sf::err().rdbuf(_sfmlStreamBuffer.rdbuf());
 	}
 }
 

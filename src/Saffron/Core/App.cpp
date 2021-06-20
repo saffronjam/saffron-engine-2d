@@ -96,6 +96,7 @@ void App::Run()
 
 		Global::Clock::Restart();
 		_window->HandleBufferedEvents();
+		_window->HandleBufferedMessages();
 		_window->Clear();
 		_renderTargetManager->ClearAll();
 		if (!_minimized)
@@ -123,9 +124,9 @@ void App::Run()
 		}
 		OnUpdate();		
 		_run->Execute();
-
-			_keyboard->OnUpdate();
-			_mouse->OnUpdate();
+		
+		_keyboard->OnUpdate();
+		_mouse->OnUpdate();
 		
 		_renderTargetManager->DisplayAll();
 		_window->Display();
@@ -215,6 +216,7 @@ void App::RunSplashScreen() const
 		splashScreenPane.OnUpdate();
 		splashScreenPane.OnGuiRender();
 		_window->HandleBufferedEvents();
+		_window->HandleBufferedMessages();
 		_gui->End();
 		_run->Execute();
 		_renderTargetManager->DisplayAll();
