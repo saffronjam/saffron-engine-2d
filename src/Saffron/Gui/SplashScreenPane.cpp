@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/App.h"
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/SplashScreenPane.h"
@@ -15,7 +16,8 @@ SplashScreenPane::SplashScreenPane(const std::shared_ptr<class BatchLoader>& bat
 	_fadeOut(FadeType::Out, sf::seconds(0.4f), [](sf::Time timer, sf::Time duration)
 	{
 		return std::min(duration, timer * 2.0f) / duration * 255.0f;
-	})
+	}),
+	_title(App::Instance().Name())
 {
 	_fadeOut.Finished += [this]
 	{
@@ -82,7 +84,8 @@ void SplashScreenPane::OnGuiRender()
 	const auto logoWidth = 200;
 	const auto logoHeight = 200;
 	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
-	Gui::Image(*_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f}, sf::Color(255, 255, 255, 255));
+	Gui::Image(*_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f},
+	           sf::Color(255, 255, 255, 255));
 
 	Gui::SetFontSize(36);
 	ImGui::NewLine();

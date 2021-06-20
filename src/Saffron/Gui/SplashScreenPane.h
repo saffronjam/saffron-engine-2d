@@ -26,7 +26,7 @@ public:
 	auto Hidden() const -> bool;
 
 private:
-	String _title = "<Project Name>";
+	String _title;
 
 	std::shared_ptr<class BatchLoader> _batchLoader;
 	Shared<sf::Texture> _texture;
