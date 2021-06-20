@@ -3,10 +3,9 @@
 #include "Saffron/Core/Global.h"
 #include "Saffron/Core/Run.h"
 
-#include <ranges>
-
 namespace Se
 {
+
 void Run::PeriodicFunction::operator()()
 {
 	Function();
@@ -26,15 +25,31 @@ void Run::Execute()
 {
 	const auto ts = Global::Clock::FrameTime();
 
-	for (auto& function : Instance()._laterFunctions)
+	auto& laterFunctions = Instance()._laterFunctions;
+	for (auto& function : laterFunctions)
 	{
 		function();
 	}
-	Instance()._laterFunctions.clear();
+	laterFunctions.clear();
 
-	for (auto& periodicFunction : Instance()._periodicFunctions | std::views::values)
+	auto& afterFunctions = Instance()._afterFunctions;
+	for (auto& afterFunction : afterFunctions)
 	{
-		periodicFunction.Counter += ts;
+		afterFunction.Counter += ts;
+		if (afterFunction.Counter > afterFunction.Delay)
+		{
+			afterFunction();
+			afterFunction.Executed = true;
+		}
+	}
+	afterFunctions.erase(std::ranges::remove_if(afterFunctions, [](const AfterFunction& af)
+	{
+		return af.Executed;
+	}).begin(), _afterFunctions.end());
+
+	for (auto& periodicFunction : _periodicFunctions | std::views::values)
+	{
+		periodicFunction.Counter+= ts;
 		if (periodicFunction.Counter >= periodicFunction.Interval)
 		{
 			periodicFunction.Counter = sf::Time::Zero;
@@ -42,7 +57,7 @@ void Run::Execute()
 		}
 	}
 
-	for (auto& frameFunction : Instance()._frameFunctions | std::views::values)
+	for (auto& frameFunction : _frameFunctions | std::views::values)
 	{
 		frameFunction();
 	}
@@ -53,14 +68,19 @@ void Run::Later(Function<void()> function)
 	Instance()._laterFunctions.push_back(Move(function));
 }
 
-auto Run::Periodically(Function<void()> function, sf::Time interval) -> Handle
+void Run::After(Function<void()> function, sf::Time delay)
+{
+	Instance()._afterFunctions.emplace_back(AfterFunction{Move(function), delay});
+}
+
+Run::Handle Run::Periodically(Function<void()> function, sf::Time interval)
 {
 	Handle newHandle;
 	Instance()._periodicFunctions.emplace(newHandle, PeriodicFunction{Move(function), interval, sf::Time::Zero});
 	return newHandle;
 }
 
-auto Run::EveryFrame(Function<void()> function) -> Handle
+Run::Handle Run::EveryFrame(Function<void()> function)
 {
 	Handle newHandle;
 	Instance()._frameFunctions.emplace(newHandle, Move(function));
