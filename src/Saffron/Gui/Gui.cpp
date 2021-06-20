@@ -229,7 +229,7 @@ auto Gui::Property(const String& name, int& value, const char* format, int min, 
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
+	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
@@ -260,7 +260,7 @@ auto Gui::Property(const String& name, float& value, const char* format, float m
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
+	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
@@ -297,7 +297,7 @@ auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, 
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
+	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
@@ -333,7 +333,7 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 
-	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
+	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
 	if (fn.has_value())
 	{
@@ -394,7 +394,7 @@ auto Gui::Property(const String& name, sf::Vector4f& value, const char* format, 
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const auto imGuiFlags = static_cast<ImGuiSliderFlags>(flags);
+	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
 	const String id = "##" + name;
 	bool changed = false;
