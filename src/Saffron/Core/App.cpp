@@ -120,12 +120,13 @@ void App::Run()
 			_fadeIn.OnUpdate();
 			_fadeIn.OnGuiRender();
 			_gui->End();
+		}
+		OnUpdate();		
+		_run->Execute();
 
 			_keyboard->OnUpdate();
 			_mouse->OnUpdate();
-		}
-		OnUpdate();
-		_run->Execute();
+		
 		_renderTargetManager->DisplayAll();
 		_window->Display();
 	}
