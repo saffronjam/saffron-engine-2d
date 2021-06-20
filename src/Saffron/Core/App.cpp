@@ -14,7 +14,7 @@ App::App(const AppProperties& properties) :
 	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
 	_name(properties.Name),
 	_filesystem(CreateUnique<Filesystem>(*_window)),
-	_gui(CreateUnique<Gui>(Path("../../../imgui.ini"))),
+	_gui(CreateUnique<Gui>()),
 	_keyboard(CreateUnique<Keyboard>()),
 	_mouse(CreateUnique<Mouse>()),
 	_renderTargetManager(CreateUnique<RenderTargetManager>()),

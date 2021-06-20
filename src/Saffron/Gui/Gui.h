@@ -16,7 +16,7 @@ using Font = ImFont;
 class Gui : public SingleTon<Gui>
 {;
 public:
-	explicit Gui(Path iniFilepath);
+	explicit Gui();
 	virtual ~Gui();
 
 	void Begin();
@@ -163,7 +163,6 @@ private:
 	static auto ToImGuiSliderFlags(GuiPropertyFlag flags) -> ImGuiSliderFlags;
 
 private:
-	Path _iniFilepath;
 	GuiStyle _currentStyle = GuiStyle::Light;
 	TreeMap<int, ImFont*> _fonts;
 	Pair<int, ImFont*> _currentFont;

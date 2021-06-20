@@ -11,15 +11,19 @@ namespace Se
 {
 static int s_UIContextID = 0;
 
-Gui::Gui(Path iniFilepath) :
-	SingleTon(this),
-	_iniFilepath(Move(iniFilepath))
+Gui::Gui() :
+	SingleTon(this)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	io.IniFilename = "../../../imgui.ini"; //reinterpret_cast<const char*>(_iniFilepath.c_str());
+
+#if defined(SE_IMGUI_INI_PATH)	
+	io.IniFilename = SE_IMGUI_INI_PATH;
+#else
+	io.IniFilename = "../../../imgui.ini";
+#endif
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
