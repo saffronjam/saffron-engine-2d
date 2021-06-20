@@ -66,6 +66,7 @@ public:
 
 	static auto ConfigurationName() -> String;
 	static auto PlatformName() -> String;
+	static auto Name() -> String;
 
 private:
 	auto OnWindowClose() -> bool;
@@ -85,6 +86,8 @@ private:
 
 	Unique<RenderTargetManager> _renderTargetManager;
 	Unique<class Run> _run;
+
+	String _name;
 
 	// Stores
 	Unique<ComputeShaderStore> _computeShaderStore;

@@ -12,6 +12,7 @@ App::App(const Properties& properties) :
 	SingleTon(this),
 	_preLoader(CreateShared<BatchLoader>("Preloader")),
 	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
+	_name(properties.Name),
 	_filesystem(CreateUnique<Filesystem>(*_window)),
 	_gui(CreateUnique<Gui>(Path("../../../imgui.ini"))),
 	_keyboard(CreateUnique<Keyboard>()),
@@ -245,5 +246,10 @@ auto App::PlatformName() -> String
 #elif defined(SE_PLATFORM_LINUX)
 	return "Linux x64";
 #endif
+}
+
+auto App::Name() -> String
+{
+	return Instance()._name;
 }
 }
