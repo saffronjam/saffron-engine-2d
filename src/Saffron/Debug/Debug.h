@@ -80,6 +80,6 @@ public:
 #endif
 
 private:
-	static constexpr const char* AssertionFailed = "\033[41m\033[37mAssertion failed\033[m\033[36m ";
+	inline static String AssertionFailed = Log::Fmt::OnRed + Log::Fmt::White + "Assertion failed" + Log::Fmt::Reset + Log::Fmt::Cyan;
 };
 }
