@@ -4,6 +4,7 @@
 
 #include "Saffron/Core/Window.h"
 #include "Saffron/Lighting/LightningMgr.h"
+#include "Saffron/Resource/ImageStore.h"
 
 #ifdef DrawText
 #undef DrawText
@@ -11,17 +12,16 @@
 
 namespace Se
 {
-Window::Window(const std::string& title, int width, int height) :
+Window::Window(String title, int width, int height) :
 	_videomode(width, height),
+	_title(Move(title)),
 	_style(sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
-	_nativeWindow(sf::RenderWindow(_videomode, title, _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
+	_nativeWindow(sf::RenderWindow(_videomode, Move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
 
 {
-	const auto contexSettings = sf::ContextSettings();
-
 	_nativeWindow.setKeyRepeatEnabled(false);
 	_nativeWindow.resetGLStates();
-	SetTitle(title);
+	SetTitle(_title);
 	PositionCenter();
 
 	SetVSync(true);
@@ -101,10 +101,10 @@ void Window::HandleBufferedEvents()
 #define CASE(eventType, arg)  case sf::Event:: ## eventType: { (eventType).Invoke(arg); break; }
 
 			// Window events
-		CASE(Closed, );
+		CASE(Closed,);
 		CASE(Resized, event.size);
-		CASE(LostFocus, );
-		CASE(GainedFocus, );
+		CASE(LostFocus,);
+		CASE(GainedFocus,);
 
 			// Keyboard events
 		CASE(TextEntered, event.text);
@@ -116,8 +116,8 @@ void Window::HandleBufferedEvents()
 		CASE(MouseButtonPressed, event.mouseButton);
 		CASE(MouseButtonReleased, event.mouseButton);
 		CASE(MouseMoved, event.mouseMove);
-		CASE(MouseEntered, );
-		CASE(MouseLeft, );
+		CASE(MouseEntered,);
+		CASE(MouseLeft,);
 
 #undef CASE
 
@@ -199,16 +199,15 @@ void Window::Resize(const sf::Vector2u& size)
 	_nativeWindow.setSize(size);
 }
 
-void Window::SetTitle(const std::string& title)
+void Window::SetTitle(const String& title)
 {
 	_nativeWindow.setTitle(title);
 }
 
-void Window::SetIcon(const std::string& icon)
+void Window::SetIcon(const Path& path)
 {
-	sf::Image image;
-	image.loadFromFile(icon);
-	_nativeWindow.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
+	const auto image = ImageStore::Get(path, false);
+	_nativeWindow.setIcon(image->getSize().x, image->getSize().y, image->getPixelsPtr());
 }
 
 void Window::SetFullscreen(bool toggle)

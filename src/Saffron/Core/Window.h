@@ -21,7 +21,7 @@ class Window
 	friend class Camera;
 
 public:
-	Window(const std::string& title, int width, int height);
+	Window(String title, int width, int height);
 	~Window() = default;
 	Window(const Window&) = delete;
 	auto operator=(const Window&) -> Window& = delete;
@@ -48,15 +48,15 @@ public:
 	auto Size() const -> sf::Vector2u;
 	auto Width() const -> int;
 	auto Height() const -> int;
-	auto Title() const -> const std::string&;
+	auto Title() const -> const String&;
 	auto ScreenRect() const -> sf::IntRect;
 
 	auto IsFullscreen() const -> bool { return _fullscreen; }
 
 	void SetPosition(const sf::Vector2i& pos);
 	void Resize(const sf::Vector2u& size);
-	void SetTitle(const std::string& title);
-	void SetIcon(const std::string& icon);
+	void SetTitle(const String& title);
+	void SetIcon(const Path& path);
 	void SetFullscreen(bool toggle);
 	void SetVSync(bool toggle);
 
