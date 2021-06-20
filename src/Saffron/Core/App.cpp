@@ -8,7 +8,7 @@
 
 namespace Se
 {
-App::App(const Properties& properties) :
+App::App(const AppProperties& properties) :
 	SingleTon(this),
 	_preLoader(CreateShared<BatchLoader>("Preloader")),
 	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
@@ -32,6 +32,7 @@ App::App(const Properties& properties) :
 	Log::CoreInfo("Creating application {0}", properties.Name);
 
 	_window->Closed += SE_EV_ACTION(App::OnWindowClose);
+	_window->SetIcon("Editor/Saffron_windowIcon.png");
 
 	_preLoader->Submit([]
 	{
@@ -172,7 +173,7 @@ void App::OnGuiRender()
 		static Array<float, 90> values = {};
 		static int values_offset = 0;
 		static constexpr auto cap = 5.0f * 1.0f / 144.0f;
-		
+
 		static float phase = 0.0f;
 		values[values_offset] = GenUtils::Map(dt.asSeconds(), 1.0f / 144.0f, cap, -1.0f, 1.0f);
 		values_offset = (values_offset + 1) % values.size();

@@ -23,19 +23,19 @@ namespace Se
 {
 class Scene;
 
+class AppProperties
+{
+public:
+	String Name;
+	Uint32 WindowWidth, WindowHeight;
+};
+
 class App : public SingleTon<App>
 {
 	friend class ApplicationSerializer;
 
 public:
-	struct Properties
-	{
-		String Name;
-		Uint32 WindowWidth, WindowHeight;
-	};
-
-public:
-	explicit App(const Properties& properties = {"Saffron 2D", 1280, 720});
+	explicit App(const AppProperties& properties = {"Unnamed", 1280, 720});
 	virtual ~App();
 
 	void Run();
