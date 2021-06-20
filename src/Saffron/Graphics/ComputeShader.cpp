@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include <Glad/glad.h>
+#include <glad/glad.h>
 
 #include "Saffron/Core/Filesystem.h"
 #include "Saffron/Graphics/ComputeShader.h"
@@ -30,7 +30,7 @@ bool ComputeShader::LoadFromFile(const Path& filepath)
 	Debug::Assert(Filesystem::FileExists(filepath));
 
 	String content;
-	IStream fileStream(filepath, std::ios::in);
+	IFileStream fileStream(filepath, std::ios::in);
 
 	if (!fileStream.is_open())
 	{
@@ -46,7 +46,7 @@ bool ComputeShader::LoadFromFile(const Path& filepath)
 	fileStream.close();
 
 	const auto* contentCStr = content.c_str();
-	const auto shader = glCreateShader(GL_COMPUTE_SHADER);
+	const auto shader = glCreateShader(GL_COMPUTE_SHADER);	
 	if (shader < 1)
 	{
 		return false;

@@ -64,7 +64,7 @@ auto Filesystem::Write(const Uint8* data, size_t size, const Path& filepath, boo
 	const bool fileExists = FileExists(filepath);
 	if (!fileExists || fileExists && overwrite)
 	{
-		OStream ofstream;
+		OFileStream ofstream;
 		ofstream.open(filepath);
 		if (ofstream.good())
 		{
