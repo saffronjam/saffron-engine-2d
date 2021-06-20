@@ -8,125 +8,143 @@ set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 ### DIRECTORIES ###
-set(BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
-set(RESOURCES_DIR "res")
-set(LIBRARY_DIR "lib")
-set(INCLUDE_DIR "src")
+set(BuildDir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+set(ResourceDir "res")
+set(LibraryDir "lib")
+set(IncludeDir "src")
 
-set(LIB_SUFFIX "")
+set(LibSuffix "")
 
 ### EXPORTED DIRECTORIES ###
-file(GLOB RESOURCES ${RESOURCES_DIR})
-set(SAFFRON_RESOURCES_DIR "${RESOURCES}" PARENT_SCOPE)
+file(GLOB resources ${ResourceDir})
+set(SaffronResourceDir "${resources}" PARENT_SCOPE)
 
 ### VARIABLES ###
 set(PLATFORM_MACRO SE_PLATFORM)
+if (${CMAKE_BUILD_TYPE} MATCHES Debug)
+    set(BuildType Debug)
+elseif (${CMAKE_BUILD_TYPE} MATCHES Release)
+    set(BuildType Release)
+elseif (${CMAKE_BUILD_TYPE} MATCHES MinSizeRel)
+    set(BuildType Dist)
+else ()
+    message(FATAL_ERROR "Bad configuration selected")
+endif ()
 
 ### COMPILER SPECIFIC ###
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
-    set(COMPILER_LIB_DIR "msvc")
+    set(CompilerLibDir "msvc")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/w44244)
     add_compile_options(/w44267)
 
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU)
-    set(COMPILER_LIB_DIR "mingw")
+    set(CompilerLibDir "mingw")
 else ()
     message(FATAL_ERROR "Bad compiler selected. Supported is GNU and MSVC")
 endif ()
 
 ### BUILD TYPE SPECIFIC ###
-if (${CMAKE_BUILD_TYPE} MATCHES Debug)
+if (BuildType STREQUAL Debug)
+    set(OutputDir ${BuildDir})
     add_definitions(
             -DSE_DEBUG
     )
-    set(LIB_SUFFIX "-d")
+    set(LibSubFolder Debug)
+    set(LibSuffix "-d")
 
-elseif (${CMAKE_BUILD_TYPE} MATCHES Release)
+elseif (BuildType STREQUAL Release)
+    set(OutputDir ${BuildDir})
     add_definitions(
             -DSE_RELEASE
     )
-elseif (${CMAKE_BUILD_TYPE} MATCHES Dist)
+    set(LibSubFolder Release)
+elseif (BuildType STREQUAL Dist)
+    set(OutputDir ${BuildDir})
+    set(LibSubFolder Release)
     add_definitions(
             -DSE_DIST
     )
+endif ()
+
+if (CMAKE_SYSTEM_NAME STREQUAL Windows)
+    set(Platform windows)
+    add_definitions(-D${PLATFORM_MACRO}_WINDOWS)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+elseif (CMAKE_SYSTEM_NAME STREQUAL Linux)
+    set(Platform Linux)
+    add_definitions(-D${PLATFORM_MACRO}_LINUX)
 else ()
-    message(FATAL_ERROR "Bad configuration selected")
+    message(FATAL_ERROR "Unknown OS. Only Windows and Linux are supported.")
 endif ()
 
 ### OS SPECIFIC ###
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    add_definitions(-D${PLATFORM_MACRO}_WINDOWS)
-
-    file(GLOB SHARED_BINARIES
-            "${LIBRARY_DIR}/Box2D/bin/${COMPILER_LIB_DIR}/${CMAKE_BUILD_TYPE}/*.dll"
-            "${LIBRARY_DIR}/SFML/bin/${COMPILER_LIB_DIR}/${CMAKE_BUILD_TYPE}/*.dll"
+if (Platform STREQUAL windows)
+    file(GLOB SharedBinaries
+            "${LibraryDir}/Box2D/bin/${CompilerLibDir}/${LibSubFolder}/*.dll"
+            "${LibraryDir}/SFML/bin/${CompilerLibDir}/${LibSubFolder}/*.dll"
             )
 
     ### EXTERNAL INCLUDES AND LIBRARIES ###
-    file(GLOB INCLUDES_EXT
-            ${LIBRARY_DIR}/Box2D/include
-            ${LIBRARY_DIR}/Glad/include
-            ${LIBRARY_DIR}/entt/include
-            ${LIBRARY_DIR}/imgui/include
-            ${LIBRARY_DIR}/jcv/include
-            ${LIBRARY_DIR}/SFML/include
-            ${LIBRARY_DIR}/spdlog/include
+    file(GLOB IncludesExt
+            ${LibraryDir}/Box2D/include
+            ${LibraryDir}/Glad/include
+            ${LibraryDir}/entt/include
+            ${LibraryDir}/imgui/include
+            ${LibraryDir}/jcv/include
+            ${LibraryDir}/SFML/include
+            ${LibraryDir}/spdlog/include
             PARENT_SCOPE
             )
 
+
     ### EXPORT ###
-    set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT} PARENT_SCOPE)
-    set(SAFFRON_INCLUDE_DIRS_EXT ${INCLUDES_EXT})
-    set(SAFFRON_SHARED_BINARES ${SHARED_BINARIES} PARENT_SCOPE)
+    set(SaffronIncludeDirsExt ${IncludesExt} PARENT_SCOPE)
+    set(SaffronIncludeDirsExt ${IncludesExt})
+    set(SaffronSharedBinaries ${SharedBinaries} PARENT_SCOPE)
 
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    add_definitions(-D${PLATFORM_MACRO}_LINUX)
-
+elseif (Platform STREQUAL windows)
     find_package(SFML REQUIRED network audio graphics window system)
     find_package(Box2D REQUIRED)
-else ()
-    message(FATAL_ERROR "Unknown OS")
 endif ()
 
 find_package(Threads REQUIRED)
 
 
 ### DEFINITIONS ###
-add_definitions(
-)
+add_definitions()
 
 ### EXECUTABLE ###
-file(GLOB_RECURSE ALL_SOURCES "${CMAKE_SOURCE_DIR}/*.cpp")
-add_library(Saffron "${ALL_SOURCES}")
+file(GLOB_RECURSE allSources "${CMAKE_SOURCE_DIR}/*.cpp")
+add_library(Saffron "${allSources}")
 target_precompile_headers(Saffron PUBLIC "src/SaffronPCH.cpp")
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 ### LOCAL INCLUDES ###
-file(GLOB INCLUDES ${INCLUDE_DIR} PARENT_SCOPE)
-set(SAFFRON_INCLUDE_DIRS ${INCLUDES})
-set(SAFFRON_INCLUDE_DIRS ${INCLUDES} PARENT_SCOPE)
-target_include_directories(Saffron PRIVATE ${SAFFRON_INCLUDE_DIRS})
+file(GLOB includes ${IncludeDir} PARENT_SCOPE)
+set(SaffronIncludeDirs ${includes})
+set(SaffronIncludeDirs ${includes} PARENT_SCOPE)
+target_include_directories(Saffron PRIVATE ${SaffronIncludeDirs})
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_include_directories(Saffron PUBLIC ${SAFFRON_INCLUDE_DIRS_EXT})
+if (Platform STREQUAL windows)
+    target_include_directories(Saffron PUBLIC ${SaffronIncludeDirsExt})
     target_link_directories(Saffron PUBLIC
-            ${LIBRARY_DIR}/Box2D/lib
-            ${LIBRARY_DIR}/imgui/lib/${COMPILER_LIB_DIR}
-            ${LIBRARY_DIR}/SFML/lib/${COMPILER_LIB_DIR}
-            ${LIBRARY_DIR}/Glad/lib
+            ${LibraryDir}/Box2D/lib
+            ${LibraryDir}/imgui/lib/${CompilerLibDir}
+            ${LibraryDir}/SFML/lib/${CompilerLibDir}
+            ${LibraryDir}/Glad/lib
             )
     target_link_libraries(Saffron PUBLIC
             ## Box2D
             Box2D
 
             ## SFML
-            sfml-graphics${LIB_SUFFIX}
-            sfml-window${LIB_SUFFIX}
-            sfml-audio${LIB_SUFFIX}
-            sfml-network${LIB_SUFFIX}
-            sfml-system${LIB_SUFFIX}
+            sfml-graphics${LibSuffix}
+            sfml-window${LibSuffix}
+            sfml-audio${LibSuffix}
+            sfml-network${LibSuffix}
+            sfml-system${LibSuffix}
             opengl32
             freetype
             winmm
@@ -140,7 +158,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             ws2_32
 
             ## imgui
-            imgui${LIB_SUFFIX}
+            imgui${LibSuffix}
             
 			## Glad
 			Glad
@@ -148,12 +166,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             )
 else ()
     target_include_directories(Saffron PRIVATE
-            ${BOX2D_INCLUDE_DIR}
-            ${SFML_INCLUDE_DIR}
-            ${LIBRARY_DIR}/entt/include
-            ${LIBRARY_DIR}/imgui/include
-            ${LIBRARY_DIR}/jcv/include
-            ${LIBRARY_DIR}/spdlog/include
+            ${BOX2D_INCLUDEDIR}
+            ${SFML_INCLUDEDIR}
+            ${LibraryDir}/entt/include
+            ${LibraryDir}/imgui/include
+            ${LibraryDir}/jcv/include
+            ${LibraryDir}/spdlog/include
             )
     target_link_directories(Saffron PRIVATE
             )
@@ -167,7 +185,7 @@ endif ()
 
 ### OUTPUT DIRECTORIES ###
 set_target_properties(Saffron PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY ${BUILD_DIR}
-        LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR}
-        RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR}
+        ARCHIVE_OUTPUT_DIRECTORY ${OutputDir}
+        LIBRARY_OUTPUT_DIRECTORY ${OutputDir}
+        RUNTIME_OUTPUT_DIRECTORY ${OutputDir}
         )
