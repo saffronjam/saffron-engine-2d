@@ -226,8 +226,8 @@ void Window::SetTitle(const String& title)
 
 void Window::SetIcon(const Path& path)
 {
-	const auto image = ImageStore::Get(path, false);
-	_nativeWindow.setIcon(image->getSize().x, image->getSize().y, image->getPixelsPtr());
+	_icon = ImageStore::Get(path, false);
+	RefreshIcon();
 }
 
 void Window::SetFullscreen(bool toggle)
@@ -239,12 +239,14 @@ void Window::SetFullscreen(bool toggle)
 		_videomode.height = Size().y;
 		_nonFullscreenPosition = Position();
 		_nativeWindow.create(sf::VideoMode::getFullscreenModes()[0], Title(), sf::Style::Fullscreen);
+		RefreshIcon();
 	}
 	else if (!toggle && _fullscreen)
 	{
 		_fullscreen = false;
 		_nativeWindow.create(_videomode, Title(), _style);
 		SetPosition(_nonFullscreenPosition);
+		RefreshIcon();
 	}
 }
 
@@ -256,5 +258,14 @@ void Window::SetVSync(bool toggle)
 void Window::Render(const sf::Drawable& drawable, sf::RenderStates renderStates)
 {
 	_nativeWindow.draw(drawable, renderStates);
+}
+
+void Window::RefreshIcon()
+{
+	if(_icon.has_value())
+	{
+		const auto shrdIcon = _icon.value();
+		_nativeWindow.setIcon(shrdIcon->getSize().x, shrdIcon->getSize().y, shrdIcon->getPixelsPtr());		
+	}
 }
 }

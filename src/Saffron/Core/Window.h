@@ -85,6 +85,7 @@ public:
 
 private:
 	void Render(const sf::Drawable& drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
+	void RefreshIcon();
 
 private:
 	// Used after exiting fullscreen
@@ -94,6 +95,8 @@ private:
 	sf::RenderWindow _nativeWindow;
 	// Used after exiting fullscreen
 	sf::Vector2i _nonFullscreenPosition;
+
+	Optional<Shared<sf::Image>> _icon;
 
 	bool _fullscreen = false;
 
