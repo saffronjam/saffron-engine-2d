@@ -16,7 +16,7 @@ public:
 	{
 		if (!what)
 		{
-			Log::CoreDebug(AssertionFailed + message, std::forward<Arg>(arg), std::forward<Args>(args)...);
+			Log::CoreDebug(AssertionFailed + " " + message, std::forward<Arg>(arg), std::forward<Args>(args)...);
 			SE_DEBUGBREAK();
 		}
 	}
@@ -25,7 +25,7 @@ public:
 	{
 		if (!what)
 		{
-			Log::CoreDebug(AssertionFailed + message);
+			Log::CoreDebug(AssertionFailed + " " + message);
 			SE_DEBUGBREAK();
 		}
 	}
@@ -80,6 +80,7 @@ public:
 #endif
 
 private:
-	inline static String AssertionFailed = Log::Fmt::OnRed + Log::Fmt::White + "Assertion failed" + Log::Fmt::Reset + Log::Fmt::Cyan;
+	inline static String AssertionFailed = Log::Fmt::OnRed + Log::Fmt::White + "Assertion failed" + Log::Fmt::Reset +
+		Log::Fmt::Cyan;
 };
 }
