@@ -7,6 +7,7 @@
 #include "Saffron/Graphics/RenderTargetManager.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/FadePane.h"
+#include "Saffron/Gui/MenuBar.h"
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Layer/LayerStack.h"
@@ -55,9 +56,7 @@ public:
 	{
 	}
 
-	virtual void OnUpdate()
-	{
-	}
+	virtual void OnUpdate();
 
 	virtual void OnGuiRender();
 
@@ -75,6 +74,7 @@ public:
 	static auto Name() -> String;
 
 private:
+	void OnRenderMenuBar();
 	auto OnWindowClose() -> bool;
 
 	void RunSplashScreen() const;
@@ -84,6 +84,7 @@ protected:
 
 private:
 	Unique<class Window> _window;
+	Unique<MenuBar> _menuBar;	
 	Unique<Filesystem> _filesystem;
 	Unique<Gui> _gui;
 

@@ -32,13 +32,14 @@ App::App(const AppProperties& properties) :
 	SingleTon(this),
 	_preLoader(CreateShared<BatchLoader>("Preloader")),
 	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
-	_name(properties.Name),
+	_menuBar(CreateUnique<MenuBar>()),
 	_filesystem(CreateUnique<Filesystem>(*_window)),
 	_gui(CreateUnique<Gui>()),
 	_keyboard(CreateUnique<Keyboard>()),
 	_mouse(CreateUnique<Mouse>()),
 	_renderTargetManager(CreateUnique<RenderTargetManager>()),
 	_run(CreateUnique<class Run>()),
+	_name(properties.Name),
 	_computeShaderStore(CreateUnique<ComputeShaderStore>()),
 	_fontStore(CreateUnique<FontStore>()),
 	_imageStore(CreateUnique<ImageStore>()),
@@ -54,9 +55,15 @@ App::App(const AppProperties& properties) :
 	_window->Closed += SE_EV_ACTION(App::OnWindowClose);
 	_window->SetIcon("Editor/Saffron_windowIcon.png");
 
-	_preLoader->Submit([]
+	if (properties.Fullscreen)
+	{
+		_window->SetFullscreen(true);
+	}
+
+	_preLoader->Submit([this]
 	{
 		Gui::SetStyle(GuiStyle::Dark);
+		MenuBar::AddMenu(MenuBarMenu("File", SE_EV_ACTION(App::OnRenderMenuBar)), -1000);
 	}, "Initializing GUI");
 
 	Global::Clock::Restart();
@@ -119,9 +126,10 @@ void App::Run()
 		_window->HandleBufferedMessages();
 		_window->Clear();
 		_renderTargetManager->ClearAll();
+		_gui->Begin();
+		
 		if (!_minimized)
 		{
-			_gui->Begin();
 			for (const auto& layer : _layerStack)
 			{
 				layer->OnPreFrame();
@@ -140,14 +148,15 @@ void App::Run()
 			}
 			_fadeIn.OnUpdate();
 			_fadeIn.OnGuiRender();
-			_gui->End();
 		}
-		OnUpdate();		
+		OnUpdate();
 		_run->Execute();
 		
+		_gui->End();
+
 		_keyboard->OnUpdate();
 		_mouse->OnUpdate();
-		
+
 		_renderTargetManager->DisplayAll();
 		_window->Display();
 	}
@@ -161,6 +170,45 @@ void App::Exit()
 {
 	_preLoader->ForceExit();
 	_running = false;
+}
+
+void App::OnUpdate()
+{
+	if (Keyboard::IsDown(sf::Keyboard::LAlt) && Keyboard::IsPressed(sf::Keyboard::Enter))
+	{
+		_window->SetFullscreen(!_window->IsFullscreen());
+	}
+
+	static bool open = false;
+	if (Keyboard::IsPressed(sf::Keyboard::Escape))
+	{
+		if(open)
+		{
+			ImGui::CloseCurrentPopup();
+			open = false;
+		}
+		else
+		{
+			ImGui::OpenPopup("###Exitmenu");
+			open = true;
+		}
+	}
+	
+	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));	
+	if (ImGui::BeginPopupModal("###Exitmenu", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
+	{
+		if (ImGui::Button("Fullscreen", {100, 0}))
+		{
+			_window->SetFullscreen(!_window->IsFullscreen());
+		}
+		
+		if(ImGui::Button("Exit", {100, 0}))
+		{
+			Exit();
+		}
+		
+		ImGui::EndPopup();
+	}
 }
 
 void App::OnGuiRender()
@@ -215,6 +263,9 @@ void App::OnGuiRender()
 		}
 	}
 	ImGui::End();
+
+	_menuBar->Begin();
+	_menuBar->End();
 }
 
 auto App::OnWindowClose() -> bool
@@ -275,5 +326,17 @@ auto App::PlatformName() -> String
 auto App::Name() -> String
 {
 	return Instance()._name;
+}
+
+void App::OnRenderMenuBar()
+{
+	if (ImGui::MenuItem("Fullscreen", "Alt+Enter", _window->IsFullscreen()))
+	{
+		_window->SetFullscreen(!_window->IsFullscreen());
+	}
+	if (ImGui::MenuItem("Exit", "Alt+F4"))
+	{
+		Exit();
+	}
 }
 }

@@ -4,6 +4,7 @@
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/GuiImpl.h"
+#include "Saffron/Gui/MenuBar.h"
 
 #include <imgui_internal.h>
 
@@ -19,7 +20,7 @@ Gui::Gui() :
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 
-#if defined(SE_IMGUI_INI_PATH)	
+#if defined(SE_IMGUI_INI_PATH)
 	io.IniFilename = SE_IMGUI_INI_PATH;
 #else
 	io.IniFilename = "../../../imgui.ini";
@@ -62,12 +63,22 @@ Gui::Gui() :
 		style.TabRounding = 0.0f;
 	}
 
+	MenuBar::AddMenu({"Gui", SE_EV_ACTION(Gui::OnRenderMenuBar)});
+
 	SetStyle(GuiStyle::Dark);
 }
 
 Gui::~Gui()
 {
 	GuiImpl::SFML::Shutdown();
+}
+
+void Gui::OnGuiRender()
+{
+	if (_viewDemo)
+	{
+		ImGui::ShowDemoWindow();
+	}
 }
 
 void Gui::Begin()
@@ -527,6 +538,11 @@ auto Gui::FontSize() -> int
 	return Instance()._currentFont.first;
 }
 
+auto Gui::Style() -> GuiStyle
+{
+	return Instance()._currentStyle;
+}
+
 void Gui::SetStyle(GuiStyle guiStyle)
 {
 	ImGuiStyle& imguiStyle = ImGui::GetStyle();
@@ -724,6 +740,27 @@ auto Gui::SaffronOrange(float opacity) -> sf::Vector4f
 auto Gui::SaffronPurple(float opacity) -> sf::Vector4f
 {
 	return sf::Vector4f(0.29f, 0.13f, 0.42f, opacity);
+}
+
+void Gui::OnRenderMenuBar()
+{
+	ImGui::MenuItem("View Demo", nullptr, &_viewDemo);
+	if (ImGui::BeginMenu("Theme"))
+	{
+		if (ImGui::MenuItem("Dark", nullptr, _currentStyle == GuiStyle::Dark))
+		{
+			SetStyle(GuiStyle::Dark);
+		}
+		if (ImGui::MenuItem("Light", nullptr, _currentStyle == GuiStyle::Light))
+		{
+			SetStyle(GuiStyle::Light);
+		}
+		if (ImGui::MenuItem("Visual Studio", nullptr, _currentStyle == GuiStyle::VisualStudio))
+		{
+			SetStyle(GuiStyle::VisualStudio);
+		}
+		ImGui::EndMenu();
+	}
 }
 
 void Gui::PushID()

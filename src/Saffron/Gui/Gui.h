@@ -1,6 +1,7 @@
 #pragma once
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Event.hpp>
@@ -14,10 +15,12 @@ namespace Se
 using Font = ImFont;
 
 class Gui : public SingleTon<Gui>
-{;
+{
 public:
 	explicit Gui();
 	virtual ~Gui();
+
+	void OnGuiRender();
 
 	void Begin();
 	void End();
@@ -145,6 +148,7 @@ public:
 	static void InfoModal(const char* title, const char* text, bool& open);
 
 	static auto FontSize() -> int;
+	static auto Style() -> GuiStyle;
 	static void SetStyle(GuiStyle guiStyle);
 	static void SetFontSize(int size);
 	static auto AddFont(const Path& path, int size) -> Font*;
@@ -153,6 +157,9 @@ public:
 
 	static auto SaffronOrange(float opacity = 1.0f) -> sf::Vector4f;
 	static auto SaffronPurple(float opacity = 1.0f) -> sf::Vector4f;
+
+private:
+	void OnRenderMenuBar();
 
 private:
 	static void PushID();
@@ -166,5 +173,7 @@ private:
 	GuiStyle _currentStyle = GuiStyle::Light;
 	TreeMap<int, ImFont*> _fonts;
 	Pair<int, ImFont*> _currentFont;
+
+	bool _viewDemo = true;
 };
 }
