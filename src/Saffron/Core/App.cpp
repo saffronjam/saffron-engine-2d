@@ -8,6 +8,26 @@
 
 namespace Se
 {
+auto AppProperties::CreateFullscreen(String name) -> AppProperties
+{
+	const auto dm = sf::VideoMode::getDesktopMode();
+	const uint halfWidth = dm.width / 3, halfHeight = dm.height / 3;
+	return {Move(name), 2 * halfWidth, 2 * halfHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, true};
+}
+
+auto AppProperties::CreateMaximized(String name) -> AppProperties
+{
+	const auto dm = sf::VideoMode::getDesktopMode();
+	return {Move(name), dm.width, dm.height, 0, 0, false};
+}
+
+auto AppProperties::CreateCentered(String name, uint windowWidth, uint windowHeight) -> AppProperties
+{
+	const auto dm = sf::VideoMode::getDesktopMode();
+	const uint halfWidth = windowWidth / 2, halfHeight = windowHeight / 2;
+	return {Move(name), windowWidth, windowHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, false};
+}
+
 App::App(const AppProperties& properties) :
 	SingleTon(this),
 	_preLoader(CreateShared<BatchLoader>("Preloader")),

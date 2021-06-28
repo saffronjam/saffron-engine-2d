@@ -27,7 +27,13 @@ class AppProperties
 {
 public:
 	String Name;
-	Uint32 WindowWidth, WindowHeight;
+	uint WindowWidth, WindowHeight;
+	uint PositionX, PositionY;
+	bool Fullscreen;
+
+	static AppProperties CreateFullscreen(String name);
+	static AppProperties CreateMaximized(String name);
+	static AppProperties CreateCentered(String name, uint windowWidth, uint windowHeight);
 };
 
 class App : public SingleTon<App>
