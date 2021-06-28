@@ -1,5 +1,18 @@
 #pragma once
 
+
+// namespace std
+// {
+// template <>
+// struct hash<Se::Pair<int, int>>
+// {
+// 	auto operator()(const Se::Pair<int, int>& uuid) const -> std::size_t
+// 	{
+// 		return 0u;
+// 	}
+// };
+// }
+
 #include <memory>
 
 #include "Saffron/Config.h"
