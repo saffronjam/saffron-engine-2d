@@ -39,7 +39,7 @@ public:
 	static auto AllFiles(const Path& directoryPath, const String& extension = "") -> List<DirEntry>;
 	static auto FileCount(const Path& directoryPath, const String& extension = "") -> size_t;
 
-	static auto Write(const Uint8* data, size_t size, const Path& filepath, bool overwrite = true) -> size_t;
+	static auto Write(const uchar* data, size_t size, const Path& filepath, bool overwrite = true) -> size_t;
 	static auto Write(WrapperBuffer buffer, const Path& filepath, bool overwrite = true) -> size_t;
 
 	static auto CreateDirectories(const Path& filepath) -> bool;

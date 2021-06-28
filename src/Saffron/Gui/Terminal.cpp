@@ -6,7 +6,7 @@
 namespace Se
 {
 // TODO: Implement as a GUI interface
-static Uint64 s_GuiID = 0;
+static ulong s_GuiID = 0;
 
 Terminal::Terminal()
 {

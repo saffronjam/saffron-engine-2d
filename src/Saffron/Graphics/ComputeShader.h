@@ -13,7 +13,7 @@ public:
 	void Bind();
 	void Unbind();
 
-	void Dispatch(Uint32 xGroup, Uint32 yGroup, Uint32 zGroup);
+	void Dispatch(uint xGroup, uint yGroup, uint zGroup);
 
 	bool LoadFromFile(const Path& filepath);
 
@@ -31,6 +31,6 @@ private:
 	void BindThenUnbind(const Function<void()>& fn);
 
 private:
-	Uint32 _id{};
+	uint _id{};
 };
 }

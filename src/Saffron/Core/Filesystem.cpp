@@ -59,7 +59,7 @@ auto Filesystem::FileCount(const Path& directoryPath, const String& extension) -
 	return 0;
 }
 
-auto Filesystem::Write(const Uint8* data, size_t size, const Path& filepath, bool overwrite) -> size_t
+auto Filesystem::Write(const uchar* data, size_t size, const Path& filepath, bool overwrite) -> size_t
 {
 	const bool fileExists = FileExists(filepath);
 	if (!fileExists || fileExists && overwrite)
@@ -69,7 +69,7 @@ auto Filesystem::Write(const Uint8* data, size_t size, const Path& filepath, boo
 		if (ofstream.good())
 		{
 			const auto start = ofstream.tellp();
-			ofstream.write(reinterpret_cast<const Int8*>(data), size);
+			ofstream.write(reinterpret_cast<const char*>(data), size);
 			return ofstream.tellp() - start;
 		}
 		Log::CoreWarn("Failed to open file: " + filepath.string());

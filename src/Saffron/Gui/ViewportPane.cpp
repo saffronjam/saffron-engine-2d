@@ -113,7 +113,7 @@ auto ViewportPane::ViewportSize() const -> sf::Vector2f
 	return BottomRight() - TopLeft();
 }
 
-auto ViewportPane::DockID() const -> Uint32 { return _dockID; }
+auto ViewportPane::DockID() const -> uint { return _dockID; }
 
 auto ViewportPane::TopLeft() const -> const sf::Vector2f& { return _topLeft; }
 

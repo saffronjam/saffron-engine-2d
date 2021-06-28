@@ -9,7 +9,7 @@
 namespace Se
 {
 FadePane::FadePane(FadeType type, sf::Time duration, sf::Time delay, bool startOnCreation, sf::Color color) :
-	FadePane(type, duration, [this](sf::Time timer, sf::Time duration) -> Uint8
+	FadePane(type, duration, [this](sf::Time timer, sf::Time duration) -> uchar
 	{
 		return DefaultAlphaFunction(timer, duration);
 	}, delay, startOnCreation, color)
@@ -70,7 +70,7 @@ void FadePane::Start()
 
 auto FadePane::IsActive() const -> bool { return _wantFade; }
 
-auto FadePane::DefaultAlphaFunction(sf::Time timer, sf::Time duration) const -> Uint8
+auto FadePane::DefaultAlphaFunction(sf::Time timer, sf::Time duration) const -> uchar
 {
 	if (_type == FadeType::In)
 	{

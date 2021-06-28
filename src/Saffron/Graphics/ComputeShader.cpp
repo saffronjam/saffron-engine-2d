@@ -17,7 +17,7 @@ void ComputeShader::Unbind()
 	glUseProgram(0);
 }
 
-void ComputeShader::Dispatch(Uint32 xGroup, Uint32 yGroup, Uint32 zGroup)
+void ComputeShader::Dispatch(uint xGroup, uint yGroup, uint zGroup)
 {
 	BindThenUnbind([&]
 	{

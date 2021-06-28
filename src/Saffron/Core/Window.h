@@ -95,7 +95,7 @@ private:
 	// Used after exiting fullscreen
 	sf::Vector2i _nonFullscreenPosition;
 
-	bool _fullscreen;
+	bool _fullscreen = false;
 
 	OStringStream _sfmlStreamBuffer;
 	inline static const String _sfmlLogFmt = Log::Fmt::OnGreen + Log::Fmt::White;

@@ -10,13 +10,13 @@ WrapperBuffer::WrapperBuffer() :
 {
 }
 
-WrapperBuffer::WrapperBuffer(Uint8* data, Uint32 size) :
+WrapperBuffer::WrapperBuffer(uchar* data, uint size) :
 	_data(data),
 	_size(size)
 {
 }
 
-auto WrapperBuffer::Copy(const void* data, Uint32 size) -> WrapperBuffer
+auto WrapperBuffer::Copy(const void* data, uint size) -> WrapperBuffer
 {
 	WrapperBuffer buffer;
 	buffer.Allocate(size);
@@ -29,7 +29,7 @@ auto WrapperBuffer::Copy(const WrapperBuffer& buffer) -> WrapperBuffer
 	return Copy(buffer.Data(), buffer.Size());
 }
 
-auto WrapperBuffer::Encapsulate(Uint8* data) -> WrapperBuffer
+auto WrapperBuffer::Encapsulate(uchar* data) -> WrapperBuffer
 {
 	WrapperBuffer buffer;
 	buffer._data = data;
@@ -37,7 +37,7 @@ auto WrapperBuffer::Encapsulate(Uint8* data) -> WrapperBuffer
 	return buffer;
 }
 
-void WrapperBuffer::Allocate(Uint32 size)
+void WrapperBuffer::Allocate(uint size)
 {
 	if (_data)
 	{
@@ -47,7 +47,7 @@ void WrapperBuffer::Allocate(Uint32 size)
 
 	if (size == 0) return;
 
-	_data = new Uint8[size];
+	_data = new uchar[size];
 	_size = size;
 }
 
@@ -56,13 +56,13 @@ void WrapperBuffer::ZeroInitialize() const
 	if (_data) memset(_data, 0, _size);
 }
 
-void WrapperBuffer::Write(void* data, Uint32 size, Uint32 offset) const
+void WrapperBuffer::Write(void* data, uint size, uint offset) const
 {
 	Debug::Assert(offset + size <= _size, "WrapperBuffer overflow");
 	memcpy(_data + offset, data, size);
 }
 
-void WrapperBuffer::Write(const void* data, Uint32 size, Uint32 offset) const
+void WrapperBuffer::Write(const void* data, uint size, uint offset) const
 {
 	Debug::Assert(offset + size <= _size, "WrapperBuffer overflow");
 	memcpy(_data + offset, data, size);
@@ -88,27 +88,27 @@ WrapperBuffer::operator bool() const
 	return _data;
 }
 
-auto WrapperBuffer::operator[](int index) -> Uint8&
+auto WrapperBuffer::operator[](int index) -> uchar&
 {
 	return _data[index];
 }
 
-auto WrapperBuffer::operator[](int index) const -> Uint8
+auto WrapperBuffer::operator[](int index) const -> uchar
 {
 	return _data[index];
 }
 
-auto WrapperBuffer::Data() -> Uint8*
+auto WrapperBuffer::Data() -> uchar*
 {
 	return _data;
 }
 
-auto WrapperBuffer::Data() const -> const Uint8*
+auto WrapperBuffer::Data() const -> const uchar*
 {
 	return _data;
 }
 
-auto WrapperBuffer::Size() const -> Uint32
+auto WrapperBuffer::Size() const -> uint
 {
 	return _size;
 }

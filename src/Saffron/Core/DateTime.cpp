@@ -9,7 +9,7 @@ namespace Se
 /// Helper functions
 ////////////////////////////////////////////////////////////////
 
-static auto ValueToMonthString(Int32 month) -> String
+static auto ValueToMonthString(int month) -> String
 {
 	switch (month)
 	{
@@ -29,7 +29,7 @@ static auto ValueToMonthString(Int32 month) -> String
 	}
 }
 
-static auto ValueToMonthShortString(Int32 month) -> String
+static auto ValueToMonthShortString(int month) -> String
 {
 	switch (month)
 	{
@@ -49,7 +49,7 @@ static auto ValueToMonthShortString(Int32 month) -> String
 	}
 }
 
-static auto ValueToWeekdayString(Int32 weekday) -> String
+static auto ValueToWeekdayString(int weekday) -> String
 {
 	switch (weekday)
 	{
@@ -64,7 +64,7 @@ static auto ValueToWeekdayString(Int32 weekday) -> String
 	}
 }
 
-static auto ValueToWeekdayShortString(Int32 weekday) -> String
+static auto ValueToWeekdayShortString(int weekday) -> String
 {
 	switch (weekday)
 	{

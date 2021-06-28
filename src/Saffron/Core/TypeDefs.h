@@ -24,24 +24,13 @@
 
 namespace Se
 {
-typedef char Int8;
-typedef unsigned char Uint8;
-
-// 16 bits integer types
-typedef short Int16;
-typedef unsigned short Uint16;
-
-// 32 bits integer types
-typedef int Int32;
-typedef unsigned int Uint32;
-
-// 64 bits integer types
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
 #if defined(_MSC_VER)
-typedef __int64 Int64;
-typedef unsigned __int64 Uint64;
+typedef unsigned __int64 ulong;
 #else
-typedef long long Int64;
-typedef unsigned long long Uint64;
+typedef unsigned long long ulong;
 #endif
 
 template <typename T>
@@ -51,9 +40,11 @@ using Array = std::array<_Ty, _size>;
 template <typename Key, typename Value>
 using TreeMap = std::map<Key, Value>;
 template <typename Key, typename Value>
-using MultiMap = std::multimap<Key, Value>;
+using MultiTreeMap = std::multimap<Key, Value>;
 template <typename Key, typename Value>
-using HashMap = std::unordered_map<Key, Value>;
+using MultiHashMap = std::unordered_multimap<Key, Value>;
+template <typename Key, typename Value, typename Hasher = std::hash<Key>>
+using HashMap = std::unordered_map<Key, Value, Hasher>;
 template <class T>
 using TreeSet = std::set<T>;
 template <typename T>

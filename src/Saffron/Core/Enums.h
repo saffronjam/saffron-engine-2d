@@ -16,9 +16,9 @@ enum class GuiStyle : int
 	VisualStudio = 2
 };
 
-typedef Uint32 GuiPropertyFlag;
+typedef uint GuiPropertyFlag;
 
-enum GuiPropertyFlag_ : Uint32
+enum GuiPropertyFlag_ : uint
 {
 	GuiPropertyFlag_None = 0u,
 	GuiPropertyFlag_Color = 1u << 4u,

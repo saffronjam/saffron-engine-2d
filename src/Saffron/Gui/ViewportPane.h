@@ -17,7 +17,7 @@ public:
 	auto MousePosition(bool normalized = false) const -> sf::Vector2f;
 	auto ViewportSize() const -> sf::Vector2f;
 
-	auto DockID() const -> Uint32;
+	auto DockID() const -> uint;
 
 	auto TopLeft() const -> const sf::Vector2f&;
 	auto BottomRight() const -> const sf::Vector2f&;
@@ -35,7 +35,7 @@ private:
 	String _windowTitle;
 	const ControllableRenderTexture* _target;
 	sf::Texture _fallbackTexture;
-	Uint32 _dockID = 0;
+	uint _dockID = 0;
 
 	sf::Vector2f _topLeft;
 	sf::Vector2f _bottomRight;

@@ -230,10 +230,10 @@ auto VecUtils::ByColor(const sf::Color& color) -> sf::Vector3<T>
 	return sf::Vector3<T>(static_cast<T>(color.r), static_cast<T>(color.g), static_cast<T>(color.b));
 }
 
-template <typename T, typename U>
-auto VecUtils::ConvertTo(const U& in) -> T
+template <typename OutputVector, typename InputVector>
+auto VecUtils::ConvertTo(const InputVector& in) -> OutputVector
 {
-	return T(in.x, in.y);
+	return OutputVector(in.x, in.y);
 }
 
 template <typename T>
