@@ -28,7 +28,8 @@ auto BoxCollider::Create(const sf::Vector2f& position, const sf::Vector2f& dimen
 
 auto BoxCollider::GetRect() const -> sf::FloatRect
 {
-	const sf::Vector2f topLeft = VecUtils::ConvertTo<sf::Vector2f>(GetBody()->GetPosition());
+	const auto &pos = GetBody()->GetPosition();
+	const sf::Vector2f topLeft = sf::Vector2f(pos.x, pos.y);
 	return sf::FloatRect(topLeft, _dimensions);
 }
 }

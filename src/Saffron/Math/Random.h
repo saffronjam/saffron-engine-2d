@@ -2,8 +2,11 @@
 
 #include <random>
 
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
+
+#include "Saffron/Libraries/VecUtils.h"
 
 namespace Se
 {
@@ -90,6 +93,41 @@ public:
 			float z = Real<NumberType>(lowZ, highZ);
 			return {x, y, z};
 		}
+	}
+
+	template<typename NumberType>
+	static auto Vec4(const sf::Vector4<NumberType>& low, const sf::Vector4<NumberType>& high) -> sf::Vector4<NumberType>
+	{
+		return Vec4(low.x, low.y, low.z, low.w, high.x, high.y, high.z, high.w);
+	}
+
+	template<typename NumberType>
+	static auto Vec4(NumberType lowX, NumberType lowY, NumberType lowZ, NumberType lowW, NumberType highX,
+	                 NumberType highY, NumberType highZ, NumberType highW) -> sf::Vector4<NumberType>
+	{
+		static_assert(std::is_arithmetic<NumberType>::value, "NumberType must be arithmetic type");
+		if constexpr ( std::is_integral<NumberType>::value )
+		{
+			const auto x = static_cast<NumberType>(Integer<NumberType>(lowX, highX));
+			const auto y = static_cast<NumberType>(Integer<NumberType>(lowY, highY));
+			const auto z = static_cast<NumberType>(Integer<NumberType>(lowZ, highZ));
+			const auto w = static_cast<NumberType>(Integer<NumberType>(lowW, highW));
+			return { x, y, z, w };
+		}
+		else
+		{
+			const auto x = static_cast<NumberType>(Real<NumberType>(lowX, highX));
+			const auto y = static_cast<NumberType>(Real<NumberType>(lowY, highY));
+			const auto z = static_cast<NumberType>(Real<NumberType>(lowZ, highZ));
+			const auto w = static_cast<NumberType>(Real<NumberType>(lowW, highW));
+			return { x, y, z, w };
+		}
+	}
+
+	static auto Color(bool randomizeAlpha = false) -> sf::Color
+	{
+		const auto bVec = VecUtils::ConvertTo<sf::Vector4<uchar>>(Vec4(0, 0, 0, randomizeAlpha ? 0 : 255, 255, 255, 255, 255));
+		return sf::Color(bVec.x, bVec.y, bVec.z, bVec.w);
 	}
 };
 

@@ -313,7 +313,7 @@ void Voronoi::Generate()
 		}
 
 		// Setup Polygon
-		Polygon polygon(*this, currentLineVAIndex, currentFilledVAIndex, VecUtils::ConvertTo<sf::Vector2f>(site->p),
+		Polygon polygon(*this, currentLineVAIndex, currentFilledVAIndex, sf::Vector2f(site->p.x, site->p.y),
 		                polygonPoints);
 		setupPolygon(polygon, currentLineVAIndex, currentFilledVAIndex);
 		_polygons.push_back(polygon);
@@ -327,7 +327,7 @@ void Voronoi::Generate()
 		{
 			if (edge->neighbor)
 			{
-				Polygon& neighbor = PolygonAt(VecUtils::ConvertTo<sf::Vector2f>(edge->neighbor->p));
+				Polygon& neighbor = PolygonAt(sf::Vector2f(site->p.x, site->p.y));
 				_polygons[i].AddNeighbor(&neighbor);
 			}
 		}

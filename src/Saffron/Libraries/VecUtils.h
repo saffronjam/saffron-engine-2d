@@ -44,6 +44,9 @@ public:
 	static auto Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float;
 
 	template <typename T>
+	static auto DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float;
+
+	template <typename T>
 	static void Normalize(sf::Vector2<T>& vector);
 
 	template <typename T>
@@ -70,9 +73,15 @@ public:
 	template <typename T = float>
 	static auto ByColor(const sf::Color& color) -> sf::Vector3<T>;
 
-	template <typename T, typename U>
-	static auto ConvertTo(const U& in) -> T;
+	template <typename OutputVector, typename InputType>
+	static auto ConvertTo(const sf::Vector2<InputType>& in) -> OutputVector;
 
+	template <typename OutputVector, typename InputType>
+	static auto ConvertTo(const sf::Vector3<InputType>& in) -> OutputVector;
+
+	template <typename OutputVector, typename InputType>
+	static auto ConvertTo(const sf::Vector4<InputType>& in) -> OutputVector;
+	
 	template <typename T>
 	static auto IsLeft(const sf::Vector2<T>& a, const sf::Vector2<T>& b, const sf::Vector2<T>& point) -> bool;
 
@@ -157,7 +166,13 @@ auto VecUtils::LengthSq(const sf::Vector2<T>& vector) -> float
 template <typename T>
 auto VecUtils::Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float
 {
-	return sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2));
+	return std::sqrt(DistanceSq(u, v));
+}
+
+template <typename T>
+auto VecUtils::DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float
+{
+	return std::pow(u.x - v.x, 2) + std::pow(u.y - v.y, 2);
 }
 
 template <typename T>
@@ -230,10 +245,22 @@ auto VecUtils::ByColor(const sf::Color& color) -> sf::Vector3<T>
 	return sf::Vector3<T>(static_cast<T>(color.r), static_cast<T>(color.g), static_cast<T>(color.b));
 }
 
-template <typename OutputVector, typename InputVector>
-auto VecUtils::ConvertTo(const InputVector& in) -> OutputVector
+template <typename OutputVector, typename InputType>
+auto VecUtils::ConvertTo(const sf::Vector2<InputType>& in) -> OutputVector
 {
 	return OutputVector(in.x, in.y);
+}
+
+template <typename OutputVector, typename InputType>
+auto VecUtils::ConvertTo(const sf::Vector3<InputType>& in) -> OutputVector
+{
+	return OutputVector(in.x, in.y, in.z);
+}
+
+template <typename OutputVector, typename InputType>
+auto VecUtils::ConvertTo(const sf::Vector4<InputType>& in) -> OutputVector
+{
+	return OutputVector(in.x, in.y, in.z, in.w);
 }
 
 template <typename T>
