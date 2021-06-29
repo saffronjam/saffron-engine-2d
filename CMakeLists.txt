@@ -16,8 +16,7 @@ set(IncludeDir "src")
 set(LibSuffix "")
 
 ### EXPORTED DIRECTORIES ###
-file(GLOB resources ${ResourceDir})
-set(SaffronResourceDir "${resources}" PARENT_SCOPE)
+set(SaffronResourceDir ${PROJECT_SOURCE_DIR}/${ResourceDir} PARENT_SCOPE)
 
 ### VARIABLES ###
 set(PLATFORM_MACRO SE_PLATFORM)
