@@ -12,7 +12,8 @@
 #include <iostream>
 #include <ranges>
 #include <algorithm>	
-#include <numeric>	
+#include <numeric>
+#include <ranges>
 
 #include <atomic>
 #include <sstream>
