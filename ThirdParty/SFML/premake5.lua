@@ -57,13 +57,13 @@ module.PostBuild = function (Configuration, BinaryOutputDir, ProjectDir)
 		if Configuration == "Debug" then
 			local from = GetBasePath() .. "bin/msvc/Debug"
 			postbuildcommands {
-				CopyCmd(from, BinaryOutputDir)
+				Utils.CopyCmd(from, BinaryOutputDir)
 			}			
 		elseif Configuration == "Release" or Configuration == "Dist" then
 
 			local from = GetBasePath() .. "bin/msvc/Release"
 			postbuildcommands {
-				CopyCmd(from, BinaryOutputDir)
+				Utils.CopyCmd(from, BinaryOutputDir)
 			}
 		end
 end

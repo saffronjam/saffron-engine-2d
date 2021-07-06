@@ -1,17 +1,15 @@
 ---@diagnostic disable: undefined-global, undefined-field
 
-inspect = require('inspect')
+Inspect = require('inspect')
+Utils = require('utils')
 
-OutBin = _MAIN_SCRIPT_DIR .. "/Build/Bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-OutObj = _MAIN_SCRIPT_DIR .. "/Build/Obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-OutLoc = _MAIN_SCRIPT_DIR .. "/Build/"
-PrjLoc = _MAIN_SCRIPT_DIR .. "/Build/"
-WrkLoc = _MAIN_SCRIPT_DIR .. "/"
-AstFol = "Assets/"
-
-function CopyCmd(from, to)
-	return "{COPY} " .. from .. " " .. to
-end
+OutBin     = _MAIN_SCRIPT_DIR .. "/Build/Bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
+OutObj     = _MAIN_SCRIPT_DIR .. "/Build/Obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
+OutBinDist = _MAIN_SCRIPT_DIR .. "/Example/%{cfg.system}/"
+OutLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
+PrjLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
+WrkLoc     = _MAIN_SCRIPT_DIR .. "/"
+AstFol     = "Assets/"
 
 local function GetBasePath()
 	return debug.getinfo(1).source:match("@?(.*/)")
@@ -105,8 +103,8 @@ module.PostBuild = function (Configuration, BinaryOutputDir, ProjectDir)
         local resBinTo = BinaryOutputDir .. AstFol
         local resProjTo = ProjectDir .. AstFol
         postbuildcommands {
-            CopyCmd(resFrom, resBinTo),
-            CopyCmd(resFrom, resProjTo),
+            Utils.CopyCmd(resFrom, resBinTo),
+            Utils.CopyCmd(resFrom, resProjTo),
         }
     PostBuildAll(Configuration, BinaryOutputDir, ProjectDir)
 end
