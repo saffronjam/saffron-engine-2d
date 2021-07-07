@@ -9,7 +9,6 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <thread>
 #include <mutex>
 #include <atomic>
 #include <optional>
@@ -21,6 +20,7 @@
 #include <stack>
 #include <list>
 #include <complex>
+#include <thread>
 
 namespace Se
 {
@@ -92,9 +92,9 @@ using IStream = std::istream;
 using StringStream = std::stringstream;
 using OStringStream = std::ostringstream;
 using IStringStream = std::istringstream;
-using Thread = std::thread;
 using Mutex = std::mutex;
 using ConditionVariable = std::condition_variable;
+using Thread = std::thread;
 
 
 template <class MoveClass>

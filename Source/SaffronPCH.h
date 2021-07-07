@@ -14,6 +14,7 @@
 #include <algorithm>	
 #include <numeric>
 #include <ranges>
+#include <thread>
 
 #include <atomic>
 #include <sstream>
