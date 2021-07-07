@@ -4,8 +4,9 @@
 #include <vector>
 #include <set>
 
-#include <SFML/Graphics/Rect.hpp>
 #include <jcv/jc_voronoi.h>
+
+#include <SFML/Graphics/Rect.hpp>
 
 #include <Saffron.h>
 
@@ -27,9 +28,10 @@ public:
 
 		auto LineVAIndex() const -> int;
 		auto FilledVAIndex() const -> int;
-		auto Points() const -> const List<sf::Vector2f>&;
-		auto FillColor() const -> sf::Color;
 
+		auto Points() const -> const List<sf::Vector2f>&;
+
+		auto FillColor() const -> sf::Color;
 		void SetFillColor(sf::Color color) const;
 		void ClearFillColor(sf::Color color) const;
 
@@ -50,7 +52,7 @@ public:
 
 		sf::Color _fillColor = sf::Color::Transparent;
 		List<sf::Vector2f> _points;
-		std::set<Polygon*> _neighbors;
+		TreeSet<Polygon*> _neighbors;
 		sf::Vector2f _voronoiPoint;
 	};
 

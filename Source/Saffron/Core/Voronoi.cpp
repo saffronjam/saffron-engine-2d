@@ -2,8 +2,6 @@
 
 #define JC_VORONOI_IMPLEMENTATION
 
-#include <SFML/Graphics/ConvexShape.hpp>
-
 #include "Saffron/Core/Voronoi.h"
 
 namespace Se
@@ -40,6 +38,38 @@ auto Voronoi::Polygon::VoronoiPoint() const -> const sf::Vector2f& { return _vor
 void Voronoi::Polygon::SetVoronoiPoint(const sf::Vector2f& voronoiPoint)
 {
 	_voronoiPoint = voronoiPoint;
+}
+
+void Voronoi::ShowGrid()
+{
+	_shouldDrawGrid = true;
+}
+
+void Voronoi::HideGrid()
+{
+	_shouldDrawGrid = false;
+}
+
+void Voronoi::ShowFilled()
+{
+	_shouldDrawFilledPolygons = true;
+}
+
+void Voronoi::HideFilled()
+{
+	_shouldDrawFilledPolygons = false;
+}
+
+auto Voronoi::Polygons() const -> const List<Polygon>& { return _polygons; }
+
+void Voronoi::EnableAutomaticGeneration()
+{
+	_automaticGeneration = true;
+}
+
+void Voronoi::DisableAutomaticGeneration()
+{
+	_automaticGeneration = false;
 }
 
 void Voronoi::Polygon::SetFillColor(sf::Color color) const
@@ -150,7 +180,7 @@ void Voronoi::SetOutlineColor(const sf::Color& color)
 
 void Voronoi::SetFillColor(const Polygon& polygon, sf::Color color)
 {
-	const auto result = std::find(_polygons.begin(), _polygons.end(), polygon);
+	const auto result = std::ranges::find(_polygons, polygon);
 	if (result != _polygons.end())
 	{
 		const size_t noPoints = polygon.Points().size();
@@ -162,47 +192,15 @@ void Voronoi::SetFillColor(const Polygon& polygon, sf::Color color)
 	}
 }
 
-void Voronoi::ShowGrid()
-{
-	_shouldDrawGrid = true;
-}
-
-void Voronoi::HideGrid()
-{
-	_shouldDrawGrid = false;
-}
-
-void Voronoi::ShowFilled()
-{
-	_shouldDrawFilledPolygons = true;
-}
-
-void Voronoi::HideFilled()
-{
-	_shouldDrawFilledPolygons = false;
-}
-
-auto Voronoi::Polygons() const -> const List<Polygon>& { return _polygons; }
-
-void Voronoi::EnableAutomaticGeneration()
-{
-	_automaticGeneration = true;
-}
-
-void Voronoi::DisableAutomaticGeneration()
-{
-	_automaticGeneration = false;
-}
-
 void Voronoi::Relax(int iterations)
 {
 	Debug::Assert(_diagram.has_value(), "Voronoi was not created. _diagram was not instantiated");
 	for (int i = 0; i < iterations; i++)
 	{
 		const jcv_site* sites = jcv_diagram_get_sites(&_diagram.value());
-		for (int i = 0; i < _diagram.value().numsites; ++i)
+		for (int j = 0; j < _diagram.value().numsites; ++j)
 		{
-			const jcv_site* site = &sites[i];
+			const jcv_site* site = &sites[j];
 			jcv_point sum = site->p;
 			int count = 1;
 			for (const jcv_graphedge* edge = site->edges; edge != nullptr; edge = edge->next)
@@ -218,7 +216,7 @@ void Voronoi::Relax(int iterations)
 	}
 }
 
-auto Voronoi::PolygonAt(const sf::Vector2f& position) -> Polygon&
+auto Voronoi::PolygonAt(const sf::Vector2f& position) -> Voronoi::Polygon&
 {
 	float minDistance = std::numeric_limits<float>::infinity();
 	Polygon* closest = nullptr;
@@ -245,8 +243,9 @@ void Voronoi::ForceGenerate()
 
 auto Voronoi::ConvertBoundingBox(const sf::FloatRect& boundingBox) -> jcv_rect
 {
-	return {
-		boundingBox.left, boundingBox.top, boundingBox.left + boundingBox.width, boundingBox.top + boundingBox.height
+	return jcv_rect{
+		jcv_point{boundingBox.left, boundingBox.top},
+		jcv_point{boundingBox.left + boundingBox.width, boundingBox.top + boundingBox.height}
 	};
 }
 
@@ -327,7 +326,7 @@ void Voronoi::Generate()
 		{
 			if (edge->neighbor)
 			{
-				Polygon& neighbor = PolygonAt(sf::Vector2f(site->p.x, site->p.y));
+				Polygon& neighbor = PolygonAt(sf::Vector2f(edge->neighbor->p.x, edge->neighbor->p.y));
 				_polygons[i].AddNeighbor(&neighbor);
 			}
 		}
