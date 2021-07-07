@@ -9,9 +9,9 @@ namespace Se
 class FontStore : public ResourceStore<sf::Font>
 {
 public:
-	static auto Get(const Path& Path, bool copy = false) -> Shared<sf::Font>
+	static auto Get(const Path& path, bool copy = false) -> Shared<sf::Font>
 	{
-		return Instance().Fetch(Path, copy);
+		return Instance().Fetch(path, copy);
 	}
 
 private:
@@ -26,10 +26,10 @@ private:
 	}
 
 private:
-	auto Load(Path Path) -> Shared<sf::Font> override
+	auto Load(Path path) -> Shared<sf::Font> override
 	{
 		auto resource = CreateShared<sf::Font>();
-		const auto result = resource->loadFromFile(Path.string());
+		const auto result = resource->loadFromFile(path.string());
 		Debug::Assert(result, "Failed to load Font");
 		return resource;
 	}

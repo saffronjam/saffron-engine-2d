@@ -9,9 +9,9 @@ namespace Se
 class MusicStore : public ResourceStore<sf::Music>
 {
 public:
-	static auto Get(const Path& Path) -> Shared<sf::Music>
+	static auto Get(const Path& path) -> Shared<sf::Music>
 	{
-		return Instance().Fetch(Path, false);
+		return Instance().Fetch(path, false);
 	}
 
 private:
@@ -21,10 +21,10 @@ private:
 	}
 
 private:
-	auto Load(Path Path) -> Shared<sf::Music> override
+	auto Load(Path path) -> Shared<sf::Music> override
 	{
 		auto resource = CreateShared<sf::Music>();
-		const auto result = resource->openFromFile(Path.string());
+		const auto result = resource->openFromFile(path.string());
 		Debug::Assert(result, "Failed to load Music");
 		return resource;
 	}

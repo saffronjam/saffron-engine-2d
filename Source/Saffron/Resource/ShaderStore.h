@@ -49,9 +49,9 @@ private:
 	}
 
 private:
-	auto Load(Path Path) -> Shared<sf::Shader> override
+	auto Load(Path path) -> Shared<sf::Shader> override
 	{
-		const auto fpString = Path.string();
+		const auto fpString = path.string();
 
 		const auto concatTokenIndex = fpString.find(ConcatToken);
 		auto resource = CreateShared<sf::Shader>();

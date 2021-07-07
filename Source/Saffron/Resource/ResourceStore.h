@@ -15,6 +15,12 @@ public:
 
 	auto Fetch(const Path& Path, bool copy) -> Shared<ItemType>;
 
+	auto Persist(const Path& path, const Shared<ItemType>& resource)
+	{
+		_resources.emplace(path.string(), resource);
+		_persistent.emplace(path.string(), resource);
+	}
+
 protected:
 	virtual auto Load(Path Path) -> Shared<ItemType>;
 	virtual auto Copy(const Shared<ItemType>& value) -> Shared<ItemType>;
@@ -22,6 +28,7 @@ protected:
 
 private:
 	HashMap<String, Weak<ItemType>> _resources;
+	HashMap<String, Shared<ItemType>> _persistent;
 };
 
 

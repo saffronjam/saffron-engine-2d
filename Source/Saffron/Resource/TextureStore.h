@@ -9,9 +9,9 @@ namespace Se
 class TextureStore : public ResourceStore<sf::Texture>
 {
 public:
-	static auto Get(const Path& Path, bool copy = false) -> Shared<sf::Texture>
+	static auto Get(const Path& path, bool copy = false) -> Shared<sf::Texture>
 	{
-		return Instance().Fetch(Path, copy);
+		return Instance().Fetch(path, copy);
 	}
 
 private:
@@ -26,10 +26,10 @@ private:
 	}
 
 private:
-	auto Load(Path Path) -> Shared<sf::Texture> override
+	auto Load(Path path) -> Shared<sf::Texture> override
 	{
 		auto resource = CreateShared<sf::Texture>();
-		const auto result = resource->loadFromFile(Path.string());
+		const auto result = resource->loadFromFile(path.string());
 		Debug::Assert(result, "Failed to load Texture");
 		return resource;
 	}

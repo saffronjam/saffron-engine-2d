@@ -10,9 +10,9 @@ class ComputeShaderStore : public ResourceStore<ComputeShader>
 public:
 	ComputeShaderStore() = default;
 
-	static auto Get(const Path& Path) -> Shared<ComputeShader>
+	static auto Get(const Path& path) -> Shared<ComputeShader>
 	{
-		return Instance().Fetch(Path, false);
+		return Instance().Fetch(path, false);
 	}
 
 private:
@@ -22,10 +22,10 @@ private:
 	}
 
 private:
-	auto Load(Path Path) -> Shared<ComputeShader> override
+	auto Load(Path path) -> Shared<ComputeShader> override
 	{
 		auto resource = CreateShared<ComputeShader>();
-		const auto result = resource->LoadFromFile(Path.string());
+		const auto result = resource->LoadFromFile(path.string());
 		Debug::Assert(result, "Failed to load ComputeShader");
 		return resource;
 	}
