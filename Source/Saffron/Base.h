@@ -1,5 +1,7 @@
 #pragma once
 
+#include <execution>
+
 #include "SaffronPCH.h"
 
 #include "Saffron/Config.h"
