@@ -45,6 +45,7 @@ App::App(const AppProperties& properties) :
 	_imageStore(CreateUnique<ImageStore>()),
 	_musicStore(CreateUnique<MusicStore>()),
 	_shaderStore(CreateUnique<ShaderStore>()),
+	_soundStore(CreateUnique<SoundStore>()),
 	_soundBufferStore(CreateUnique<SoundBufferStore>()),
 	_textureStore(CreateUnique<TextureStore>()),
 	_fadeIn(FadeType::In, sf::seconds(0.5f))
@@ -127,7 +128,7 @@ void App::Run()
 		_window->Clear();
 		_renderTargetManager->ClearAll();
 		_gui->Begin();
-		
+
 		if (!_minimized)
 		{
 			for (const auto& layer : _layerStack)
@@ -151,7 +152,7 @@ void App::Run()
 		}
 		OnUpdate();
 		_run->Execute();
-		
+
 		_gui->End();
 
 		_keyboard->OnUpdate();
@@ -182,7 +183,7 @@ void App::OnUpdate()
 	static bool open = false;
 	if (Keyboard::IsPressed(sf::Keyboard::Escape))
 	{
-		if(open)
+		if (open)
 		{
 			ImGui::CloseCurrentPopup();
 			open = false;
@@ -193,20 +194,21 @@ void App::OnUpdate()
 			open = true;
 		}
 	}
-	
-	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));	
-	if (ImGui::BeginPopupModal("###Exitmenu", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
+
+	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+	if (ImGui::BeginPopupModal("###Exitmenu", &open,
+	                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 	{
 		if (ImGui::Button("Fullscreen", {100, 0}))
 		{
 			_window->SetFullscreen(!_window->IsFullscreen());
 		}
-		
-		if(ImGui::Button("Exit", {100, 0}))
+
+		if (ImGui::Button("Exit", {100, 0}))
 		{
 			Exit();
 		}
-		
+
 		ImGui::EndPopup();
 	}
 }
