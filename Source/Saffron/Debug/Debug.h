@@ -16,7 +16,7 @@ public:
 	{
 		if (!what)
 		{
-			Log::CoreDebug(AssertionFailed + " " + message, std::forward<Arg>(arg), std::forward<Args>(args)...);
+			Log::CoreDebug((AssertionFailed + " " + message).c_str(), std::forward<Arg>(arg), std::forward<Args>(args)...);
 			SE_DEBUGBREAK();
 		}
 	}

@@ -1,14 +1,9 @@
 #pragma once
 
-#include <optional>
-#include <vector>
-#include <set>
-
 #include <jcv/jc_voronoi.h>
+#include <SFML/Graphics.hpp>
 
-#include <SFML/Graphics/Rect.hpp>
-
-#include <Saffron.h>
+#include "Saffron/Base.h"
 
 namespace Se
 {
@@ -32,8 +27,8 @@ public:
 		auto Points() const -> const List<sf::Vector2f>&;
 
 		auto FillColor() const -> sf::Color;
-		void SetFillColor(sf::Color color) const;
-		void ClearFillColor(sf::Color color) const;
+		void SetFillColor(sf::Color color);
+		void ClearFillColor(sf::Color color);
 
 		auto Neighbors() const -> const TreeSet<Polygon*>&;
 		void AddNeighbor(Polygon* neighbor);

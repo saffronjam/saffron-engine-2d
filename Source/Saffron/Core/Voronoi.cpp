@@ -3,6 +3,8 @@
 #define JC_VORONOI_IMPLEMENTATION
 
 #include "Saffron/Core/Voronoi.h"
+#include "Saffron/Math/Random.h"
+#include "Saffron/Libraries/VecUtils.h"
 
 namespace Se
 {
@@ -72,12 +74,12 @@ void Voronoi::DisableAutomaticGeneration()
 	_automaticGeneration = false;
 }
 
-void Voronoi::Polygon::SetFillColor(sf::Color color) const
+void Voronoi::Polygon::SetFillColor(sf::Color color)
 {
 	_parent.SetFillColor(*this, color);
 }
 
-void Voronoi::Polygon::ClearFillColor(sf::Color color) const
+void Voronoi::Polygon::ClearFillColor(sf::Color color)
 {
 	SetFillColor(sf::Color::Transparent);
 }
