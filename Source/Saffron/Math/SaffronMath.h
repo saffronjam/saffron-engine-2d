@@ -4,6 +4,7 @@
 #include <SFML/System/Vector3.hpp>
 
 #include "Saffron/Math/Vector4.h"
+#include "Saffron/Math/Transform.h"
 
 namespace Se
 {
