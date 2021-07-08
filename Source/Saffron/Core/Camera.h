@@ -17,6 +17,10 @@ public:
 	void OnUpdate();
 	void OnGuiRender();
 
+	auto Enabled() const -> bool;
+	void Enable();
+	void Disable();
+
 	void ApplyMovement(const sf::Vector2f& offset);
 	void ApplyZoom(float factor);
 	void ApplyRotation(float angle);
@@ -46,8 +50,14 @@ public:
 	auto Offset() const -> sf::Vector2f;
 	auto Zoom() const -> float;
 
+	auto ViewportSize() const -> sf::Vector2f;
 	void SetViewportSize(const sf::Vector2f& viewportSize);
 	void SetRotationSpeed(float rps);
+
+	void SetTransform(const sf::Transform &transform);
+
+public:
+	EventSubscriberList<void> Reset;
 
 private:
 	void UpdateTransform();
@@ -55,6 +65,8 @@ private:
 	void ResetTransformation();
 
 private:
+	bool _enabled = true;
+
 	sf::Transform _transform;
 	sf::Transform _positionTransform;
 	sf::Transform _rotationTransform;

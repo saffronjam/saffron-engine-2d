@@ -31,6 +31,8 @@ Camera::Camera() :
 
 void Camera::OnUpdate()
 {
+	if (!_enabled) return;
+
 	const auto dt = Global::Clock::FrameTime();
 
 	if (_follow.has_value())
@@ -41,7 +43,6 @@ void Camera::OnUpdate()
 	{
 		if (Mouse::IsDown(sf::Mouse::Button::Left) && Mouse::IsDown(sf::Mouse::Button::Right))
 		{
-			
 			sf::Vector2f delta = Mouse::Swipe();
 			if (VecUtils::LengthSq(delta) > 0.0f)
 			{
@@ -99,6 +100,21 @@ void Camera::OnGuiRender()
 		Gui::EndPropertyGrid();
 	}
 	ImGui::End();
+}
+
+auto Camera::Enabled() const -> bool
+{
+	return _enabled;
+}
+
+void Camera::Enable()
+{
+	_enabled = true;
+}
+
+void Camera::Disable()
+{
+	_enabled = false;
 }
 
 void Camera::ApplyMovement(const sf::Vector2f& offset)
@@ -183,6 +199,11 @@ auto Camera::Zoom() const -> float
 	return _zoom.x;
 }
 
+auto Camera::ViewportSize() const -> sf::Vector2f
+{
+	return _viewportSize;
+}
+
 void Camera::SetViewportSize(const sf::Vector2f& viewportSize)
 {
 	_viewportSize = viewportSize;
@@ -191,6 +212,11 @@ void Camera::SetViewportSize(const sf::Vector2f& viewportSize)
 void Camera::SetRotationSpeed(float rps)
 {
 	_rps = rps;
+}
+
+void Camera::SetTransform(const sf::Transform& transform)
+{
+	_transform = transform;
 }
 
 auto Camera::Viewport() const -> Pair<sf::Vector2f, sf::Vector2f>
@@ -231,5 +257,7 @@ void Camera::ResetTransformation()
 	_positionTransform = sf::Transform::Identity;
 	_rotationTransform = sf::Transform::Identity;
 	_zoomTransform = sf::Transform::Identity;
+
+	Reset.Invoke();
 }
 }
