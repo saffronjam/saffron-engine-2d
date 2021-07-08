@@ -35,16 +35,16 @@ public:
 	                   const sf::Vector2<T>& around) -> sf::Vector2<T>;
 
 	template <typename T>
-	static auto Length(const sf::Vector2<T>& vector) -> float;
+	static auto Length(const sf::Vector2<T>& vector) -> T;
 
 	template <typename T>
-	static auto LengthSq(const sf::Vector2<T>& vector) -> float;
+	static auto LengthSq(const sf::Vector2<T>& vector) -> T;
 
 	template <typename T>
-	static auto Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float;
+	static auto Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> T;
 
 	template <typename T>
-	static auto DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float;
+	static auto DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> T;
 
 	template <typename T>
 	static void Normalize(sf::Vector2<T>& vector);
@@ -152,25 +152,25 @@ auto VecUtils::Rotate(const sf::Vector2<T>& vector, const sf::Vector2f& directio
 }
 
 template <typename T>
-auto VecUtils::Length(const sf::Vector2<T>& vector) -> float
+auto VecUtils::Length(const sf::Vector2<T>& vector) -> T
 {
 	return sqrt(VecUtils::LengthSq(vector));
 }
 
 template <typename T>
-auto VecUtils::LengthSq(const sf::Vector2<T>& vector) -> float
+auto VecUtils::LengthSq(const sf::Vector2<T>& vector) -> T
 {
 	return vector.x * vector.x + vector.y * vector.y;
 }
 
 template <typename T>
-auto VecUtils::Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float
+auto VecUtils::Distance(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> T
 {
 	return std::sqrt(DistanceSq(u, v));
 }
 
 template <typename T>
-auto VecUtils::DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> float
+auto VecUtils::DistanceSq(const sf::Vector2<T>& u, const sf::Vector2<T>& v) -> T
 {
 	return std::pow(u.x - v.x, 2) + std::pow(u.y - v.y, 2);
 }
