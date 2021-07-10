@@ -242,14 +242,20 @@ void App::OnGuiRender()
 
 		Gui::EndPropertyGrid();
 
+		static float acc = 0.0f;
+		acc += dt.asSeconds();
+		
+
 		static Array<float, 90> values = {};
 		static int values_offset = 0;
 		static constexpr auto cap = 5.0f * 1.0f / 144.0f;
 
-		static float phase = 0.0f;
-		values[values_offset] = GenUtils::Map(dt.asSeconds(), 1.0f / 144.0f, cap, -1.0f, 1.0f);
-		values_offset = (values_offset + 1) % values.size();
-		phase += 0.10f * values_offset;
+		while(acc > 0.01f)
+		{
+			values[values_offset] = GenUtils::Map(dt.asSeconds(), 1.0f / 144.0f, cap, -1.0f, 1.0f);
+			values_offset = (values_offset + 1) % values.size();
+			acc -= 0.01f;
+		}
 
 		auto shouldPop = false;
 		if (cap - dt.asSeconds() < 0.001f)
