@@ -20,11 +20,10 @@ Window::Window(String title, int width, int height) :
 	_videomode(width, height),
 	_title(Move(title)),
 	_style(sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
-	_nativeWindow(sf::RenderWindow(_videomode, Move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u)))
+	_nativeWindow(_videomode, Move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u))
 {
 	_nativeWindow.setKeyRepeatEnabled(false);
 	_nativeWindow.resetGLStates();
-	SetTitle(_title);
 	PositionCenter();
 
 	SetVSync(true);
