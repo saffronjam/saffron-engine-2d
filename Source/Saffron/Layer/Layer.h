@@ -3,7 +3,7 @@
 #include <SFML/Window/Event.hpp>
 
 #include "Saffron/Base.h"
-#include "Saffron/Core/BatchLoader.h"
+#include "Saffron/Core/Batch.h"
 
 namespace Se
 {
@@ -13,7 +13,7 @@ public:
 	explicit Layer(const String& name = "Layer");
 	virtual ~Layer() = default;
 
-	virtual void OnAttach(std::shared_ptr<BatchLoader>& loader)
+	virtual void OnAttach(std::shared_ptr<Batch>& loader)
 	{
 	}
 

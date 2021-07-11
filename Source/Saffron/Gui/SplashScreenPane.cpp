@@ -8,20 +8,24 @@
 
 namespace Se
 {
-SplashScreenPane::SplashScreenPane(const std::shared_ptr<class BatchLoader>& batchLoader) :
-	_batchLoader(batchLoader),
+SplashScreenPane::SplashScreenPane(Shared<class Batch> batch) :
+	_title(App::Name()),
+	_batch(batch),
 	_texture(TextureStore::Get("Editor/Saffron.png", true)),
-	_finalizingStatus("Finalizing"),
 	_fadeIn(FadeType::In, sf::seconds(0.4f), sf::seconds(0.5f), true),
 	_fadeOut(FadeType::Out, sf::seconds(0.4f), [](sf::Time timer, sf::Time duration)
 	{
 		return std::min(duration, timer * 2.0f) / duration * 255.0f;
-	}),
-	_title(App::Instance().Name())
+	})
 {
+	_fadeIn.Finished += [this]
+	{
+		_finishedFadeIn = true;
+		return false;
+	};
 	_fadeOut.Finished += [this]
 	{
-		_finished = true;
+		_finishedFadeOut = true;
 		return false;
 	};
 }
@@ -46,14 +50,14 @@ void SplashScreenPane::OnUpdate()
 		}
 	}
 
-	if (_batchLoader->Progress() > 99.9f)
+	if (_shouldFadeOut)
 	{
 		_fadeOut.Start();
 	}
 
-	if (std::abs(_batchLoader->Progress() - _progressViewFinished) > 0.1f)
+	if (std::abs(_batch->Progress() - _progressViewFinished) > 0.1f)
 	{
-		_progressViewFinished = _batchLoader->Progress();
+		_progressViewFinished = _batch->Progress();
 		_progressTimer = sf::Time::Zero;
 	}
 	else
@@ -114,13 +118,13 @@ void SplashScreenPane::OnGuiRender()
 
 	Gui::SetFontSize(18);
 
-	const String* status = _progressViewFinished < 100.0f ? _batchLoader->Status() : &_finalizingStatus;
-	if (status && !status->empty())
+	const auto& status = _batch->JobStatus();
+	if (!status.empty())
 	{
-		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
+		const auto infoTextWidth = ImGui::CalcTextSize(status.c_str()).x;
 		ImGui::NewLine();
 		ImGui::SetCursorPosX(windowSize.x / 2.0f - infoTextWidth / 2.0f);
-		ImGui::Text("%s", status->c_str());
+		ImGui::Text("%s", status.c_str());
 	}
 
 	_fadeIn.OnGuiRender();
@@ -129,7 +133,7 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::End();
 }
 
-auto SplashScreenPane::BatchLoader() const -> const std::shared_ptr<Se::BatchLoader>& { return _batchLoader; }
+auto SplashScreenPane::BatchLoader() const -> const Shared<Batch>& { return _batch; }
 
 void SplashScreenPane::Show()
 {
@@ -141,14 +145,30 @@ void SplashScreenPane::Hide()
 	_hidden = true;
 }
 
+void SplashScreenPane::FadeOut()
+{
+	_shouldFadeOut = true;
+}
+
+
+auto SplashScreenPane::FinishedFadeOut() const -> bool
+{
+	return _finishedFadeOut;
+}
+
+auto SplashScreenPane::FinishedFadeIn() const -> bool
+{
+	return _finishedFadeIn;
+}
+
 auto SplashScreenPane::Idle() const -> bool
 {
 	return static_cast<int>(std::round(_progressView)) == static_cast<int>(std::round(_progressViewFinished));
 }
 
-auto SplashScreenPane::Finished() const -> bool
+auto SplashScreenPane::BatchFinished() const -> bool
 {
-	return _finished;
+	return _batch->Status() == BatchStatus::Finished;
 }
 
 auto SplashScreenPane::Hidden() const -> bool

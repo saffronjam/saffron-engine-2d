@@ -13,7 +13,7 @@ LayerStack::~LayerStack()
 	_layers.clear();
 }
 
-void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<BatchLoader>& batchLoader)
+void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<Batch>& batchLoader)
 {
 	const auto& newLayer = *_layers.emplace(_layers.begin() + _layerInsertIndex, layer);
 	_layerInsertIndex++;
@@ -21,7 +21,7 @@ void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<BatchLo
 	newLayer->OnAttach(batchLoader);
 }
 
-void LayerStack::PushOverlay(std::shared_ptr<Layer> overlay, std::shared_ptr<BatchLoader>& batchLoader)
+void LayerStack::PushOverlay(std::shared_ptr<Layer> overlay, std::shared_ptr<Batch>& batchLoader)
 {
 	// TODO: Implement
 	Debug::Assert("NOT IMPLEMETED");

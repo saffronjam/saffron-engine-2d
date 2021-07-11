@@ -31,7 +31,7 @@ FadePane::FadePane(FadeType type, sf::Time duration, FadeFn alphaFunction, sf::T
 void FadePane::OnUpdate()
 {
 	if (_wantFade)
-	{
+	{		
 		const auto dt = Global::Clock::FrameTime();
 		if (_delayTimer >= _delay)
 		{
@@ -66,6 +66,7 @@ void FadePane::OnGuiRender() const
 void FadePane::Start()
 {
 	_wantFade = true;
+	Began.Invoke();
 }
 
 auto FadePane::IsActive() const -> bool { return _wantFade; }

@@ -4,11 +4,18 @@
 
 namespace Se
 {
-class BatchLoader
+enum class BatchStatus
+{
+	Preparing,
+	Executing,
+	Finished
+};
+
+class Batch
 {
 public:
-	explicit BatchLoader(String name);
-	~BatchLoader();
+	explicit Batch(String name);
+	~Batch();
 
 	void Submit(Function<void()> function, String shortDescription);
 	void Execute();
@@ -16,12 +23,14 @@ public:
 	void Reset();
 
 	auto Progress() const -> float;
-	auto Status() const -> const String*;
+	auto JobStatus() const -> const String&;
 	auto JobCount() const -> size_t;
 	auto JobsDone() const -> size_t;
 	auto JobsLeft() const -> size_t;
 
-	auto IsFinished() const -> bool;
+	auto Status() const -> BatchStatus;
+
+	void SetFinalizingStatus(String statusMessage);
 
 	auto ExecutionMutex() -> Mutex&;
 
@@ -31,13 +40,15 @@ public:
 
 private:
 	String _name;
+	Atomic<BatchStatus> _status = BatchStatus::Preparing;
 
 	List<Pair<Function<void()>, String>> _queue;
-	size_t _noJobsDone = 0;
+	Atomic<size_t> _finishedJobs = 0;
+	const String _fallback = "";
+	String _finalizingStatus = "Finalizing";
 
 	Atomic<float> _progress = 0.0f;
-	Atomic<const String*> _status = nullptr;
-	Atomic<bool> _running = false, _shouldExit = false;
+	Atomic<const String*> _jobStatus = nullptr;
 	Mutex _queueMutex, _executionMutex;
 	Thread _worker;
 };

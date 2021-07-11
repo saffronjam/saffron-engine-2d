@@ -11,8 +11,8 @@ public:
 	LayerStack() = default;
 	~LayerStack();
 
-	void PushLayer(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader>& batchLoader);
-	void PushOverlay(std::shared_ptr<Layer>, std::shared_ptr<BatchLoader>& batchLoader);
+	void PushLayer(std::shared_ptr<Layer>, std::shared_ptr<Batch>& batchLoader);
+	void PushOverlay(std::shared_ptr<Layer>, std::shared_ptr<Batch>& batchLoader);
 	void PopLayer(int count);
 	void PopOverlay(int count);
 	void EraseLayer(std::shared_ptr<Layer> layer);

@@ -8,6 +8,7 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/FadePane.h"
 #include "Saffron/Gui/MenuBar.h"
+#include "Saffron/Gui/SplashScreenPane.h"
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Layer/LayerStack.h"
@@ -78,10 +79,12 @@ private:
 	void OnRenderMenuBar();
 	auto OnWindowClose() -> bool;
 
-	void RunSplashScreen() const;
+	void RunFrame();
+	void RunLayerFrame();
+	void RunSplashScreen();
 
 protected:
-	Shared<BatchLoader> _preLoader;
+	Shared<Batch> _splashScreenBatch;
 
 private:
 	Unique<class Window> _window;
@@ -107,9 +110,9 @@ private:
 	Unique<SoundBufferStore> _soundBufferStore;
 	Unique<TextureStore> _textureStore;
 
+	SplashScreenPane _splashScreenPane;
 	bool _running = true, _minimized = false;
 	LayerStack _layerStack;
-	Mutex _finalPreloaderMessageMutex;
 
 	sf::Time _fpsTimer = sf::Time::Zero;
 	int _cachedFps = 0;

@@ -26,6 +26,7 @@ public:
 	auto IsActive() const -> bool;
 
 public:
+	EventSubscriberList<void> Began;
 	EventSubscriberList<void> Finished;
 
 private:

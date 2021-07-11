@@ -3,7 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "Saffron/Base.h"
-#include "Saffron/Core/BatchLoader.h"
+#include "Saffron/Core/Batch.h"
 #include "Saffron/Gui/FadePane.h"
 
 namespace Se
@@ -11,28 +11,33 @@ namespace Se
 class SplashScreenPane
 {
 public:
-	explicit SplashScreenPane(const std::shared_ptr<class BatchLoader>& batchLoader);
+	explicit SplashScreenPane(Shared<class Batch> batch);
 
 	void OnUpdate();
 	void OnGuiRender();
 
-	auto BatchLoader() const -> const std::shared_ptr<class BatchLoader>&;
+	auto BatchLoader() const -> const Shared<class Batch>&;
 
 	void Show();
 	void Hide();
+	void FadeOut();
+
+	auto FinishedFadeIn() const -> bool;
+	auto FinishedFadeOut() const -> bool;
 	
 	auto Idle() const -> bool;
-	auto Finished() const -> bool;
+	auto BatchFinished() const -> bool;
 	auto Hidden() const -> bool;
-
+	
 private:
 	String _title;
 
-	std::shared_ptr<class BatchLoader> _batchLoader;
+	Shared<class Batch> _batch;
 	Shared<sf::Texture> _texture;
 	bool _hidden = false;
-	bool _finished = false;
-	String _finalizingStatus;
+	bool _finishedFadeIn = false;
+	bool _finishedFadeOut = false;
+	bool _shouldFadeOut = false;
 
 	sf::Time _progressTimer = sf::Time::Zero;
 	float _progressView = 0.0f;

@@ -2,9 +2,7 @@
 
 #include "Saffron/Core/App.h"
 #include "Saffron/Core/Global.h"
-#include "Saffron/Gui/SplashScreenPane.h"
 #include "Saffron/Graphics/Scene.h"
-
 
 namespace Se
 {
@@ -30,7 +28,7 @@ auto AppProperties::CreateCentered(String name, uint windowWidth, uint windowHei
 
 App::App(const AppProperties& properties) :
 	SingleTon(this),
-	_preLoader(CreateShared<BatchLoader>("Preloader")),
+	_splashScreenBatch(CreateShared<Batch>("Preloader")),
 	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
 	_menuBar(CreateUnique<MenuBar>()),
 	_filesystem(CreateUnique<Filesystem>(*_window)),
@@ -48,6 +46,7 @@ App::App(const AppProperties& properties) :
 	_soundStore(CreateUnique<SoundStore>()),
 	_soundBufferStore(CreateUnique<SoundBufferStore>()),
 	_textureStore(CreateUnique<TextureStore>()),
+	_splashScreenPane(_splashScreenBatch),
 	_fadeIn(FadeType::In, sf::seconds(0.5f))
 {
 	Log::CoreInfo("--- Saffron 2D Framework ---");
@@ -61,11 +60,12 @@ App::App(const AppProperties& properties) :
 		_window->SetFullscreen(true);
 	}
 
-	_preLoader->Submit([this]
+	_splashScreenBatch->Submit([this]
 	{
 		Gui::SetStyle(GuiStyle::Dark);
 		MenuBar::AddMenu(MenuBarMenu("File", SE_EV_ACTION(App::OnRenderMenuBar)), -1000);
 	}, "Initializing GUI");
+	_splashScreenBatch->SetFinalizingStatus("Preparing frames");
 
 	Global::Clock::Restart();
 }
@@ -77,12 +77,12 @@ App::~App()
 
 void App::PushLayer(std::shared_ptr<Layer> layer)
 {
-	_layerStack.PushLayer(layer, _preLoader);
+	_layerStack.PushLayer(layer, _splashScreenBatch);
 }
 
 void App::PushOverlay(std::shared_ptr<Layer> overlay)
 {
-	_layerStack.PushOverlay(overlay, _preLoader);
+	_layerStack.PushOverlay(overlay, _splashScreenBatch);
 }
 
 void App::PopLayer(int count)
@@ -116,50 +116,13 @@ void App::Run()
 
 	while (_running)
 	{
-		if (!_preLoader->IsFinished())
+		if (_splashScreenBatch->Status() != BatchStatus::Finished)
 		{
 			RunSplashScreen();
 			_fadeIn.Start();
 		}
 
-		Global::Clock::Restart();
-		_window->HandleBufferedEvents();
-		_window->HandleBufferedMessages();
-		_window->Clear();
-		_renderTargetManager->ClearAll();
-		_gui->Begin();
-
-		if (!_minimized)
-		{
-			for (const auto& layer : _layerStack)
-			{
-				layer->OnPreFrame();
-			}
-			for (const auto& layer : _layerStack)
-			{
-				layer->OnUpdate();
-			}
-			for (const auto& layer : _layerStack)
-			{
-				layer->OnGuiRender();
-			}
-			for (const auto& layer : _layerStack)
-			{
-				layer->OnPostFrame();
-			}
-			_fadeIn.OnUpdate();
-			_fadeIn.OnGuiRender();
-		}
-		OnUpdate();
-		_run->Execute();
-
-		_gui->End();
-
-		_keyboard->OnUpdate();
-		_mouse->OnUpdate();
-
-		_renderTargetManager->DisplayAll();
-		_window->Display();
+		RunFrame();
 	}
 
 	_layerStack.Clear();
@@ -169,7 +132,7 @@ void App::Run()
 
 void App::Exit()
 {
-	_preLoader->ForceExit();
+	_splashScreenBatch->ForceExit();
 	_running = false;
 }
 
@@ -239,18 +202,16 @@ void App::OnGuiRender()
 		Gui::Property("Frametime", std::to_string(_cachedSpf.asMicroseconds() / 1000.0f) + " ms");
 		Gui::Property("FPS", std::to_string(_cachedFps));
 
-
 		Gui::EndPropertyGrid();
 
 		static float acc = 0.0f;
 		acc += dt.asSeconds();
-		
 
 		static Array<float, 90> values = {};
 		static int values_offset = 0;
 		static constexpr auto cap = 5.0f * 1.0f / 144.0f;
 
-		while(acc > 0.01f)
+		while (acc > 0.01f)
 		{
 			values[values_offset] = GenUtils::Map(dt.asSeconds(), 1.0f / 144.0f, cap, -1.0f, 1.0f);
 			values_offset = (values_offset + 1) % values.size();
@@ -282,18 +243,64 @@ auto App::OnWindowClose() -> bool
 	return true;
 }
 
-void App::RunSplashScreen() const
+void App::RunFrame()
 {
-	_preLoader->Execute();
+	Global::Clock::Restart();
+	_window->HandleBufferedEvents();
+	_window->HandleBufferedMessages();
+	_window->Clear();
+	_renderTargetManager->ClearAll();
+	_gui->Begin();
 
-	SplashScreenPane splashScreenPane(_preLoader);
-	while (!splashScreenPane.Finished())
+	if (!_minimized)
+	{
+		RunLayerFrame();
+		_fadeIn.OnUpdate();
+		_fadeIn.OnGuiRender();
+	}
+	OnUpdate();
+	_run->Execute();
+
+	_gui->End();
+
+	_keyboard->OnUpdate();
+	_mouse->OnUpdate();
+
+	_renderTargetManager->DisplayAll();
+	_window->Display();
+}
+
+void App::RunLayerFrame()
+{
+	for (const auto& layer : _layerStack)
+	{
+		layer->OnPreFrame();
+	}
+	for (const auto& layer : _layerStack)
+	{
+		layer->OnUpdate();
+	}
+	for (const auto& layer : _layerStack)
+	{
+		layer->OnGuiRender();
+	}
+	for (const auto& layer : _layerStack)
+	{
+		layer->OnPostFrame();
+	}
+}
+
+void App::RunSplashScreen()
+{
+	_splashScreenBatch->Execute();
+
+	while (!_splashScreenPane.FinishedFadeIn() || !_splashScreenPane.BatchFinished())
 	{
 		_window->Clear();
 		_renderTargetManager->ClearAll();
 		_gui->Begin();
-		splashScreenPane.OnUpdate();
-		splashScreenPane.OnGuiRender();
+		_splashScreenPane.OnUpdate();
+		_splashScreenPane.OnGuiRender();
 		_window->HandleBufferedEvents();
 		_window->HandleBufferedMessages();
 		_gui->End();
@@ -302,7 +309,56 @@ void App::RunSplashScreen() const
 		_window->Display();
 		Global::Clock::Restart();
 		const auto step = Global::Clock::FrameTime().asSeconds();
-		const auto duration = splashScreenPane.BatchLoader()->IsFinished()
+		const auto duration = _splashScreenPane.BatchLoader()->Status() == BatchStatus::Finished
+			                      ? 0ll
+			                      : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - step));
+		std::this_thread::sleep_for(std::chrono::milliseconds(duration * 5));
+	}
+
+	// Run some frames to prepare gui
+	for (int i = 0; i < 10; i++)
+	{
+		Global::Clock::Restart();
+		_window->HandleBufferedEvents();
+		_window->HandleBufferedMessages();
+		_window->Clear();
+		_renderTargetManager->ClearAll();
+		_gui->Begin();
+
+		RunLayerFrame();
+		_splashScreenPane.OnUpdate();
+		_splashScreenPane.OnGuiRender();
+
+		OnUpdate();
+		_run->Execute();
+
+		_gui->End();
+
+		_keyboard->OnUpdate();
+		_mouse->OnUpdate();
+
+		_renderTargetManager->DisplayAll();
+		_window->Display();
+	}
+
+	_splashScreenPane.FadeOut();
+
+	while (!_splashScreenPane.FinishedFadeOut())
+	{
+		_window->Clear();
+		_renderTargetManager->ClearAll();
+		_gui->Begin();
+		_splashScreenPane.OnUpdate();
+		_splashScreenPane.OnGuiRender();
+		_window->HandleBufferedEvents();
+		_window->HandleBufferedMessages();
+		_gui->End();
+		_run->Execute();
+		_renderTargetManager->DisplayAll();
+		_window->Display();
+		Global::Clock::Restart();
+		const auto step = Global::Clock::FrameTime().asSeconds();
+		const auto duration = _splashScreenPane.BatchLoader()->Status() == BatchStatus::Finished
 			                      ? 0ll
 			                      : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - step));
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
@@ -314,9 +370,9 @@ auto App::ConfigurationName() -> String
 #if defined(SE_DEBUG)
 	return "Debug";
 #elif defined(SE_RELEASE)
-	return "Release";
+		return "Release";
 #elif defined(SE_DIST)
-	return "Dist";
+		return "Dist";
 #else
 #error Undefined configuration?
 #endif
@@ -327,7 +383,7 @@ auto App::PlatformName() -> String
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";
 #elif defined(SE_PLATFORM_LINUX)
-	return "Linux x64";
+		return "Linux x64";
 #endif
 }
 
