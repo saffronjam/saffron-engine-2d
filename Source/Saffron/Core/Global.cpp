@@ -20,4 +20,9 @@ auto Global::Clock::Restart() -> sf::Time
 {
 	return _localClock.Restart();
 }
+
+auto Global::Clock::SinceStart() -> sf::Time
+{
+	return _localClock.SinceStart();
+}
 }

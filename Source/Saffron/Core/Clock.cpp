@@ -21,7 +21,13 @@ auto Clock::ElapsedTime() const -> sf::Time
 
 auto Clock::Restart() -> sf::Time
 {
+	_start += ElapsedTime();
 	_dt = _clock.restart();
 	return _dt;
+}
+
+auto Clock::SinceStart() const -> sf::Time
+{
+	return _start + ElapsedTime();
 }
 }
