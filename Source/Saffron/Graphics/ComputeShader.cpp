@@ -27,7 +27,7 @@ void ComputeShader::Dispatch(uint xGroup, uint yGroup, uint zGroup)
 
 bool ComputeShader::LoadFromFile(const Path& filepath)
 {
-	Debug::Assert(Filesystem::FileExists(filepath));
+	Debug::Assert(Filesystem::FileExists(filepath), "{} did not exist", filepath.string());
 
 	String content;
 	IFileStream fileStream(filepath, std::ios::in);
