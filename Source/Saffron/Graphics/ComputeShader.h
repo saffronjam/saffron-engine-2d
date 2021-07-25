@@ -22,7 +22,7 @@ public:
 	void SetInt(const String& name, int value);;
 
 	void SetVector2d(const String& name, const sf::Vector2<double>& value);
-	void SetVector2d(const String& name, const Complex<double>& value);
+	void SetVector2d(const String& name, const std::complex<double>& value);
 	void SetVector4f(const String& name, const sf::Vector4f& value);
 
 	static void AwaitFinish();

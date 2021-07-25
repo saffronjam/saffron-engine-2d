@@ -125,7 +125,7 @@ void ComputeShader::SetVector2d(const String& name, const sf::Vector2<double>& v
 	});
 }
 
-void ComputeShader::SetVector2d(const String& name, const Complex<double>& value)
+void ComputeShader::SetVector2d(const String& name, const std::complex<double>& value)
 {
 	SetVector2d(name, sf::Vector2<double>(value.real(), value.imag()));
 }
