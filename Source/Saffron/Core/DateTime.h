@@ -37,10 +37,10 @@ public:
 	auto Month() const -> int;
 	auto Year() const -> int;
 
-	auto WeekdayString(bool abbreviation = false) const -> String;
-	auto MonthString(bool abbreviation = false) const -> String;
-	auto TimeString() const -> String;
-	auto ANSIDateString() const -> String;
+	auto WeekdayString(bool abbreviation = false) const -> std::string;
+	auto MonthString(bool abbreviation = false) const -> std::string;
+	auto TimeString() const -> std::string;
+	auto ANSIDateString() const -> std::string;
 
 private:
 	void Clamp();

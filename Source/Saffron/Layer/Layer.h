@@ -10,7 +10,7 @@ namespace Se
 class Layer
 {
 public:
-	explicit Layer(const String& name = "Layer");
+	explicit Layer(const std::string& name = "Layer");
 	virtual ~Layer() = default;
 
 	virtual void OnAttach(std::shared_ptr<Batch>& loader)
@@ -41,9 +41,9 @@ public:
 	{
 	}
 
-	auto Name() const -> const String&;
+	auto Name() const -> const std::string&;
 
 protected:
-	String _debugName;
+	std::string _debugName;
 };
 }

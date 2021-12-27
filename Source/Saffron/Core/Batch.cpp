@@ -4,8 +4,8 @@
 
 namespace Se
 {
-Batch::Batch(String name) :
-	_name(Move(name))
+Batch::Batch(std::string name) :
+	_name(std::move(name))
 {
 }
 
@@ -14,7 +14,7 @@ Batch::~Batch()
 	ForceExit();
 }
 
-void Batch::Submit(Function<void()> function, String shortDescription)
+void Batch::Submit(std::function<void()> function, std::string shortDescription)
 {
 	if (_status != BatchStatus::Preparing)
 	{
@@ -23,7 +23,7 @@ void Batch::Submit(Function<void()> function, String shortDescription)
 	}
 
 	std::scoped_lock queueLock(_queueMutex);
-	_queue.emplace_back(Move(function), Move(shortDescription));
+	_queue.emplace_back(std::move(function), std::move(shortDescription));
 }
 
 void Batch::Execute()
@@ -62,7 +62,7 @@ void Batch::Execute()
 		OnFinished.Invoke();
 	};
 
-	_worker = Thread(workerFn);
+	_worker = std::thread(workerFn);
 }
 
 void Batch::ForceExit()
@@ -90,7 +90,7 @@ auto Batch::Progress() const -> float
 	return _progress;
 }
 
-auto Batch::JobStatus() const -> const String&
+auto Batch::JobStatus() const -> const std::string&
 {
 	return _jobStatus == nullptr ? _fallback : *_jobStatus;
 }
@@ -115,12 +115,12 @@ auto Batch::Status() const -> BatchStatus
 	return _status;
 }
 
-void Batch::SetFinalizingStatus(String statusMessage)
+void Batch::SetFinalizingStatus(std::string statusMessage)
 {
 	_finalizingStatus = statusMessage;
 }
 
-auto Batch::ExecutionMutex() -> Mutex&
+auto Batch::ExecutionMutex() -> std::mutex&
 {
 	return _executionMutex;
 }

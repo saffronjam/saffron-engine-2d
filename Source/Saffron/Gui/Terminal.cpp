@@ -22,7 +22,7 @@ void Terminal::Clear() const
 
 void Terminal::OnGuiRender()
 {
-	OStringStream oss;
+	std::ostringstream oss;
 	oss << "Terminal##" << s_GuiID++;
 
 	if (!ImGui::Begin("Terminal"))

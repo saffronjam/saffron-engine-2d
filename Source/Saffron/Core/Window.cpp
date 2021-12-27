@@ -16,11 +16,11 @@
 
 namespace Se
 {
-Window::Window(String title, int width, int height) :
+Window::Window(std::string title, int width, int height) :
 	_videomode(width, height),
-	_title(Move(title)),
+	_title(std::move(title)),
 	_style(sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close),
-	_nativeWindow(_videomode, Move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u))
+	_nativeWindow(_videomode, std::move(title), _style, sf::ContextSettings(0u, 0u, 0u, 1u, 4u, 0u))
 {
 	_nativeWindow.setKeyRepeatEnabled(false);
 	_nativeWindow.resetGLStates();
@@ -156,7 +156,7 @@ void Window::HandleBufferedMessages()
 	if (!_sfmlStreamBuffer.view().empty())
 	{
 		Log::CoreInfo("{0}[SFML Log]{1} {2}", _sfmlLogFmt, Log::Fmt::Reset,_sfmlStreamBuffer.view());
-		_sfmlStreamBuffer = OStringStream();
+		_sfmlStreamBuffer = std::ostringstream();
 		sf::err().rdbuf(_sfmlStreamBuffer.rdbuf());
 	}
 }
@@ -218,12 +218,12 @@ void Window::Resize(const sf::Vector2u& size)
 	_nativeWindow.setSize(size);
 }
 
-void Window::SetTitle(const String& title)
+void Window::SetTitle(const std::string& title)
 {
 	_nativeWindow.setTitle(title);
 }
 
-void Window::SetIcon(const Path& path)
+void Window::SetIcon(const std::filesystem::path& path)
 {
 	_icon = ImageStore::Get(path, false);
 	RefreshIcon();

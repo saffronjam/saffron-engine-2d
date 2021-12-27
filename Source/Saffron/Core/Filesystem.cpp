@@ -10,19 +10,20 @@ auto Filesystem::Filter::Empty() -> Filesystem::Filter
 }
 
 Filesystem::Filesystem(const Window& window) :
-	SingleTon(this),
+	Singleton(this),
 	_window(window)
 {
 }
 
-auto Filesystem::AllFiles(const Path& directoryPath, const String& extension) -> List<DirEntry>
+auto Filesystem::AllFiles(const std::filesystem::path& directoryPath,
+                          const std::string& extension) -> std::vector<std::filesystem::directory_entry>
 {
-	List<DirEntry> output;
+	std::vector<std::filesystem::directory_entry> output;
 
 	try
 	{
 		std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output),
-		             [&](const DirEntry& entry)
+		             [&](const std::filesystem::directory_entry& entry)
 		             {
 			             return entry.path().extension() == extension;
 		             });
@@ -36,7 +37,7 @@ auto Filesystem::AllFiles(const Path& directoryPath, const String& extension) ->
 	return output;
 }
 
-auto Filesystem::FileCount(const Path& directoryPath, const String& extension) -> size_t
+auto Filesystem::FileCount(const std::filesystem::path& directoryPath, const std::string& extension) -> size_t
 {
 	// Return early if no extension is given
 	if (extension.empty())
@@ -46,10 +47,11 @@ auto Filesystem::FileCount(const Path& directoryPath, const String& extension) -
 
 	try
 	{
-		return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const DirEntry& entry)
-		{
-			return entry.path().extension() == extension;
-		});
+		return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{},
+		                     [&](const std::filesystem::directory_entry& entry)
+		                     {
+			                     return entry.path().extension() == extension;
+		                     });
 	}
 	catch (fs::filesystem_error& fe)
 	{
@@ -59,12 +61,12 @@ auto Filesystem::FileCount(const Path& directoryPath, const String& extension) -
 	return 0;
 }
 
-auto Filesystem::Write(const uchar* data, size_t size, const Path& filepath, bool overwrite) -> size_t
+auto Filesystem::Write(const uchar* data, size_t size, const std::filesystem::path& filepath, bool overwrite) -> size_t
 {
 	const bool fileExists = FileExists(filepath);
 	if (!fileExists || fileExists && overwrite)
 	{
-		OFileStream ofstream;
+		std::ofstream ofstream;
 		ofstream.open(filepath);
 		if (ofstream.good())
 		{
@@ -77,24 +79,24 @@ auto Filesystem::Write(const uchar* data, size_t size, const Path& filepath, boo
 	return 0;
 }
 
-auto Filesystem::Write(const WrapperBuffer buffer, const Path& filepath, bool overwrite) -> size_t
+auto Filesystem::Write(const WrapperBuffer buffer, const std::filesystem::path& filepath, bool overwrite) -> size_t
 {
 	return Write(buffer.Data(), buffer.Size(), filepath, overwrite);
 }
 
-auto Filesystem::CreateDirectories(const Path& filepath) -> bool
+auto Filesystem::CreateDirectories(const std::filesystem::path& filepath) -> bool
 {
 	std::error_code errorCode;
 	return create_directories(filepath, errorCode);
 }
 
-auto Filesystem::FileExists(const Path& filepath) -> bool
+auto Filesystem::FileExists(const std::filesystem::path& filepath) -> bool
 {
 	std::error_code errorCode;
 	return exists(filepath, errorCode);
 }
 
-auto Filesystem::Copy(const Path& source, const Path& destination) -> bool
+auto Filesystem::Copy(const std::filesystem::path& source, const std::filesystem::path& destination) -> bool
 {
 	std::error_code errorCode;
 	copy_file(source, destination, errorCode);

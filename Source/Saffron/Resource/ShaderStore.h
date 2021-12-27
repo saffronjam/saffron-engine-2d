@@ -14,24 +14,24 @@ public:
 	};
 
 public:
-	static auto Get(const Path& vertexShader, const Path& pixelShader) -> Shared<sf::Shader>
+	static auto Get(const std::filesystem::path& vertexShader, const std::filesystem::path& pixelShader) -> std::shared_ptr<sf::Shader>
 	{
-		const Path concat = vertexShader.string() + ConcatToken + pixelShader.string();
+		const std::filesystem::path concat = vertexShader.string() + ConcatToken + pixelShader.string();
 		return Instance().Fetch(concat, false);
 	}
 
-	static auto Get(const Path& path, sf::Shader::Type type) -> Shared<sf::Shader>
+	static auto Get(const std::filesystem::path& path, sf::Shader::Type type) -> std::shared_ptr<sf::Shader>
 	{
 		switch (type)
 		{
 		case sf::Shader::Type::Vertex:
 		{
-			const Path concat = path.string() + VertexToken;
+			const std::filesystem::path concat = path.string() + VertexToken;
 			return Instance().Fetch(concat, false);
 		}
 		case sf::Shader::Type::Fragment:
 		{
-			const Path concat = path.string() + PixelToken;
+			const std::filesystem::path concat = path.string() + PixelToken;
 			return Instance().Fetch(concat, false);
 		}
 		default:
@@ -43,23 +43,23 @@ public:
 	}
 
 private:
-	auto Location() -> Path override
+	auto Location() -> std::filesystem::path override
 	{
 		return "Assets/Shaders/";
 	}
 
 private:
-	auto Load(Path path) -> Shared<sf::Shader> override
+	auto Load(std::filesystem::path path) -> std::shared_ptr<sf::Shader> override
 	{
 		const auto fpString = path.string();
 
 		const auto concatTokenIndex = fpString.find(ConcatToken);
-		auto resource = CreateShared<sf::Shader>();
+		auto resource = std::make_shared<sf::Shader>();
 		bool result = false;
 
 
 		// If vertex shader + pixel shader
-		if (concatTokenIndex == String::npos)
+		if (concatTokenIndex == std::string::npos)
 		{
 			const auto typeToken = fpString.substr(fpString.length() - TypeTokenLength);
 			const auto formattedPath = fpString.substr(0, fpString.length() - TypeTokenLength);
@@ -83,9 +83,9 @@ private:
 		return resource;
 	}
 
-	inline static const String ConcatToken = "%%";
-	inline static const String VertexToken = "%V%";
-	inline static const String PixelToken = "%P%";
+	inline static const std::string ConcatToken = "%%";
+	inline static const std::string VertexToken = "%V%";
+	inline static const std::string PixelToken = "%P%";
 	static constexpr size_t TypeTokenLength = 3;
 };
 }

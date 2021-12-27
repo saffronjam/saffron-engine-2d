@@ -9,11 +9,11 @@ class ThreadPool
 private:
 	struct Worker
 	{
-		String Id;
-		Thread Thread;
-		Atomic<bool> Available = false;
-		Function<void()> Function;
-		Atomic<int> UseCounter = 0;
+		std::string Id;
+		std::thread Thread;
+		std::atomic<bool> Available = false;
+		std::function<void()> Function;
+		std::atomic<int> UseCounter = 0;
 	};
 
 public:
@@ -24,7 +24,7 @@ public:
 	ThreadPool& operator=(const ThreadPool&) const = delete;
 	ThreadPool& operator=(ThreadPool&&) = delete;
 
-	auto DispatchWork(const String& id, Function<void()> fn) -> bool;
+	auto DispatchWork(const std::string& id, std::function<void()> fn) -> bool;
 
 	void CollectAll()
 	{
@@ -58,7 +58,7 @@ public:
 private:
 	static constexpr int MaxThreads = 24;
 
-	Mutex _mutex;
-	Array<Worker, MaxThreads> _workers;
+	std::mutex _mutex;
+	std::array<Worker, MaxThreads> _workers;
 };
 }

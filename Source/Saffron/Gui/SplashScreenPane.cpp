@@ -8,7 +8,7 @@
 
 namespace Se
 {
-SplashScreenPane::SplashScreenPane(Shared<class Batch> batch) :
+SplashScreenPane::SplashScreenPane(std::shared_ptr<class Batch> batch) :
 	_title(App::Name()),
 	_batch(batch),
 	_texture(TextureStore::Get("Editor/Saffron.png", true)),
@@ -76,7 +76,7 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
-	OStringStream oss;
+	std::ostringstream oss;
 	oss << "Loading Screen##";
 	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
@@ -85,8 +85,8 @@ void SplashScreenPane::OnGuiRender()
 
 	const auto windowSize = ImGui::GetWindowSize();
 
-	const auto logoWidth = 200;
-	const auto logoHeight = 200;
+	constexpr auto logoWidth = 200;
+	constexpr auto logoHeight = 200;
 	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
 	Gui::Image(*_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f},
 	           sf::Color(255, 255, 255, 255));
@@ -133,7 +133,7 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::End();
 }
 
-auto SplashScreenPane::BatchLoader() const -> const Shared<Batch>& { return _batch; }
+auto SplashScreenPane::BatchLoader() const -> const std::shared_ptr<Batch>& { return _batch; }
 
 void SplashScreenPane::Show()
 {

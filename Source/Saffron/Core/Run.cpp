@@ -5,7 +5,6 @@
 
 namespace Se
 {
-
 void Run::PeriodicFunction::operator()()
 {
 	Function();
@@ -17,7 +16,7 @@ void Run::PeriodicFunction::operator()() const
 }
 
 Run::Run() :
-	SingleTon(this)
+	Singleton(this)
 {
 }
 
@@ -49,7 +48,7 @@ void Run::Execute()
 
 	for (auto& periodicFunction : _periodicFunctions | std::views::values)
 	{
-		periodicFunction.Counter+= ts;
+		periodicFunction.Counter += ts;
 		if (periodicFunction.Counter >= periodicFunction.Interval)
 		{
 			periodicFunction.Counter = sf::Time::Zero;
@@ -63,27 +62,27 @@ void Run::Execute()
 	}
 }
 
-void Run::Later(Function<void()> function)
+void Run::Later(std::function<void()> function)
 {
-	Instance()._laterFunctions.push_back(Move(function));
+	Instance()._laterFunctions.push_back(std::move(function));
 }
 
-void Run::After(Function<void()> function, sf::Time delay)
+void Run::After(std::function<void()> function, sf::Time delay)
 {
-	Instance()._afterFunctions.emplace_back(AfterFunction{Move(function), delay});
+	Instance()._afterFunctions.emplace_back(AfterFunction{std::move(function), delay});
 }
 
-Run::Handle Run::Periodically(Function<void()> function, sf::Time interval)
+Run::Handle Run::Periodically(std::function<void()> function, sf::Time interval)
 {
 	Handle newHandle;
-	Instance()._periodicFunctions.emplace(newHandle, PeriodicFunction{Move(function), interval, sf::Time::Zero});
+	Instance()._periodicFunctions.emplace(newHandle, PeriodicFunction{std::move(function), interval, sf::Time::Zero});
 	return newHandle;
 }
 
-Run::Handle Run::EveryFrame(Function<void()> function)
+Run::Handle Run::EveryFrame(std::function<void()> function)
 {
 	Handle newHandle;
-	Instance()._frameFunctions.emplace(newHandle, Move(function));
+	Instance()._frameFunctions.emplace(newHandle, std::move(function));
 	return newHandle;
 }
 

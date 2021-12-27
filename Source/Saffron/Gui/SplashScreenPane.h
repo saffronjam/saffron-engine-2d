@@ -11,12 +11,12 @@ namespace Se
 class SplashScreenPane
 {
 public:
-	explicit SplashScreenPane(Shared<class Batch> batch);
+	explicit SplashScreenPane(std::shared_ptr<class Batch> batch);
 
 	void OnUpdate();
 	void OnGuiRender();
 
-	auto BatchLoader() const -> const Shared<class Batch>&;
+	auto BatchLoader() const -> const std::shared_ptr<class Batch>&;
 
 	void Show();
 	void Hide();
@@ -30,10 +30,10 @@ public:
 	auto Hidden() const -> bool;
 	
 private:
-	String _title;
+	std::string _title;
 
-	Shared<class Batch> _batch;
-	Shared<sf::Texture> _texture;
+	std::shared_ptr<class Batch> _batch;
+	std::shared_ptr<sf::Texture> _texture;
 	bool _hidden = false;
 	bool _finishedFadeIn = false;
 	bool _finishedFadeOut = false;

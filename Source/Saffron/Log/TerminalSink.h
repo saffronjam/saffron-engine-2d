@@ -12,13 +12,13 @@ public:
 	void Clear();
 
 	auto TextBuffer() const -> const ImGuiTextBuffer&;
-	auto LineOffsets() const -> const List<int>&;
+	auto LineOffsets() const -> const std::vector<int>&;
 
 protected:
 	bool Post(const LogMessage &message);
 
 private:
 	ImGuiTextBuffer _textBuffer;
-	List<int> _lineOffsets;
+	std::vector<int> _lineOffsets;
 };
 }

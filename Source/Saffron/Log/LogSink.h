@@ -3,7 +3,6 @@
 #include "Saffron/Base.h"
 #include "Saffron/Log/Log.h"
 #include "Saffron/Log/LogMessage.h"
-#include "Saffron/Core/ScopedLock.h"
 
 #include <format>
 
@@ -22,17 +21,17 @@ public:
 protected:
 	void log(const spdlog::details::log_msg& msg) final override
 	{
-		ScopedLock lock(_mutex);
+		std::scoped_lock lock(_mutex);
 		Sink(LogMessage(msg));
 	}
 
 	void flush() final override
 	{
-		ScopedLock lock(_mutex);
+		std::scoped_lock lock(_mutex);
 		Flush();
 	}
 
 private:
-	Mutex _mutex;
+	std::mutex _mutex;
 };
 }

@@ -10,7 +10,7 @@ namespace Se
 class FadePane
 {
 public:
-	using FadeFn = Function<uchar(sf::Time, sf::Time)>;
+	using FadeFn = std::function<uchar(sf::Time, sf::Time)>;
 
 
 public:
@@ -26,8 +26,8 @@ public:
 	auto IsActive() const -> bool;
 
 public:
-	EventSubscriberList<void> Began;
-	EventSubscriberList<void> Finished;
+	SubscriberList<void> Began;
+	SubscriberList<void> Finished;
 
 private:
 	auto DefaultAlphaFunction(sf::Time timer, sf::Time duration) const -> uchar;

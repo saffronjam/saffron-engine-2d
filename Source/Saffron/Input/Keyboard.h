@@ -7,7 +7,7 @@
 
 namespace Se
 {
-class Keyboard : public SingleTon<Keyboard>
+class Keyboard : public Singleton<Keyboard>
 {
 public:
 	Keyboard();
@@ -27,13 +27,13 @@ private:
 	static void OnTextInput(const sf::Event::TextEvent& event);
 
 public:
-	EventSubscriberList<const sf::Event::KeyEvent &> Pressed;
-	EventSubscriberList<const sf::Event::KeyEvent &> Released;
-	EventSubscriberList<const sf::Event::TextEvent> TextEntered;
+	SubscriberList<const sf::Event::KeyEvent &> Pressed;
+	SubscriberList<const sf::Event::KeyEvent &> Released;
+	SubscriberList<const sf::Event::TextEvent> TextEntered;
 
 private:
-	HashMap<sf::Keyboard::Key, bool> _keymap;
-	HashMap<sf::Keyboard::Key, bool> _prevKeymap;
+	std::unordered_map<sf::Keyboard::Key, bool> _keymap;
+	std::unordered_map<sf::Keyboard::Key, bool> _prevKeymap;
 	std::u32string _textInputBuffer;
 };
 }

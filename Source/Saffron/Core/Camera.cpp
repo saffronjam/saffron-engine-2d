@@ -219,7 +219,7 @@ void Camera::SetTransform(const sf::Transform& transform)
 	_transform = transform;
 }
 
-auto Camera::Viewport() const -> Pair<sf::Vector2f, sf::Vector2f>
+auto Camera::Viewport() const -> std::pair<sf::Vector2f, sf::Vector2f>
 {
 	const sf::FloatRect screenRect = {{0.0f, 0.0f}, _viewportSize};
 	const auto TL = sf::Vector2f(screenRect.left, screenRect.top);

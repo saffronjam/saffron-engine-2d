@@ -7,7 +7,7 @@
 
 #include "Saffron/Core/Core.h"
 
-extern Se::Unique<Se::App> Se::CreateApplication();
+extern std::unique_ptr<Se::App> Se::CreateApplication();
 
 int main(int argc, char **argv)
 {

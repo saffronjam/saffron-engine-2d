@@ -8,10 +8,10 @@
 
 namespace Se
 {
-Scene::Scene(String name, ControllableRenderTexture* target, class Camera* camera) :
+Scene::Scene(std::string name, ControllableRenderTexture* target, class Camera* camera) :
 	_target(target),
 	_camera(camera),
-	_viewportPane(Move(name), *_target)
+	_viewportPane(std::move(name), *_target)
 {
 }
 

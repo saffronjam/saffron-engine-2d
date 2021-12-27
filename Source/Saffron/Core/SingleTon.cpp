@@ -1,5 +1,5 @@
 ﻿#include "SaffronPCH.h"
-#include "Saffron/Core/SingleTon.h"
+#include "Saffron/Core/Singleton.h"
 
 namespace Se
 {

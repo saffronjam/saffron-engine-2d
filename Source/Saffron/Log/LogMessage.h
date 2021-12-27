@@ -16,8 +16,8 @@ public:
 	{
 	}
 
-	String Raw;
-	String Formatted;
+	std::string Raw;
+	std::string Formatted;
 	LogLevel Level;
 };
 }

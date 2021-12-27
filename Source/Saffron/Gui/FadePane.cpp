@@ -19,7 +19,7 @@ FadePane::FadePane(FadeType type, sf::Time duration, sf::Time delay, bool startO
 FadePane::FadePane(FadeType type, sf::Time duration, FadeFn alphaFunction, sf::Time delay, bool startOnCreation,
                    sf::Color color) :
 	_type(type),
-	_alphaFunction(Move(alphaFunction)),
+	_alphaFunction(std::move(alphaFunction)),
 	_wantFade(startOnCreation),
 	_fadeColor(color),
 	_timer(sf::Time::Zero),

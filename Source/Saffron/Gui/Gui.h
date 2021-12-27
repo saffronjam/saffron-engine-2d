@@ -14,7 +14,7 @@ namespace Se
 {
 using Font = ImFont;
 
-class Gui : public SingleTon<Gui>
+class Gui : public Singleton<Gui>
 {
 public:
 	explicit Gui();
@@ -25,79 +25,79 @@ public:
 	void Begin();
 	void End();
 
-	static void BeginPropertyGrid(String id = "", float width = -1.0);
+	static void BeginPropertyGrid(std::string id = "", float width = -1.0);
 	static void EndPropertyGrid();
 
-	static auto BeginTreeNode(const String& name, bool defaultOpen = true) -> bool;
+	static auto BeginTreeNode(const std::string& name, bool defaultOpen = true) -> bool;
 	static void EndTreeNode();
 
 	////////////////////////////////
 	/// Bool and string
 	////////////////////////////////
 
-	static void Property(const String& name, const Function<void()>& onClick, bool secondColumn = false);
+	static void Property(const std::string& name, const std::function<void()>& onClick, bool secondColumn = false);
 
-	static void Property(const String& name, const String& value);
+	static void Property(const std::string& name, const std::string& value);
 
-	static auto Property(const String& name, String& value) -> bool;
+	static auto Property(const std::string& name, std::string& value) -> bool;
 
-	static auto Property(const String& name, bool& value) -> bool;
+	static auto Property(const std::string& name, bool& value) -> bool;
 
-	static auto Property(const String& name, const String& text, const String& buttonName,
-	                     const Function<void()>& onButtonPress) -> bool;
+	static auto Property(const std::string& name, const std::string& text, const std::string& buttonName,
+	                     const std::function<void()>& onButtonPress) -> bool;
 
 	////////////////////////////////
 	/// Single value
 	////////////////////////////////
 
-	static auto Property(const String& name, int& value, int min = -1, int max = 1, float step = 1,
+	static auto Property(const std::string& name, int& value, int min = -1, int max = 1, float step = 1,
 	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
-	static auto Property(const String& name, int& value, const char* format, int min = -1, int max = 1, float step = 1,
+	static auto Property(const std::string& name, int& value, const char* format, int min = -1, int max = 1, float step = 1,
 	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
-	static auto Property(const String& name, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static auto Property(const std::string& name, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
 	                     GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
-	static auto Property(const String& name, float& value, const char* format, float min = -1.0f, float max = 1.0f,
+	static auto Property(const std::string& name, float& value, const char* format, float min = -1.0f, float max = 1.0f,
 	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	////////////////////////////////
 	/// Vector2
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool;
+	static auto Property(const std::string& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool;
 
-	static auto Property(const String& name, sf::Vector2f& value, float min = -1.0f, float max = 1.0f,
+	static auto Property(const std::string& name, sf::Vector2f& value, float min = -1.0f, float max = 1.0f,
 	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
-	static auto Property(const String& name, sf::Vector2f& value, const char* format, float min = -1.0f,
+	static auto Property(const std::string& name, sf::Vector2f& value, const char* format, float min = -1.0f,
 	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 	////////////////////////////////
 	/// Vector3
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool;
+	static auto Property(const std::string& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool;
 
-	static auto Property(const String& name, sf::Vector3f& value, float min = -1.0f, float max = 1.0f,
+	static auto Property(const std::string& name, sf::Vector3f& value, float min = -1.0f, float max = 1.0f,
 	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None,
-	                     Optional<std::function<void()>> fn = {}) -> bool;
+	                     std::optional<std::function<void()>> fn = {}) -> bool;
 
-	static auto Property(const String& name, sf::Vector3f& value, const char* format, float min = -1.0f,
+	static auto Property(const std::string& name, sf::Vector3f& value, const char* format, float min = -1.0f,
 	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None,
-	                     Optional<std::function<void()>> fn = {}) -> bool;
+	                     std::optional<std::function<void()>> fn = {}) -> bool;
 
 	////////////////////////////////
 	/// Vector4
 	////////////////////////////////
 
-	static auto Property(const String& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool;
+	static auto Property(const std::string& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool;
 
-	static auto Property(const String& name, sf::Vector4f& value, float min = -1.0f, float max = 1.0f,
+	static auto Property(const std::string& name, sf::Vector4f& value, float min = -1.0f, float max = 1.0f,
 	                     float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
-	static auto Property(const String& name, sf::Vector4f& value, const char* format, float min = -1.0f,
+	static auto Property(const std::string& name, sf::Vector4f& value, const char* format, float min = -1.0f,
 	                     float max = 1.0f, float step = 1.0f, GuiPropertyFlag flags = GuiPropertyFlag_None) -> bool;
 
 
@@ -143,7 +143,7 @@ public:
 	                        const sf::Color& bgColor = sf::Color::Transparent,
 	                        const sf::Color& tintColor = sf::Color::White) -> bool;
 
-	static void HelpMarker(const String& desc);
+	static void HelpMarker(const std::string& desc);
 
 	static void InfoModal(const char* title, const char* text, bool& open);
 
@@ -151,7 +151,7 @@ public:
 	static auto Style() -> GuiStyle;
 	static void SetStyle(GuiStyle guiStyle);
 	static void SetFontSize(int size);
-	static auto AddFont(const Path& path, int size) -> Font*;
+	static auto AddFont(const std::filesystem::path& path, int size) -> Font*;
 
 	static void ForceHideBarTab();
 
@@ -171,8 +171,8 @@ private:
 
 private:
 	GuiStyle _currentStyle = GuiStyle::Light;
-	TreeMap<int, ImFont*> _fonts;
-	Pair<int, ImFont*> _currentFont;
+	std::map<int, ImFont*> _fonts;
+	std::pair<int, ImFont*> _currentFont;
 
 	bool _viewDemo = true;
 };

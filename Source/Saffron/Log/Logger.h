@@ -3,7 +3,7 @@
 // Until <format> has been implemented
 #include <spdlog/spdlog.h>
 
-#include "Saffron/Core/EventSubscriberList.h"
+#include "Saffron/Core/SubscriberList.h"
 #include "Saffron/Log/LogLevel.h"
 #include "Saffron/Log/LogMessage.h"
 
@@ -12,7 +12,7 @@ namespace Se
 class Logger
 {
 public:
-	explicit Logger(Shared<spdlog::logger> logger);
+	explicit Logger(std::shared_ptr<spdlog::logger> logger);
 
 	template <typename Arg1, typename... Args>
 	void Info(const char* fmt, const Arg1& arg1, const Args&... args)
@@ -75,11 +75,11 @@ public:
 	}
 
 public:
-	EventSubscriberList<const LogMessage&> OnAll;
-	EventSubscriberList<const LogMessage&> OnInfo;
-	EventSubscriberList<const LogMessage&> OnDebug;
-	EventSubscriberList<const LogMessage&> OnWarn;
-	EventSubscriberList<const LogMessage&> OnError;
+	SubscriberList<const LogMessage&> OnAll;
+	SubscriberList<const LogMessage&> OnInfo;
+	SubscriberList<const LogMessage&> OnDebug;
+	SubscriberList<const LogMessage&> OnWarn;
+	SubscriberList<const LogMessage&> OnError;
 
 private:
 

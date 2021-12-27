@@ -5,39 +5,39 @@
 namespace Se
 {
 template <class ItemType>
-class ResourceStore : public SingleTon<ResourceStore<ItemType>>
+class ResourceStore : public Singleton<ResourceStore<ItemType>>
 {
 public:
 	ResourceStore() :
-		SingleTon<ResourceStore<ItemType>>(this)
+		Singleton<ResourceStore<ItemType>>(this)
 	{
 	}
 
-	auto Fetch(const Path& Path, bool copy) -> Shared<ItemType>;
+	auto Fetch(const std::filesystem::path& path, bool copy) -> std::shared_ptr<ItemType>;
 
-	auto Persist(const Path& path, const Shared<ItemType>& resource)
+	auto Persist(const std::filesystem::path& path, const std::shared_ptr<ItemType>& resource)
 	{
 		_resources.emplace(path.string(), resource);
 		_persistent.emplace(path.string(), resource);
 	}
 
 protected:
-	virtual auto Load(Path Path) -> Shared<ItemType>;
-	virtual auto Copy(const Shared<ItemType>& value) -> Shared<ItemType>;
-	virtual auto Location() -> Path;
+	virtual auto Load(std::filesystem::path path) -> std::shared_ptr<ItemType>;
+	virtual auto Copy(const std::shared_ptr<ItemType>& value) -> std::shared_ptr<ItemType>;
+	virtual auto Location() -> std::filesystem::path;
 
 private:
-	HashMap<String, Weak<ItemType>> _resources;
-	HashMap<String, Shared<ItemType>> _persistent;
+	std::unordered_map<std::string, std::weak_ptr<ItemType>> _resources;
+	std::unordered_map<std::string, std::shared_ptr<ItemType>> _persistent;
 };
 
 
 template <class StoreType>
-auto ResourceStore<StoreType>::Fetch(const Path& Path, bool copy) -> Shared<StoreType>
+auto ResourceStore<StoreType>::Fetch(const std::filesystem::path& path, bool copy) -> std::shared_ptr<StoreType>
 {
-	String newPath(Location().string() + Path.string());
-	Shared<StoreType> newResoure;
-	if (_resources.find(newPath) == _resources.end())
+	std::string newPath(Location().string() + path.string());
+	std::shared_ptr<StoreType> newResoure;
+	if (!_resources.contains(newPath))
 	{
 		newResoure = Load(newPath);
 		_resources.emplace(newPath, newResoure);
@@ -55,21 +55,21 @@ auto ResourceStore<StoreType>::Fetch(const Path& Path, bool copy) -> Shared<Stor
 }
 
 template <class StoreType>
-Shared<StoreType> ResourceStore<StoreType>::Load(Path Path)
+auto ResourceStore<StoreType>::Load(std::filesystem::path path) -> std::shared_ptr<StoreType>
 {
 	Debug::Break("Load was called on store that did not implement it");
 	return nullptr;
 }
 
 template <class StoreType>
-Shared<StoreType> ResourceStore<StoreType>::Copy(const Shared<StoreType>& value)
+auto ResourceStore<StoreType>::Copy(const std::shared_ptr<StoreType>& value) -> std::shared_ptr<StoreType>
 {
 	Debug::Break("Copy was called on store that did not implement it");
 	return nullptr;
 }
 
 template <class StoreType>
-auto ResourceStore<StoreType>::Location() -> Path
+auto ResourceStore<StoreType>::Location() -> std::filesystem::path
 {
 	Debug::Break("GetLocation was called on store that did not implement it");
 	return {};

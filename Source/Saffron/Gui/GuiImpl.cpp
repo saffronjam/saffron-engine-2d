@@ -49,11 +49,11 @@ int openKeyboardIME()
 	jclass context = env->FindClass("android/content/Context");
 
 	jfieldID fid = env->GetStaticFieldID(context, "INPUT_METHOD_SERVICE",
-										 "Ljava/lang/String;");
+										 "Ljava/lang/std::string;");
 	jobject svcstr = env->GetStaticObjectField(context, fid);
 
 	jmethodID getss = env->GetMethodID(
-		natact, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+		natact, "getSystemService", "(Ljava/lang/std::string;)Ljava/lang/Object;");
 	jobject imm_obj = env->CallObjectMethod(activity->clazz, getss, svcstr);
 
 	jclass imm_cls = env->GetObjectClass(imm_obj);
@@ -89,11 +89,11 @@ int closeKeyboardIME()
 	jclass context = env->FindClass("android/content/Context");
 
 	jfieldID fid = env->GetStaticFieldID(context, "INPUT_METHOD_SERVICE",
-										 "Ljava/lang/String;");
+										 "Ljava/lang/std::string;");
 	jobject svcstr = env->GetStaticObjectField(context, fid);
 
 	jmethodID getss = env->GetMethodID(
-		natact, "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+		natact, "getSystemService", "(Ljava/lang/std::string;)Ljava/lang/Object;");
 	jobject imm_obj = env->CallObjectMethod(activity->clazz, getss, svcstr);
 
 	jclass imm_cls = env->GetObjectClass(imm_obj);

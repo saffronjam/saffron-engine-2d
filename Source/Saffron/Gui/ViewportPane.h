@@ -8,7 +8,7 @@ namespace Se
 class ViewportPane
 {
 public:
-	explicit ViewportPane(String windowTitle, const ControllableRenderTexture& target);
+	explicit ViewportPane(std::string windowTitle, const ControllableRenderTexture& target);
 
 	void OnGuiRender(bool* open = nullptr, UUID uuid = 0);
 
@@ -28,11 +28,11 @@ public:
 	void SetTarget(const ControllableRenderTexture& target);
 
 public:
-	EventSubscriberList<void> Rendered;
-	EventSubscriberList<const sf::Vector2f&> Resized;
+	SubscriberList<void> Rendered;
+	SubscriberList<const sf::Vector2f&> Resized;
 
 private:
-	String _windowTitle;
+	std::string _windowTitle;
 	const ControllableRenderTexture* _target;
 	sf::Texture _fallbackTexture;
 	uint _dockID = 0;

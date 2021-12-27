@@ -4,12 +4,12 @@
 
 namespace Se
 {
-Layer::Layer(const String& name) :
+Layer::Layer(const std::string& name) :
 	_debugName(name)
 {
 }
 
-auto Layer::Name() const -> const String&
+auto Layer::Name() const -> const std::string&
 {
 	return _debugName;
 }

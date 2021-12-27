@@ -9,29 +9,29 @@ namespace Se
 class ImageStore : public ResourceStore<sf::Image>
 {
 public:
-	static auto Get(const Path& Path, bool copy = false) -> Shared<sf::Image>
+	static auto Get(const std::filesystem::path& path, bool copy = false) -> std::shared_ptr<sf::Image>
 	{
-		return Instance().Fetch(Path, copy);
+		return Instance().Fetch(path, copy);
 	}
 
 private:
-	auto Copy(const Shared<sf::Image>& value) -> Shared<sf::Image> override
+	auto Copy(const std::shared_ptr<sf::Image>& value) -> std::shared_ptr<sf::Image> override
 	{
-		auto resource = CreateShared<sf::Image>();
+		auto resource = std::make_shared<sf::Image>();
 		resource->copy(*value, 0, 0);
 		return resource;
 	}
 
-	auto Location() -> Path override
+	auto Location() -> std::filesystem::path override
 	{
 		return "Assets/Textures/";
 	}
 
 private:
-	auto Load(Path Path) -> Shared<sf::Image> override
+	auto Load(std::filesystem::path path) -> std::shared_ptr<sf::Image> override
 	{
-		auto resource = CreateShared<sf::Image>();
-		const auto result = resource->loadFromFile(Path.string());
+		auto resource = std::make_shared<sf::Image>();
+		const auto result = resource->loadFromFile(path.string());
 		Debug::Assert(result, "Failed to load Image");
 		return resource;
 	}

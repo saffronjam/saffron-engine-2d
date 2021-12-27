@@ -13,7 +13,7 @@ public:
 	void OnGuiRender();
 
 private:
-	Shared<TerminalSink> _sink;
+	std::shared_ptr<TerminalSink> _sink;
 	ImGuiTextFilter _filter;
 	bool _autoScroll = true;
 };

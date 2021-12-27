@@ -14,42 +14,42 @@ enum class BatchStatus
 class Batch
 {
 public:
-	explicit Batch(String name);
+	explicit Batch(std::string name);
 	~Batch();
 
-	void Submit(Function<void()> function, String shortDescription);
+	void Submit(std::function<void()> function, std::string shortDescription);
 	void Execute();
 	void ForceExit();
 	void Reset();
 
 	auto Progress() const -> float;
-	auto JobStatus() const -> const String&;
+	auto JobStatus() const -> const std::string&;
 	auto JobCount() const -> size_t;
 	auto JobsDone() const -> size_t;
 	auto JobsLeft() const -> size_t;
 
 	auto Status() const -> BatchStatus;
 
-	void SetFinalizingStatus(String statusMessage);
+	void SetFinalizingStatus(std::string statusMessage);
 
-	auto ExecutionMutex() -> Mutex&;
+	auto ExecutionMutex() -> std::mutex&;
 
 public:
-	EventSubscriberList<void> OnStarted;
-	EventSubscriberList<void> OnFinished;
+	SubscriberList<void> OnStarted;
+	SubscriberList<void> OnFinished;
 
 private:
-	String _name;
-	Atomic<BatchStatus> _status = BatchStatus::Preparing;
+	std::string _name;
+	std::atomic<BatchStatus> _status = BatchStatus::Preparing;
 
-	List<Pair<Function<void()>, String>> _queue;
-	Atomic<size_t> _finishedJobs = 0;
-	const String _fallback = "";
-	String _finalizingStatus = "Finalizing";
+	std::vector<std::pair<std::function<void()>, std::string>> _queue;
+	std::atomic<size_t> _finishedJobs = 0;
+	const std::string _fallback = "";
+	std::string _finalizingStatus = "Finalizing";
 
-	Atomic<float> _progress = 0.0f;
-	Atomic<const String*> _jobStatus = nullptr;
-	Mutex _queueMutex, _executionMutex;
-	Thread _worker;
+	std::atomic<float> _progress = 0.0f;
+	std::atomic<const std::string*> _jobStatus = nullptr;
+	std::mutex _queueMutex, _executionMutex;
+	std::thread _worker;
 };
 }

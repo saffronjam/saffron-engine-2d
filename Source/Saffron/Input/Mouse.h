@@ -7,7 +7,7 @@
 
 namespace Se
 {
-class Mouse : public SingleTon<Mouse>
+class Mouse : public Singleton<Mouse>
 {
 public:
 	Mouse();
@@ -35,16 +35,16 @@ private:
 	static void OnScroll(const sf::Event::MouseWheelScrollEvent& event);
 
 public:
-	EventSubscriberList<const sf::Event::MouseWheelScrollEvent&> Scrolled;
-	EventSubscriberList<const sf::Event::MouseButtonEvent&> Pressed;
-	EventSubscriberList<const sf::Event::MouseButtonEvent&> Released;
-	EventSubscriberList<const sf::Event::MouseMoveEvent&> Moved;
-	EventSubscriberList<void> Entered;
-	EventSubscriberList<void> Left;
+	SubscriberList<const sf::Event::MouseWheelScrollEvent&> Scrolled;
+	SubscriberList<const sf::Event::MouseButtonEvent&> Pressed;
+	SubscriberList<const sf::Event::MouseButtonEvent&> Released;
+	SubscriberList<const sf::Event::MouseMoveEvent&> Moved;
+	SubscriberList<void> Entered;
+	SubscriberList<void> Left;
 
 private:
-	HashMap<sf::Mouse::Button, bool> _buttonmap;
-	HashMap<sf::Mouse::Button, bool> _prevButtonmap;
+	std::unordered_map<sf::Mouse::Button, bool> _buttonmap;
+	std::unordered_map<sf::Mouse::Button, bool> _prevButtonmap;
 
 	sf::Vector2f _mousePosition = sf::Vector2f(0.0f, 0.0f);
 	sf::Vector2f _mousePositionNDC = sf::Vector2f(0.0f, 0.0f);

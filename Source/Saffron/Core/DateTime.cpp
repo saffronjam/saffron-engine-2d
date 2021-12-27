@@ -9,7 +9,7 @@ namespace Se
 /// Helper functions
 ////////////////////////////////////////////////////////////////
 
-static auto ValueToMonthString(int month) -> String
+static auto ValueToMonthString(int month) -> std::string
 {
 	switch (month)
 	{
@@ -29,7 +29,7 @@ static auto ValueToMonthString(int month) -> String
 	}
 }
 
-static auto ValueToMonthShortString(int month) -> String
+static auto ValueToMonthShortString(int month) -> std::string
 {
 	switch (month)
 	{
@@ -49,7 +49,7 @@ static auto ValueToMonthShortString(int month) -> String
 	}
 }
 
-static auto ValueToWeekdayString(int weekday) -> String
+static auto ValueToWeekdayString(int weekday) -> std::string
 {
 	switch (weekday)
 	{
@@ -64,7 +64,7 @@ static auto ValueToWeekdayString(int weekday) -> String
 	}
 }
 
-static auto ValueToWeekdayShortString(int weekday) -> String
+static auto ValueToWeekdayShortString(int weekday) -> std::string
 {
 	switch (weekday)
 	{
@@ -89,7 +89,7 @@ DateTime::DateTime() :
 }
 
 DateTime::DateTime(Date date) :
-	_date(Move(date))
+	_date(std::move(date))
 {
 	Clamp();
 }
@@ -161,26 +161,26 @@ auto DateTime::Year() const -> int
 	return _date.Year;
 }
 
-auto DateTime::WeekdayString(bool abbreviation) const -> String
+auto DateTime::WeekdayString(bool abbreviation) const -> std::string
 {
 	return abbreviation ? ValueToWeekdayShortString(Weekday()) : ValueToWeekdayString(Weekday());
 }
 
-auto DateTime::MonthString(bool abbreviation) const -> String
+auto DateTime::MonthString(bool abbreviation) const -> std::string
 {
 	return abbreviation ? ValueToMonthShortString(Month()) : ValueToMonthString(Month());
 }
 
-auto DateTime::TimeString() const -> String
+auto DateTime::TimeString() const -> std::string
 {
-	OStringStream oss;
+	std::ostringstream oss;
 	oss << std::setw(2) << std::setfill('0') << Hour() << ":" << std::setw(2) << std::setfill('0') << Minutes();
 	return oss.str();
 }
 
-auto DateTime::ANSIDateString() const -> String
+auto DateTime::ANSIDateString() const -> std::string
 {
-	OStringStream oss;
+	std::ostringstream oss;
 	oss << Year() << "-" << std::setw(2) << std::setfill('0') << Month() << "-" << std::setw(2) << std::setfill('0') <<
 		Day();
 	return oss.str();

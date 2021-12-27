@@ -6,46 +6,46 @@
 
 namespace Se
 {
-auto AppProperties::CreateFullscreen(String name) -> AppProperties
+auto AppProperties::CreateFullscreen(std::string name) -> AppProperties
 {
 	const auto dm = sf::VideoMode::getDesktopMode();
 	const uint halfWidth = dm.width / 3, halfHeight = dm.height / 3;
-	return {Move(name), 2 * halfWidth, 2 * halfHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, true};
+	return {std::move(name), 2 * halfWidth, 2 * halfHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, true};
 }
 
-auto AppProperties::CreateMaximized(String name) -> AppProperties
+auto AppProperties::CreateMaximized(std::string name) -> AppProperties
 {
 	const auto dm = sf::VideoMode::getDesktopMode();
-	return {Move(name), dm.width, dm.height, 0, 0, false};
+	return {std::move(name), dm.width, dm.height, 0, 0, false};
 }
 
-auto AppProperties::CreateCentered(String name, uint windowWidth, uint windowHeight) -> AppProperties
+auto AppProperties::CreateCentered(std::string name, uint windowWidth, uint windowHeight) -> AppProperties
 {
 	const auto dm = sf::VideoMode::getDesktopMode();
 	const uint halfWidth = windowWidth / 2, halfHeight = windowHeight / 2;
-	return {Move(name), windowWidth, windowHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, false};
+	return {std::move(name), windowWidth, windowHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, false};
 }
 
 App::App(const AppProperties& properties) :
-	SingleTon(this),
-	_splashScreenBatch(CreateShared<Batch>("Preloader")),
-	_window(CreateUnique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
-	_menuBar(CreateUnique<MenuBar>()),
-	_filesystem(CreateUnique<Filesystem>(*_window)),
-	_gui(CreateUnique<Gui>()),
-	_keyboard(CreateUnique<Keyboard>()),
-	_mouse(CreateUnique<Mouse>()),
-	_renderTargetManager(CreateUnique<RenderTargetManager>()),
-	_run(CreateUnique<class Run>()),
+	Singleton(this),
+	_splashScreenBatch(std::make_shared<Batch>("Preloader")),
+	_window(std::make_unique<class Window>(properties.Name, properties.WindowWidth, properties.WindowHeight)),
+	_menuBar(std::make_unique<MenuBar>()),
+	_filesystem(std::make_unique<Filesystem>(*_window)),
+	_gui(std::make_unique<Gui>()),
+	_keyboard(std::make_unique<Keyboard>()),
+	_mouse(std::make_unique<Mouse>()),
+	_renderTargetManager(std::make_unique<RenderTargetManager>()),
+	_run(std::make_unique<class Run>()),
 	_name(properties.Name),
-	_computeShaderStore(CreateUnique<ComputeShaderStore>()),
-	_fontStore(CreateUnique<FontStore>()),
-	_imageStore(CreateUnique<ImageStore>()),
-	_musicStore(CreateUnique<MusicStore>()),
-	_shaderStore(CreateUnique<ShaderStore>()),
-	_soundStore(CreateUnique<SoundStore>()),
-	_soundBufferStore(CreateUnique<SoundBufferStore>()),
-	_textureStore(CreateUnique<TextureStore>()),
+	_computeShaderStore(std::make_unique<ComputeShaderStore>()),
+	_fontStore(std::make_unique<FontStore>()),
+	_imageStore(std::make_unique<ImageStore>()),
+	_musicStore(std::make_unique<MusicStore>()),
+	_shaderStore(std::make_unique<ShaderStore>()),
+	_soundStore(std::make_unique<SoundStore>()),
+	_soundBufferStore(std::make_unique<SoundBufferStore>()),
+	_textureStore(std::make_unique<TextureStore>()),
 	_splashScreenPane(_splashScreenBatch),
 	_fadeIn(FadeType::In, sf::seconds(0.5f))
 {
@@ -207,7 +207,7 @@ void App::OnGuiRender()
 		static float acc = 0.0f;
 		acc += dt.asSeconds();
 
-		static Array<float, 90> values = {};
+		static std::array<float, 90> values = {};
 		static int values_offset = 0;
 		static constexpr auto cap = 5.0f * 1.0f / 144.0f;
 
@@ -365,7 +365,7 @@ void App::RunSplashScreen()
 	}
 }
 
-auto App::ConfigurationName() -> String
+auto App::ConfigurationName() -> std::string
 {
 #if defined(SE_DEBUG)
 	return "Debug";
@@ -378,7 +378,7 @@ auto App::ConfigurationName() -> String
 #endif
 }
 
-auto App::PlatformName() -> String
+auto App::PlatformName() -> std::string
 {
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";
@@ -387,7 +387,7 @@ auto App::PlatformName() -> String
 #endif
 }
 
-auto App::Name() -> String
+auto App::Name() -> std::string
 {
 	return Instance()._name;
 }

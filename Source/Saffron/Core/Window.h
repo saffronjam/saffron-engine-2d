@@ -21,7 +21,7 @@ class Window
 	friend class Camera;
 
 public:
-	Window(String title, int width, int height);
+	Window(std::string title, int width, int height);
 	~Window() = default;
 	Window(const Window&) = delete;
 	auto operator=(const Window&) -> Window& = delete;
@@ -49,39 +49,39 @@ public:
 	auto Size() const -> sf::Vector2u;
 	auto Width() const -> int;
 	auto Height() const -> int;
-	auto Title() const -> const String&;
+	auto Title() const -> const std::string&;
 	auto ScreenRect() const -> sf::IntRect;
 
 	auto IsFullscreen() const -> bool { return _fullscreen; }
 
 	void SetPosition(const sf::Vector2i& pos);
 	void Resize(const sf::Vector2u& size);
-	void SetTitle(const String& title);
-	void SetIcon(const Path& path);
+	void SetTitle(const std::string& title);
+	void SetIcon(const std::filesystem::path& path);
 	void SetFullscreen(bool toggle);
 	void SetVSync(bool toggle);
 
 public:
-	EventSubscriberList<const sf::Event&> AnyEvent;
+	SubscriberList<const sf::Event&> AnyEvent;
 
 	// Window events
-	EventSubscriberList<void> Closed;
-	EventSubscriberList<const sf::Event::SizeEvent&> Resized;
-	EventSubscriberList<void> LostFocus;
-	EventSubscriberList<void> GainedFocus;
+	SubscriberList<void> Closed;
+	SubscriberList<const sf::Event::SizeEvent&> Resized;
+	SubscriberList<void> LostFocus;
+	SubscriberList<void> GainedFocus;
 
 	// Keyboard events
-	EventSubscriberList<const sf::Event::TextEvent&> TextEntered;
-	EventSubscriberList<const sf::Event::KeyEvent&> KeyPressed;
-	EventSubscriberList<const sf::Event::KeyEvent&> KeyReleased;
+	SubscriberList<const sf::Event::TextEvent&> TextEntered;
+	SubscriberList<const sf::Event::KeyEvent&> KeyPressed;
+	SubscriberList<const sf::Event::KeyEvent&> KeyReleased;
 
 	// Mouse events
-	EventSubscriberList<const sf::Event::MouseWheelScrollEvent&> MouseWheelScrolled;
-	EventSubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonPressed;
-	EventSubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonReleased;
-	EventSubscriberList<const sf::Event::MouseMoveEvent&> MouseMoved;
-	EventSubscriberList<void> MouseEntered;
-	EventSubscriberList<void> MouseLeft;
+	SubscriberList<const sf::Event::MouseWheelScrollEvent&> MouseWheelScrolled;
+	SubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonPressed;
+	SubscriberList<const sf::Event::MouseButtonEvent&> MouseButtonReleased;
+	SubscriberList<const sf::Event::MouseMoveEvent&> MouseMoved;
+	SubscriberList<void> MouseEntered;
+	SubscriberList<void> MouseLeft;
 
 private:
 	void Render(const sf::Drawable& drawable, sf::RenderStates renderStates = sf::RenderStates::Default);
@@ -90,18 +90,18 @@ private:
 private:
 	// Used after exiting fullscreen
 	sf::VideoMode _videomode;
-	String _title;
+	std::string _title;
 	sf::Uint32 _style;
 	sf::RenderWindow _nativeWindow;
 	// Used after exiting fullscreen
 	sf::Vector2i _nonFullscreenPosition;
 
-	Optional<Shared<sf::Image>> _icon;
+	std::optional<std::shared_ptr<sf::Image>> _icon;
 
 	bool _fullscreen = false;
 
-	OStringStream _sfmlStreamBuffer;
-	inline static const String _sfmlLogFmt = Log::Fmt::OnGreen + Log::Fmt::White;
+	std::ostringstream _sfmlStreamBuffer;
+	inline static const std::string _sfmlLogFmt = Log::Fmt::OnGreen + Log::Fmt::White;
 };
 }
 

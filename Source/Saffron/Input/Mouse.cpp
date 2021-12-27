@@ -8,7 +8,7 @@
 namespace Se
 {
 Mouse::Mouse() :
-	SingleTon(this)
+	Singleton(this)
 {
 	auto& win = App::Instance().Window();
 	win.MouseWheelScrolled += SE_EV_ACTION(Mouse::OnScroll);

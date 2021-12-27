@@ -7,8 +7,8 @@
 
 namespace Se
 {
-ViewportPane::ViewportPane(String windowTitle, const ControllableRenderTexture& target) :
-	_windowTitle(Move(windowTitle)),
+ViewportPane::ViewportPane(std::string windowTitle, const ControllableRenderTexture& target) :
+	_windowTitle(std::move(windowTitle)),
 	_target(&target),
 	//_fallbackTexture(Factory::Create<Texture2D>("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
 	_topLeft(0.0f, 0.0f),
@@ -25,7 +25,7 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	OStringStream oss;
+	std::ostringstream oss;
 	oss << _windowTitle << "##" << uuid;
 
 	ImGui::Begin(oss.str().c_str(), open);

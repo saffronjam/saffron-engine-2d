@@ -9,6 +9,6 @@ class Logger;
 class LogManager 
 {
 public:
-	static auto CreateLogger(const String& name) -> Shared<Logger>;
+	static auto CreateLogger(const std::string& name) -> std::shared_ptr<Logger>;
 };
 }

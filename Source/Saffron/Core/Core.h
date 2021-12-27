@@ -11,6 +11,6 @@ public:
 	Core();
 
 private:
-	Unique<Log> _log;
+	std::unique_ptr<Log> _log;
 };
 }

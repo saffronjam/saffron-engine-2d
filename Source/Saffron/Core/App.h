@@ -29,17 +29,17 @@ class Scene;
 class AppProperties
 {
 public:
-	String Name;
+	std::string Name;
 	uint WindowWidth, WindowHeight;
 	uint PositionX, PositionY;
 	bool Fullscreen;
 
-	static AppProperties CreateFullscreen(String name);
-	static AppProperties CreateMaximized(String name);
-	static AppProperties CreateCentered(String name, uint windowWidth, uint windowHeight);
+	static AppProperties CreateFullscreen(std::string name);
+	static AppProperties CreateMaximized(std::string name);
+	static AppProperties CreateCentered(std::string name, uint windowWidth, uint windowHeight);
 };
 
-class App : public SingleTon<App>
+class App : public Singleton<App>
 {
 	friend class ApplicationSerializer;
 
@@ -71,9 +71,9 @@ public:
 
 	auto Window() const -> Window&;
 
-	static auto ConfigurationName() -> String;
-	static auto PlatformName() -> String;
-	static auto Name() -> String;
+	static auto ConfigurationName() -> std::string;
+	static auto PlatformName() -> std::string;
+	static auto Name() -> std::string;
 
 private:
 	void OnRenderMenuBar();
@@ -84,31 +84,31 @@ private:
 	void RunSplashScreen();
 
 protected:
-	Shared<Batch> _splashScreenBatch;
+	std::shared_ptr<Batch> _splashScreenBatch;
 
 private:
-	Unique<class Window> _window;
-	Unique<MenuBar> _menuBar;	
-	Unique<Filesystem> _filesystem;
-	Unique<Gui> _gui;
+	std::unique_ptr<class Window> _window;
+	std::unique_ptr<MenuBar> _menuBar;	
+	std::unique_ptr<Filesystem> _filesystem;
+	std::unique_ptr<Gui> _gui;
 
-	Unique<Keyboard> _keyboard;
-	Unique<Mouse> _mouse;
+	std::unique_ptr<Keyboard> _keyboard;
+	std::unique_ptr<Mouse> _mouse;
 
-	Unique<RenderTargetManager> _renderTargetManager;
-	Unique<class Run> _run;
+	std::unique_ptr<RenderTargetManager> _renderTargetManager;
+	std::unique_ptr<class Run> _run;
 
-	String _name;
+	std::string _name;
 
 	// Stores
-	Unique<ComputeShaderStore> _computeShaderStore;
-	Unique<FontStore> _fontStore;
-	Unique<ImageStore> _imageStore;
-	Unique<MusicStore> _musicStore;
-	Unique<ShaderStore> _shaderStore;
-	Unique<SoundStore> _soundStore;
-	Unique<SoundBufferStore> _soundBufferStore;
-	Unique<TextureStore> _textureStore;
+	std::unique_ptr<ComputeShaderStore> _computeShaderStore;
+	std::unique_ptr<FontStore> _fontStore;
+	std::unique_ptr<ImageStore> _imageStore;
+	std::unique_ptr<MusicStore> _musicStore;
+	std::unique_ptr<ShaderStore> _shaderStore;
+	std::unique_ptr<SoundStore> _soundStore;
+	std::unique_ptr<SoundBufferStore> _soundBufferStore;
+	std::unique_ptr<TextureStore> _textureStore;
 
 	SplashScreenPane _splashScreenPane;
 	bool _running = true, _minimized = false;
@@ -124,5 +124,5 @@ private:
 };
 
 // Implemented by client
-auto CreateApplication() -> Unique<App>;
+auto CreateApplication() -> std::unique_ptr<App>;
 }

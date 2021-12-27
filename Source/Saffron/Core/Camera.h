@@ -46,7 +46,7 @@ public:
 	auto WorldToScreen(const sf::FloatRect& rect) const -> sf::FloatRect;
 
 	auto Transform() const -> const sf::Transform&;
-	auto Viewport() const -> Pair<sf::Vector2f, sf::Vector2f>;
+	auto Viewport() const -> std::pair<sf::Vector2f, sf::Vector2f>;
 	auto Offset() const -> sf::Vector2f;
 	auto Zoom() const -> float;
 
@@ -57,7 +57,7 @@ public:
 	void SetTransform(const sf::Transform &transform);
 
 public:
-	EventSubscriberList<void> Reset;
+	SubscriberList<void> Reset;
 
 private:
 	void UpdateTransform();
@@ -78,6 +78,6 @@ private:
 	sf::Vector2f _zoom;
 	sf::Vector2f _viewportSize;
 
-	Optional<const sf::Vector2f*> _follow;
+	std::optional<const sf::Vector2f*> _follow;
 };
 }

@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class RenderTargetManager : SingleTon<RenderTargetManager>
+class RenderTargetManager : Singleton<RenderTargetManager>
 {
 public:
 	RenderTargetManager();
@@ -17,6 +17,6 @@ public:
 	void DisplayAll();
 
 private:
-	List<ControllableRenderTexture*> _targets;
+	std::vector<ControllableRenderTexture*> _targets;
 };
 }

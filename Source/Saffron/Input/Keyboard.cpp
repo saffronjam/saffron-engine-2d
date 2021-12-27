@@ -6,7 +6,7 @@
 namespace Se
 {
 Keyboard::Keyboard() :
-	SingleTon(this)
+	Singleton(this)
 {
 	auto& win = App::Instance().Window();
 

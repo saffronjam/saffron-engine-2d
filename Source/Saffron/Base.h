@@ -6,10 +6,10 @@
 
 #include "Saffron/Config.h"
 
-#include "Saffron/Core/EventSubscriberList.h"
+#include "Saffron/Core/SubscriberList.h"
 #include "Saffron/Core/Macros.h"
 #include "Saffron/Core/Run.h"
-#include "Saffron/Core/SingleTon.h"
+#include "Saffron/Core/Singleton.h"
 #include "Saffron/Core/TypeDefs.h"
 #include "Saffron/Core/UUID.h"
 

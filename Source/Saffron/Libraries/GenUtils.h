@@ -24,6 +24,13 @@ static constexpr T E = static_cast<T>(2.71828182845904523536);
 class GenUtils
 {
 public:
+	template <typename Dest, typename Src, std::size_t N>
+	static auto ConvertArrayTo(const std::array<Src, N>& src)
+	{
+		return ConvertArrayToImpl<Dest>(src, std::make_index_sequence<N>());
+	}
+
+
 	template <typename T, typename U>
 	static auto ConvertTo(const sf::Vector2<U>& vec) -> sf::Vector2<T>;
 
@@ -35,7 +42,7 @@ public:
 
 	static auto Mid(const sf::ConvexShape& polygon) -> sf::Vector2f;
 
-	static auto Mid(const List<sf::Vector2f>& polygonPoints) -> sf::Vector2f;
+	static auto Mid(const std::vector<sf::Vector2f>& polygonPoints) -> sf::Vector2f;
 
 	template <typename T>
 	static auto MapPoint(const sf::Vector2<T>& point, sf::Rect<T> from, sf::Rect<T> to) -> sf::Vector2<T>;
@@ -66,10 +73,10 @@ public:
 	template <typename T>
 	static auto ValueToSpectrum(T value, T maxValue) -> sf::Color;
 
-	static auto CreateConvexShape(const List<sf::Vector2f>& points) -> sf::ConvexShape;
+	static auto CreateConvexShape(const std::vector<sf::Vector2f>& points) -> sf::ConvexShape;
 
 	template <typename T>
-	static auto WrapPoints(const List<sf::Vector2<T>>& points) -> List<sf::Vector2<T>>;
+	static auto WrapPoints(const std::vector<sf::Vector2<T>>& points) -> std::vector<sf::Vector2<T>>;
 
 	/// @hue: 0-360°
 	/// @saturation: 0.0 - 1.0
@@ -81,9 +88,16 @@ public:
 	static auto RGBtoHSV(const sf::Color& color) -> HSVColor;
 
 private:
+	template <typename Dest, typename Src, std::size_t N, std::size_t... Is>
+	static auto ConvertArrayToImpl(const std::array<Src, N>& src, std::index_sequence<Is...>)
+	{
+		return std::array<Dest, N>{{static_cast<Dest>(src[Is])...}};
+	}
+
 	template <typename T>
 	static void ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>>& line,
-	                                   const List<sf::Vector2<T>>& points, List<sf::Vector2<T>>& finalPoints);
+	                                   const std::vector<sf::Vector2<T>>& points,
+	                                   std::vector<sf::Vector2<T>>& finalPoints);
 };
 
 template <typename T, typename U>
@@ -198,12 +212,12 @@ auto GenUtils::ValueToSpectrum(T value, T maxValue) -> sf::Color
 };
 
 template <typename T>
-auto GenUtils::WrapPoints(const List<sf::Vector2<T>>& points) -> List<sf::Vector2<T>>
+auto GenUtils::WrapPoints(const std::vector<sf::Vector2<T>>& points) -> std::vector<sf::Vector2<T>>
 {
-	List<sf::Vector2f> finalPoints;
+	std::vector<sf::Vector2f> finalPoints;
 
-	List<sf::Vector2f> topPoints;
-	List<sf::Vector2f> bottomPoints;
+	std::vector<sf::Vector2f> topPoints;
+	std::vector<sf::Vector2f> bottomPoints;
 	std::pair<sf::Vector2f, sf::Vector2f> startLine;
 
 	sf::Vector2f biggestX = {static_cast<T>(-std::numeric_limits<T>::infinity()), -std::numeric_limits<T>::infinity()};
@@ -242,7 +256,8 @@ auto GenUtils::WrapPoints(const List<sf::Vector2<T>>& points) -> List<sf::Vector
 
 template <typename T>
 void GenUtils::ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector2<T>>& line,
-                                      const List<sf::Vector2<T>>& points, List<sf::Vector2<T>>& finalPoints)
+                                      const std::vector<sf::Vector2<T>>& points,
+                                      std::vector<sf::Vector2<T>>& finalPoints)
 {
 	//Find the point which is the furthest away
 	float biggestDistance = 0.0f;
@@ -265,8 +280,8 @@ void GenUtils::ClearPointsRecursively(const std::pair<sf::Vector2<T>, sf::Vector
 		std::pair<sf::Vector2f, sf::Vector2f> newLine = {lineCpy.first, furthest};
 		lineCpy.first = furthest;
 
-		List<sf::Vector2f> consideredPoints1;
-		List<sf::Vector2f> consideredPoints2;
+		std::vector<sf::Vector2f> consideredPoints1;
+		std::vector<sf::Vector2f> consideredPoints2;
 		for (auto& point : points)
 		{
 			if (!VecUtils::IsLeft(newLine.first, newLine.second, point))

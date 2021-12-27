@@ -12,7 +12,7 @@ public:
 
 #ifdef SE_DEBUG
 	template <typename Arg, typename... Args>
-	static constexpr void Assert(bool what, const String& message, Arg&& arg, Args&& ... args)
+	static constexpr void Assert(bool what, const std::string& message, Arg&& arg, Args&& ... args)
 	{
 		if (!what)
 		{
@@ -21,7 +21,7 @@ public:
 		}
 	}
 
-	static constexpr void Assert(bool what, const String& message)
+	static constexpr void Assert(bool what, const std::string& message)
 	{
 		if (!what)
 		{
@@ -36,12 +36,12 @@ public:
 	}
 
 	template <typename Arg, typename... Args>
-	static constexpr void Break(const String& message, Arg&& arg, Args&& ... args)
+	static constexpr void Break(const std::string& message, Arg&& arg, Args&& ... args)
 	{
 		Assert(false, message, std::forward<Arg>(arg), std::forward<Args>(args)...);
 	}
 
-	static constexpr void Break(const String& message)
+	static constexpr void Break(const std::string& message)
 	{
 		Assert(false, message);
 	}
@@ -53,11 +53,11 @@ public:
 
 #else
 	template <typename Arg, typename... Args>
-	static constexpr void Assert(bool what, const String& message, Arg&& arg, Args&& ... args)
+	static constexpr void Assert(bool what, const std::string& message, Arg&& arg, Args&& ... args)
 	{
 	}
 
-	static constexpr void Assert(bool what, const String& message)
+	static constexpr void Assert(bool what, const std::string& message)
 	{
 	}
 
@@ -66,11 +66,11 @@ public:
 	}
 
 	template <typename Arg, typename... Args>
-	static constexpr void Break(const String& message, Arg&& arg, Args&& ... args)
+	static constexpr void Break(const std::string& message, Arg&& arg, Args&& ... args)
 	{
 	}
 
-	static constexpr void Break(const String& message)
+	static constexpr void Break(const std::string& message)
 	{
 	}
 
@@ -80,7 +80,7 @@ public:
 #endif
 
 private:
-	inline static String AssertionFailed = Log::Fmt::OnRed + Log::Fmt::White + "Assertion failed" + Log::Fmt::Reset +
+	inline static std::string AssertionFailed = Log::Fmt::OnRed + Log::Fmt::White + "Assertion failed" + Log::Fmt::Reset +
 		Log::Fmt::Cyan;
 };
 }

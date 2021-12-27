@@ -21,7 +21,7 @@ auto TerminalSink::TextBuffer() const -> const ImGuiTextBuffer&
 	return _textBuffer;
 }
 
-auto TerminalSink::LineOffsets() const -> const List<int>&
+auto TerminalSink::LineOffsets() const -> const std::vector<int>&
 {
 	return _lineOffsets;
 }

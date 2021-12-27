@@ -5,6 +5,8 @@
 #include "Saffron/Core/Filesystem.h"
 #include "Saffron/Graphics/ComputeShader.h"
 
+#include <complex>
+
 namespace Se
 {
 void ComputeShader::Bind()
@@ -25,19 +27,19 @@ void ComputeShader::Dispatch(uint xGroup, uint yGroup, uint zGroup)
 	});
 }
 
-bool ComputeShader::LoadFromFile(const Path& filepath)
+bool ComputeShader::LoadFromFile(const std::filesystem::path& filepath)
 {
 	Debug::Assert(Filesystem::FileExists(filepath), "{} did not exist", filepath.string());
 
-	String content;
-	IFileStream fileStream(filepath, std::ios::in);
+	std::string content;
+	std::fstream fileStream(filepath, std::ios::in);
 
 	if (!fileStream.is_open())
 	{
 		std::cerr << "Could not read file " << filepath << ". File does not exist." << std::endl;
 	}
 
-	String line;
+	std::string line;
 	while (!fileStream.eof())
 	{
 		std::getline(fileStream, line);
@@ -46,7 +48,7 @@ bool ComputeShader::LoadFromFile(const Path& filepath)
 	fileStream.close();
 
 	const auto* contentCStr = content.c_str();
-	const auto shader = glCreateShader(GL_COMPUTE_SHADER);	
+	const auto shader = glCreateShader(GL_COMPUTE_SHADER);
 	if (shader < 1)
 	{
 		return false;
@@ -85,7 +87,7 @@ bool ComputeShader::LoadFromFile(const Path& filepath)
 	return true;
 }
 
-void ComputeShader::SetFloat(const String& name, float value)
+void ComputeShader::SetFloat(const std::string& name, float value)
 {
 	BindThenUnbind([&]
 	{
@@ -95,7 +97,7 @@ void ComputeShader::SetFloat(const String& name, float value)
 	});
 }
 
-void ComputeShader::SetDouble(const String& name, double value)
+void ComputeShader::SetDouble(const std::string& name, double value)
 {
 	BindThenUnbind([&]
 	{
@@ -105,7 +107,7 @@ void ComputeShader::SetDouble(const String& name, double value)
 	});
 }
 
-void ComputeShader::SetInt(const String& name, int value)
+void ComputeShader::SetInt(const std::string& name, int value)
 {
 	BindThenUnbind([&]
 	{
@@ -115,7 +117,7 @@ void ComputeShader::SetInt(const String& name, int value)
 	});
 }
 
-void ComputeShader::SetVector2d(const String& name, const sf::Vector2<double>& value)
+void ComputeShader::SetVector2d(const std::string& name, const sf::Vector2<double>& value)
 {
 	BindThenUnbind([&]
 	{
@@ -125,12 +127,12 @@ void ComputeShader::SetVector2d(const String& name, const sf::Vector2<double>& v
 	});
 }
 
-void ComputeShader::SetVector2d(const String& name, const std::complex<double>& value)
+void ComputeShader::SetVector2d(const std::string& name, const std::complex<double>& value)
 {
 	SetVector2d(name, sf::Vector2<double>(value.real(), value.imag()));
 }
 
-void ComputeShader::SetVector4f(const String& name, const sf::Vector4f& value)
+void ComputeShader::SetVector4f(const std::string& name, const sf::Vector4f& value)
 {
 	BindThenUnbind([&]
 	{
@@ -145,7 +147,7 @@ void ComputeShader::AwaitFinish()
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
 
-void ComputeShader::BindThenUnbind(const Function<void()>& fn)
+void ComputeShader::BindThenUnbind(const std::function<void()>& fn)
 {
 	Bind();
 	fn();

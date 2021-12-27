@@ -9,26 +9,26 @@ namespace Se
 class SoundBufferStore : public ResourceStore<sf::SoundBuffer>
 {
 public:
-	static auto Get(const Path& path, bool copy) -> Shared<sf::SoundBuffer>
+	static auto Get(const std::filesystem::path& path, bool copy) -> std::shared_ptr<sf::SoundBuffer>
 	{
 		return Instance().Fetch(path, copy);
 	}
 
 private:
-	auto Copy(const Shared<sf::SoundBuffer>& value) -> Shared<sf::SoundBuffer> override
+	auto Copy(const std::shared_ptr<sf::SoundBuffer>& value) -> std::shared_ptr<sf::SoundBuffer> override
 	{
-		return CreateShared<sf::SoundBuffer>(*value);
+		return std::make_shared<sf::SoundBuffer>(*value);
 	}
 
-	auto Location() -> Path override
+	auto Location() -> std::filesystem::path override
 	{
 		return "Assets/Sounds/";
 	}	
 
 private:
-	auto Load(Path path) -> Shared<sf::SoundBuffer> override
+	auto Load(std::filesystem::path path) -> std::shared_ptr<sf::SoundBuffer> override
 	{
-		auto resource = CreateShared<sf::SoundBuffer>();
+		auto resource = std::make_shared<sf::SoundBuffer>();
 		const auto result = resource->loadFromFile(path.string());
 		Debug::Assert(result, "Failed to load SoundBuffer");
 		return resource;

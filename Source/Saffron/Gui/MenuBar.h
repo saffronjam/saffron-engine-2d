@@ -6,14 +6,13 @@
 
 namespace Se
 {
-
 struct MenuBarMenu
 {
-	String Title;
-	Function<void()> Generator;
+	std::string Title;
+	std::function<void()> Generator;
 };
 
-class MenuBar : public SingleTon<MenuBar>
+class MenuBar : public Singleton<MenuBar>
 {
 public:
 	MenuBar();
@@ -22,8 +21,8 @@ public:
 	void End();
 
 	static void AddMenu(MenuBarMenu menu, int order = 0);
-	
+
 private:
-	MultiTreeMap<int, MenuBarMenu> _menus;
+	std::multimap<int, MenuBarMenu> _menus;
 };
 }

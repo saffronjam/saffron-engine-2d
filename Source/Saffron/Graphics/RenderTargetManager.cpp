@@ -7,7 +7,7 @@
 namespace Se
 {
 RenderTargetManager::RenderTargetManager() :
-	SingleTon(this)
+	Singleton(this)
 {
 }
 

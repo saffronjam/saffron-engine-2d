@@ -26,7 +26,7 @@ auto FormatFilter(const Filesystem::Filter& filter) -> const char*
 	return buffer;
 }
 
-auto Filesystem::OpenFile(const Filter& filter) -> Path
+auto Filesystem::OpenFile(const Filter& filter) -> std::filesystem::path
 {
 	const char* formattedFilter = FormatFilter(filter);
 
@@ -47,10 +47,10 @@ auto Filesystem::OpenFile(const Filter& filter) -> Path
 	{
 		return ofn.lpstrFile;
 	}
-	return Path();
+	return std::filesystem::path();
 }
 
-auto Filesystem::SaveFile(const Filter& filter) -> Path
+auto Filesystem::SaveFile(const Filter& filter) -> std::filesystem::path
 {
 	const char* formattedFilter = FormatFilter(filter);
 	const char* fallbackExtension = filter.Extensions.front() == "*.*" ? "" : filter.Extensions.front().c_str();
@@ -73,7 +73,7 @@ auto Filesystem::SaveFile(const Filter& filter) -> Path
 	{
 		return ofn.lpstrFile;
 	}
-	return Path();
+	return std::filesystem::path();
 }
 }
 

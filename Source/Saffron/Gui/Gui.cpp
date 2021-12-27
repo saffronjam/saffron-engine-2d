@@ -13,7 +13,7 @@ namespace Se
 static int s_UIContextID = 0;
 
 Gui::Gui() :
-	SingleTon(this)
+	Singleton(this)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -99,7 +99,7 @@ void Gui::End()
 	}
 }
 
-void Gui::BeginPropertyGrid(String id, float width)
+void Gui::BeginPropertyGrid(std::string id, float width)
 {
 	PushID();
 	ImGui::Columns(2, id.length() ? id.c_str() : nullptr);
@@ -112,7 +112,7 @@ void Gui::EndPropertyGrid()
 	PopID();
 }
 
-auto Gui::BeginTreeNode(const String& name, bool defaultOpen) -> bool
+auto Gui::BeginTreeNode(const std::string& name, bool defaultOpen) -> bool
 {
 	ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth |
 		ImGuiTreeNodeFlags_FramePadding;
@@ -126,14 +126,14 @@ void Gui::EndTreeNode()
 	ImGui::TreePop();
 }
 
-void Gui::Property(const String& name, const Function<void()>& onClick, bool secondColumn)
+void Gui::Property(const std::string& name, const std::function<void()>& onClick, bool secondColumn)
 {
 	if (secondColumn)
 	{
 		ImGui::NextColumn();
 	}
 
-	const String id = name + "##" + name;
+	const std::string id = name + "##" + name;
 	if (ImGui::Button(id.c_str(), {ImGui::GetContentRegionAvailWidth(), 0}))
 	{
 		onClick();
@@ -146,20 +146,20 @@ void Gui::Property(const String& name, const Function<void()>& onClick, bool sec
 	ImGui::NextColumn();
 }
 
-void Gui::Property(const String& name, const String& value)
+void Gui::Property(const std::string& name, const std::string& value)
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	ImGui::InputText(id.c_str(), const_cast<char*>(value.c_str()), 256, ImGuiInputTextFlags_ReadOnly);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
 }
 
-auto Gui::Property(const String& name, String& value) -> bool
+auto Gui::Property(const std::string& name, std::string& value) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
@@ -168,7 +168,7 @@ auto Gui::Property(const String& name, String& value) -> bool
 	char buffer[256];
 	strcpy(buffer, value.c_str());
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (ImGui::InputText(id.c_str(), buffer, 256))
 	{
@@ -181,13 +181,13 @@ auto Gui::Property(const String& name, String& value) -> bool
 	return changed;
 }
 
-auto Gui::Property(const String& name, bool& value) -> bool
+auto Gui::Property(const std::string& name, bool& value) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	const bool result = ImGui::Checkbox(id.c_str(), &value);
 
 	ImGui::PopItemWidth();
@@ -196,8 +196,8 @@ auto Gui::Property(const String& name, bool& value) -> bool
 	return result;
 }
 
-auto Gui::Property(const String& name, const String& text, const String& buttonName,
-                   const Function<void()>& onButtonPress) -> bool
+auto Gui::Property(const std::string& name, const std::string& text, const std::string& buttonName,
+                   const std::function<void()>& onButtonPress) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
@@ -210,7 +210,7 @@ auto Gui::Property(const String& name, const String& text, const String& buttonN
 		ImGui::PushItemWidth(textBoxWidth);
 		char buffer[256];
 		strcpy(buffer, text.c_str());
-		const String id = "##" + name;
+		const std::string id = "##" + name;
 		ImGui::InputText(id.c_str(), const_cast<char*>(text.c_str()), 256, ImGuiInputTextFlags_ReadOnly);
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
@@ -232,12 +232,12 @@ auto Gui::Property(const String& name, const String& text, const String& buttonN
 	return changed;
 }
 
-auto Gui::Property(const String& name, int& value, int min, int max, float step, GuiPropertyFlag flags) -> bool
+auto Gui::Property(const std::string& name, int& value, int min, int max, float step, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%d", min, max, step, flags);
 }
 
-auto Gui::Property(const String& name, int& value, const char* format, int min, int max, float step,
+auto Gui::Property(const std::string& name, int& value, const char* format, int min, int max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
@@ -246,7 +246,7 @@ auto Gui::Property(const String& name, int& value, const char* format, int min, 
 
 	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (flags & GuiPropertyFlag_Slider)
 	{
@@ -263,12 +263,12 @@ auto Gui::Property(const String& name, int& value, const char* format, int min, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, float& value, float min, float max, float step, GuiPropertyFlag flags) -> bool
+auto Gui::Property(const std::string& name, float& value, float min, float max, float step, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
-auto Gui::Property(const String& name, float& value, const char* format, float min, float max, float step,
+auto Gui::Property(const std::string& name, float& value, const char* format, float min, float max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
@@ -277,7 +277,7 @@ auto Gui::Property(const String& name, float& value, const char* format, float m
 
 	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (flags & GuiPropertyFlag_Slider)
 	{
@@ -294,18 +294,18 @@ auto Gui::Property(const String& name, float& value, const char* format, float m
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool
+auto Gui::Property(const std::string& name, sf::Vector2f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector2f& value, float min, float max, float step,
+auto Gui::Property(const std::string& name, sf::Vector2f& value, float min, float max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.03f", min, max, step, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, float min, float max, float step,
+auto Gui::Property(const std::string& name, sf::Vector2f& value, const char* format, float min, float max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text("%s", name.c_str());
@@ -314,7 +314,7 @@ auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, 
 
 	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (flags & GuiPropertyFlag_Slider)
 	{
@@ -331,19 +331,19 @@ auto Gui::Property(const String& name, sf::Vector2f& value, const char* format, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool
+auto Gui::Property(const std::string& name, sf::Vector3f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector3f& value, float min, float max, float step, GuiPropertyFlag flags,
-                   Optional<std::function<void()>> fn) -> bool
+auto Gui::Property(const std::string& name, sf::Vector3f& value, float min, float max, float step, GuiPropertyFlag flags,
+                   std::optional<std::function<void()>> fn) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, float min, float max, float step,
-                   GuiPropertyFlag flags, Optional<std::function<void()>> fn) -> bool
+auto Gui::Property(const std::string& name, sf::Vector3f& value, const char* format, float min, float max, float step,
+                   GuiPropertyFlag flags, std::optional<std::function<void()>> fn) -> bool
 {
 	ImGui::Text("%s", name.c_str());
 	ImGui::NextColumn();
@@ -359,7 +359,7 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 		ImGui::PushItemWidth(-1);
 	}
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (flags & GuiPropertyFlag_Color)
 	{
@@ -376,7 +376,7 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 
 	if (fn.has_value())
 	{
-		const String buttonID = "<" + id + "##fn";
+		const std::string buttonID = "<" + id + "##fn";
 		ImGui::SameLine();
 		if (ImGui::Button(buttonID.c_str(), {ImGui::GetContentRegionAvailWidth(), 0.0f}))
 		{
@@ -391,18 +391,18 @@ auto Gui::Property(const String& name, sf::Vector3f& value, const char* format, 
 	return changed;
 }
 
-auto Gui::Property(const String& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool
+auto Gui::Property(const std::string& name, sf::Vector4f& value, GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector4f& value, float min, float max, float step,
+auto Gui::Property(const std::string& name, sf::Vector4f& value, float min, float max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	return Property(name, value, "%.3f", min, max, step, flags);
 }
 
-auto Gui::Property(const String& name, sf::Vector4f& value, const char* format, float min, float max, float step,
+auto Gui::Property(const std::string& name, sf::Vector4f& value, const char* format, float min, float max, float step,
                    GuiPropertyFlag flags) -> bool
 {
 	ImGui::Text(name.c_str());
@@ -411,7 +411,7 @@ auto Gui::Property(const String& name, sf::Vector4f& value, const char* format, 
 
 	const auto imGuiFlags = ToImGuiSliderFlags(flags);
 
-	const String id = "##" + name;
+	const std::string id = "##" + name;
 	bool changed = false;
 	if (flags & GuiPropertyFlag_Color)
 	{
@@ -496,7 +496,7 @@ auto Gui::ImageButton(const sf::Sprite& sprite, const sf::Vector2f& size, int fr
 	return GuiImpl::ImageButton(sprite, size, framePadding, bgColor, tintColor);
 }
 
-void Gui::HelpMarker(const String& desc)
+void Gui::HelpMarker(const std::string& desc)
 {
 	ImGui::TextDisabled("(?)");
 	if (ImGui::IsItemHovered())
@@ -710,7 +710,7 @@ void Gui::SetFontSize(int size)
 	ImGui::SetCurrentFont(candidate);
 }
 
-auto Gui::AddFont(const Path& path, int size) -> Font*
+auto Gui::AddFont(const std::filesystem::path& path, int size) -> Font*
 {
 	auto* newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(path.string().c_str(), static_cast<float>(size));
 	Instance()._fonts.emplace(size, newFont);

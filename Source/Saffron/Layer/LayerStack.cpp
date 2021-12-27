@@ -94,7 +94,7 @@ auto LayerStack::Back() -> std::shared_ptr<Layer>
 	return _layers.back();
 }
 
-auto LayerStack::begin() -> List<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
+auto LayerStack::begin() -> std::vector<std::shared_ptr<Layer>>::iterator { return _layers.begin(); }
 
-auto LayerStack::end() -> List<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
+auto LayerStack::end() -> std::vector<std::shared_ptr<Layer>>::iterator { return _layers.end(); }
 }

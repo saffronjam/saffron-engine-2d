@@ -9,26 +9,26 @@ namespace Se
 class TextureStore : public ResourceStore<sf::Texture>
 {
 public:
-	static auto Get(const Path& path, bool copy = false) -> Shared<sf::Texture>
+	static auto Get(const std::filesystem::path& path, bool copy = false) -> std::shared_ptr<sf::Texture>
 	{
 		return Instance().Fetch(path, copy);
 	}
 
 private:
-	auto Copy(const Shared<sf::Texture>& value) -> Shared<sf::Texture> override
+	auto Copy(const std::shared_ptr<sf::Texture>& value) -> std::shared_ptr<sf::Texture> override
 	{
-		return CreateShared<sf::Texture>(*value);
+		return std::make_shared<sf::Texture>(*value);
 	}
 
-	auto Location() -> Path override
+	auto Location() -> std::filesystem::path override
 	{
 		return "Assets/Textures/";
 	}
 
 private:
-	auto Load(Path path) -> Shared<sf::Texture> override
+	auto Load(std::filesystem::path path) -> std::shared_ptr<sf::Texture> override
 	{
-		auto resource = CreateShared<sf::Texture>();
+		auto resource = std::make_shared<sf::Texture>();
 		const auto result = resource->loadFromFile(path.string());
 		Debug::Assert(result, "Failed to load Texture");
 		return resource;

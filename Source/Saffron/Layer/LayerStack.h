@@ -22,17 +22,17 @@ public:
 	auto Front() -> std::shared_ptr<Layer>;
 	auto Back() -> std::shared_ptr<Layer>;
 
-	auto begin() -> List<std::shared_ptr<Layer>>::iterator;
-	auto end() -> List<std::shared_ptr<Layer>>::iterator;
+	auto begin() -> std::vector<std::shared_ptr<Layer>>::iterator;
+	auto end() -> std::vector<std::shared_ptr<Layer>>::iterator;
 
 public:
-	EventSubscriberList<const Shared<Layer>&> OnPushLayer;
-	EventSubscriberList<const Shared<Layer>&> OnPushOverlay;
-	EventSubscriberList<const Shared<Layer>&> OnPopLayer;
-	EventSubscriberList<const Shared<Layer>&> OnPopOverlay;
+	SubscriberList<const std::shared_ptr<Layer>&> OnPushLayer;
+	SubscriberList<const std::shared_ptr<Layer>&> OnPushOverlay;
+	SubscriberList<const std::shared_ptr<Layer>&> OnPopLayer;
+	SubscriberList<const std::shared_ptr<Layer>&> OnPopOverlay;
 
 private:
-	List<Shared<Layer>> _layers;
+	std::vector<std::shared_ptr<Layer>> _layers;
 	unsigned int _layerInsertIndex = 0;
 };
 }

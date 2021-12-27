@@ -14,7 +14,7 @@ namespace Se
 class Scene
 {
 public:
-	Scene(String name, ControllableRenderTexture* target, Camera* camera);
+	Scene(std::string name, ControllableRenderTexture* target, Camera* camera);
 
 	void OnUpdate() const;
 	void OnGuiRender();

@@ -6,11 +6,11 @@
 namespace Se
 {
 template <typename EventArgs>
-class EventSubscriberList
+class SubscriberList
 {
 public:
 	using CancellationToken = UUID;
-	using Handler = Function<bool(EventArgs)>;
+	using Handler = std::function<bool(EventArgs)>;
 
 public:
 	void Invoke(EventArgs args);
@@ -23,15 +23,15 @@ public:
 	void operator -=(CancellationToken token);
 
 private:
-	HashMap<CancellationToken, Handler> _subscribers;
+	std::unordered_map<CancellationToken, Handler> _subscribers;
 };
 
 template <>
-class EventSubscriberList<void>
+class SubscriberList<void>
 {
 public:
 	using CancellationToken = UUID;
-	using Handler = Function<bool()>;
+	using Handler = std::function<bool()>;
 
 public:
 	void Invoke();
@@ -44,11 +44,11 @@ public:
 	void operator -=(CancellationToken token);
 
 private:
-	HashMap<CancellationToken, Handler> _subscribers;
+	std::unordered_map<CancellationToken, Handler> _subscribers;
 };
 
 template <typename EventArgs>
-void EventSubscriberList<EventArgs>::Invoke(EventArgs args)
+void SubscriberList<EventArgs>::Invoke(EventArgs args)
 {
 	for (const auto& [token, subscriber] : _subscribers)
 	{
@@ -60,33 +60,33 @@ void EventSubscriberList<EventArgs>::Invoke(EventArgs args)
 }
 
 template <typename EventArgs>
-auto EventSubscriberList<EventArgs>::Subscribe(Handler handler) -> CancellationToken
+auto SubscriberList<EventArgs>::Subscribe(Handler handler) -> CancellationToken
 {
 	const CancellationToken token;
-	_subscribers.emplace(token, Move(handler));
+	_subscribers.emplace(token, std::move(handler));
 	return token;
 }
 
 template <typename EventArgs>
-void EventSubscriberList<EventArgs>::Unsubscribe(CancellationToken token)
+void SubscriberList<EventArgs>::Unsubscribe(CancellationToken token)
 {
 	_subscribers.erase(token);
 }
 
 template <typename EventArgs>
-auto EventSubscriberList<EventArgs>::Empty() -> bool
+auto SubscriberList<EventArgs>::Empty() -> bool
 {
 	return _subscribers.empty();
 }
 
 template <typename EventArgs>
-auto EventSubscriberList<EventArgs>::operator+=(Handler handler) -> CancellationToken
+auto SubscriberList<EventArgs>::operator+=(Handler handler) -> CancellationToken
 {
 	return Subscribe(handler);
 }
 
 template <typename EventArgs>
-void EventSubscriberList<EventArgs>::operator-=(CancellationToken token)
+void SubscriberList<EventArgs>::operator-=(CancellationToken token)
 {
 	Unsubscribe(token);
 }

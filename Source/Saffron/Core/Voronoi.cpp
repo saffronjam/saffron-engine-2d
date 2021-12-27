@@ -9,11 +9,11 @@
 namespace Se
 {
 Voronoi::Polygon::Polygon(Voronoi& parent, int lineVAIndex, int filledVAIndex, const sf::Vector2f& voronoiPoint,
-                          List<sf::Vector2f> points) :
+                          std::vector<sf::Vector2f> points) :
 	_parent(parent),
 	_lineVAIndex(lineVAIndex),
 	_filledVAIndex(filledVAIndex),
-	_points(Move(points)),
+	_points(std::move(points)),
 	_voronoiPoint(voronoiPoint)
 {
 }
@@ -24,11 +24,11 @@ auto Voronoi::Polygon::LineVAIndex() const -> int { return _lineVAIndex; }
 
 auto Voronoi::Polygon::FilledVAIndex() const -> int { return _filledVAIndex; }
 
-auto Voronoi::Polygon::Points() const -> const List<sf::Vector2f>& { return _points; }
+auto Voronoi::Polygon::Points() const -> const std::vector<sf::Vector2f>& { return _points; }
 
 auto Voronoi::Polygon::FillColor() const -> sf::Color { return _fillColor; }
 
-auto Voronoi::Polygon::Neighbors() const -> const TreeSet<Polygon*>& { return _neighbors; }
+auto Voronoi::Polygon::Neighbors() const -> const std::set<Polygon*>& { return _neighbors; }
 
 void Voronoi::Polygon::AddNeighbor(Polygon* neighbor)
 {
@@ -62,7 +62,7 @@ void Voronoi::HideFilled()
 	_shouldDrawFilledPolygons = false;
 }
 
-auto Voronoi::Polygons() const -> const List<Polygon>& { return _polygons; }
+auto Voronoi::Polygons() const -> const std::vector<Polygon>& { return _polygons; }
 
 void Voronoi::EnableAutomaticGeneration()
 {
@@ -84,11 +84,11 @@ void Voronoi::Polygon::ClearFillColor(sf::Color color)
 	SetFillColor(sf::Color::Transparent);
 }
 
-auto Voronoi::Polygon::ClosestEdge(const sf::Vector2f& position) const -> Pair<sf::Vector2f, sf::Vector2f>
+auto Voronoi::Polygon::ClosestEdge(const sf::Vector2f& position) const -> std::pair<sf::Vector2f, sf::Vector2f>
 {
 	constexpr float inf = std::numeric_limits<float>::infinity();
-	Pair<float, float> distCache{inf, inf};
-	Pair<int, int> closestIndices{-1, -1};
+	std::pair<float, float> distCache{inf, inf};
+	std::pair<int, int> closestIndices{-1, -1};
 
 	for (int i = 0; i < _points.size(); i++)
 	{
@@ -128,9 +128,9 @@ Voronoi::Voronoi(const sf::FloatRect& boundingBox) :
 	SetupUpdateCallback();
 }
 
-Voronoi::Voronoi(const sf::FloatRect& boundingBox, List<sf::Vector2f> points) :
+Voronoi::Voronoi(const sf::FloatRect& boundingBox, std::vector<sf::Vector2f> points) :
 	_boundingBox(boundingBox),
-	_points(Move(points))
+	_points(std::move(points))
 {
 	SetupUpdateCallback();
 	ForceGenerate();
@@ -154,9 +154,9 @@ Voronoi::~Voronoi()
 	Run::Remove(_updateHandle);
 }
 
-void Voronoi::SetPoints(List<sf::Vector2f> points)
+void Voronoi::SetPoints(std::vector<sf::Vector2f> points)
 {
-	_points = Move(points);
+	_points = std::move(points);
 	MarkForGeneration();
 }
 
@@ -307,7 +307,7 @@ void Voronoi::Generate()
 	{
 		const jcv_site* site = &sites[i];
 
-		List<sf::Vector2f> polygonPoints;
+		std::vector<sf::Vector2f> polygonPoints;
 		for (jcv_graphedge* edge = site->edges; edge != nullptr; edge = edge->next)
 		{
 			polygonPoints.emplace_back(edge->pos[0].x, edge->pos[0].y);

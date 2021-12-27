@@ -6,7 +6,7 @@
 namespace Se
 {
 MenuBar::MenuBar():
-	SingleTon<MenuBar>(this)
+	Singleton<MenuBar>(this)
 {
 }
 
@@ -32,6 +32,6 @@ void MenuBar::End()
 
 void MenuBar::AddMenu(MenuBarMenu menu, int order)
 {
-	Instance()._menus.emplace(order, Move(menu));
+	Instance()._menus.emplace(order, std::move(menu));
 }
 }

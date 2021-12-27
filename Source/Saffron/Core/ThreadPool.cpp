@@ -19,7 +19,7 @@ ThreadPool::~ThreadPool()
 	CollectAll();
 }
 
-auto ThreadPool::DispatchWork(const String& id, Function<void()> fn) -> bool
+auto ThreadPool::DispatchWork(const std::string& id, std::function<void()> fn) -> bool
 {
 	std::scoped_lock scoped(_mutex);
 
@@ -44,7 +44,7 @@ auto ThreadPool::DispatchWork(const String& id, Function<void()> fn) -> bool
 				worker.Id = id;
 				worker.Available = false;
 				worker.Function = fn;
-				worker.Thread = Thread([&worker]
+				worker.Thread = std::thread([&worker]
 				{
 					ThreadFn(worker);
 				});

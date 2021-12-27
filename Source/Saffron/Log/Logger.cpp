@@ -4,11 +4,11 @@
 
 namespace Se
 {
-Logger::Logger(Shared<spdlog::logger> logger) :
-	_nativeLogger(Move(logger))
+Logger::Logger(std::shared_ptr<spdlog::logger> logger) :
+	_nativeLogger(std::move(logger))
 {
-	auto& sinks = const_cast<List<spdlog::sink_ptr>&>(_nativeLogger->sinks());
-	sinks.push_back(std::reinterpret_pointer_cast<spdlog::sinks::sink>(CreateShared<InternalSink>(*this)));
+	auto& sinks = const_cast<std::vector<spdlog::sink_ptr>&>(_nativeLogger->sinks());
+	sinks.push_back(std::reinterpret_pointer_cast<spdlog::sinks::sink>(std::make_shared<InternalSink>(*this)));
 }
 
 auto Logger::ToSpdlogLevel(LogLevel logLevel) -> spdlog::level::level_enum
