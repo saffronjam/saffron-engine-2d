@@ -37,7 +37,7 @@ auto ResourceStore<StoreType>::Fetch(const std::filesystem::path& path, bool cop
 {
 	std::string newPath(Location().string() + path.string());
 	std::shared_ptr<StoreType> newResoure;
-	if (!_resources.contains(newPath))
+	if (!_resources.contains(newPath) || _resources.at(newPath).expired())
 	{
 		newResoure = Load(newPath);
 		_resources.emplace(newPath, newResoure);
