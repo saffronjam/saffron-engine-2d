@@ -1,28 +1,28 @@
 ---@diagnostic disable: undefined-global, undefined-field
 
-Inspect = require('inspect')
-Utils = require('utils')
-
-OutBin     = _MAIN_SCRIPT_DIR .. "/Build/Bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-OutObj     = _MAIN_SCRIPT_DIR .. "/Build/Obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-OutBinDist = _MAIN_SCRIPT_DIR .. "/Example/%{cfg.system}/"
-OutLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
-PrjLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
+OutBin     = _MAIN_SCRIPT_DIR .. "/build/bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
+OutObj     = _MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
+OutBinDist = _MAIN_SCRIPT_DIR .. "/build/dist/%{cfg.system}/"
+OutLoc     = _MAIN_SCRIPT_DIR .. "/build/"
+PrjLoc     = _MAIN_SCRIPT_DIR .. "/build/"
 WrkLoc     = _MAIN_SCRIPT_DIR .. "/"
-AstFol     = "Assets/"
+AstFol     = "assets/"
 
 local function GetBasePath()
 	return debug.getinfo(1).source:match("@?(.*/)")
 end
 
+Inspect = dofile(GetBasePath() .. "inspect.lua")
+Utils = dofile(GetBasePath() .. "utils.lua")
+
 local function RequireAll()
     local result = {}
-    result["ImGui"]  = require("ThirdParty.imgui.premake5")
-    result["SFML"]   = require("ThirdParty.SFML.premake5")
-    result["Glad"]   = require("ThirdParty.Glad.premake5")
-    result["Jcv"]    = require("ThirdParty.jcv.premake5")
-    result["Spdlog"] = require("ThirdParty.spdlog.premake5")
-    result["Box2D"]  = require("ThirdParty.Box2D.premake5")
+    result["ImGui"]  = dofile(GetBasePath() .. "deps/imgui/premake5.lua")
+    result["SFML"]   = dofile(GetBasePath() .. "deps/SFML/premake5.lua")
+    result["Glad"]   = dofile(GetBasePath() .. "deps/Glad/premake5.lua")
+    result["Jcv"]    = dofile(GetBasePath() .. "deps/jcv/premake5.lua")
+    result["Spdlog"] = dofile(GetBasePath() .. "deps/spdlog/premake5.lua")
+    result["Box2D"]  = dofile(GetBasePath() .. "deps/Box2D/premake5.lua")
     return result
 end
 
@@ -73,11 +73,11 @@ end
 
 local module = {}
 
-module.Project = "SaffronEngine2D"
+module.Project = "saffron-engine-2d"
 
 module.Include = function ()
     includedirs {
-        GetBasePath() .. "Source"
+        GetBasePath() .. "source"
     }    
     -- Include third parties
     IncludeAll()
@@ -110,12 +110,12 @@ module.PostBuild = function (Configuration, BinaryOutputDir, ProjectDir)
 end
 
 module.SetStartUpProject = function (projectName)
-    workspace "Saffron"
+    workspace "saffron"
         startproject (projectName)
 end
 
 
-group "Engine/ThirdParty"
+group "Engine/deps"
 ThirdParties = RequireAll()
 group "Engine"
 module.PostBuildSfml = ThirdParties["SFML"].PostBuild
@@ -123,13 +123,18 @@ module.PostBuildSfml = ThirdParties["SFML"].PostBuild
 module.AddDefines = function()
 	filter "configurations:Debug or Release or Dist"
         defines {
-            "SE_IMGUI_INI_PATH=\"Assets/imgui.ini\""
+            "SE_IMGUI_INI_PATH=\"assets/imgui.ini\""
         }
     filter "system:windows"
         defines {
             "_CRT_SECURE_NO_WARNINGS",
             "SE_PLATFORM_WINDOWS",
         }
+    filter "system:linux"
+        defines {
+            "SE_PLATFORM_LINUX",
+        }
+    filter {}
     filter "configurations:Debug"
         defines { "DEBUG", "SE_DEBUG" }
     filter "configurations:Release"
@@ -144,21 +149,40 @@ project (module.Project)
     cppdialect "C++20"
 	staticruntime "On"
 
-	pchheader ("SaffronPCH.h")
-	pchsource ("Source/SaffronPCH.cpp")
+	filter "system:linux"
+		buildoptions { "-std=c++23" }
+	filter "system:windows"
+		buildoptions { "/std:c++latest" }
+	filter {}
+
+	-- MSVC-style PCH: every .cpp already #includes "saffron_pch.h" explicitly.
+	-- gcc's force-include PCH double-defines pragma-once headers, so only
+	-- enable the precompiled header on Windows; Linux just compiles the
+	-- explicit includes normally.
+	filter "system:windows"
+		pchheader ("saffron_pch.h")
+		pchsource ("source/saffron_pch.cpp")
+	filter {}
 
 	targetdir (OutBin)
 	objdir (OutObj)
 	location (OutLoc)
 
     files {
-        "Source/**.h",
-		"Source/**.c",
-		"Source/**.hpp",
-		"Source/**.cpp",
+        "source/**.h",
+		"source/**.c",
+		"source/**.hpp",
+		"source/**.cpp",
     }
-    
-    disablewarnings { 
+
+    -- Compile only the matching platform implementation
+    filter "system:not windows"
+        removefiles { "source/saffron/platform/windows/**" }
+    filter "system:not linux"
+        removefiles { "source/saffron/platform/linux/**" }
+    filter {}
+
+    disablewarnings {
         "4244",
         "4267"
     }

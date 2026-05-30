@@ -41,7 +41,7 @@ RelWithDebInfo
 
 # Executables
 *.exe
-!ThirdParty/Premake/Bin/premake5.exe
+!deps/Premake/Bin/premake5.exe
 *.out
 *.app
 

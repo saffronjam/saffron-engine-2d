@@ -1,0 +1,37 @@
+#include "saffron_pch.h"
+
+#include "saffron/gui/menu_bar.h"
+#include "saffron/gui/gui.h"
+
+namespace saffron
+{
+MenuBar::MenuBar():
+	Singleton<MenuBar>(this)
+{
+}
+
+void MenuBar::Begin() const
+{
+	if (ImGui::BeginMenuBar())
+	{
+		for (const auto& menu : _menus | std::views::values)
+		{			
+			if(ImGui::BeginMenu(menu.Title.c_str()))
+			{
+				menu.Generator();
+				ImGui::EndMenu();
+			}
+		}
+		ImGui::EndMenuBar();
+	}
+}
+
+void MenuBar::End()
+{
+}
+
+void MenuBar::AddMenu(MenuBarMenu menu, int order)
+{
+	Instance()._menus.emplace(order, std::move(menu));
+}
+}

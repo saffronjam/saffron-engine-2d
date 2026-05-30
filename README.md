@@ -8,4 +8,4 @@
     <img src="https://img.shields.io/badge/gcc-10.0+-ff69b4.svg" alt="gcc-8.0+">
 </p>
 
-See <a href="https://github.com/saffronjam/SaffronEngine2D-Example">Example app</a>
+See <a href="https://github.com/saffronjam/fractals">Fractals example app</a>

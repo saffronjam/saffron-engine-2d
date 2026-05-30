@@ -5,7 +5,13 @@ end
 module = {}
 
 module.CopyCmd = function (from, to)
-	return "{COPY} " .. from .. " " .. to
+	if os.target() == "windows" then
+		return "{COPY} " .. from .. " " .. to
+	end
+	-- On POSIX, `cp -rf SRC DST` nests (DST/SRC) when DST already exists, so a
+	-- second asset copy into the same dir produces assets/Assets. Copy the
+	-- directory *contents* into the target instead, which merges correctly.
+	return "mkdir -p " .. to .. " && cp -rf " .. from .. ". " .. to
 end
 
 function CopyAssetsToOutput (configuration, from, binaryOutputDir, projectDir)

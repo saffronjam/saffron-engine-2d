@@ -1,4 +1,4 @@
-[submodule "ThirdParty/imgui"]
-	path = ThirdParty/imgui
+[submodule "deps/imgui"]
+	path = deps/imgui
 	url = https://github.com/saffronjam/imgui.git
 	branch = docking

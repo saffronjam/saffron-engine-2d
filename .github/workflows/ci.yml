@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-linux:
+    name: Build Linux amd64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libsfml-dev libgl1-mesa-dev
+
+      - name: Setup Premake
+        uses: abel0b/setup-premake@v1
+
+      - name: Generate makefiles
+        run: |
+          cat > ci_premake5.lua <<'EOF'
+          workspace "saffron-engine-2d-ci"
+            architecture "x64"
+            configurations { "Debug", "Release", "Dist" }
+            flags { "MultiProcessorCompile" }
+          dofile("premake5.lua")
+          EOF
+          premake5 --file=ci_premake5.lua gmake2
+
+      - name: Build
+        run: make config=release saffron-engine-2d -j2
