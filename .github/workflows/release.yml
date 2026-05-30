@@ -51,7 +51,7 @@ jobs:
           dofile("premake5.lua")
           EOF
           premake5 --file=ci_premake5.lua gmake2
-          make config=release saffron-engine-2d -j2
+          make -f build/Makefile config=release saffron-engine-2d -j2
 
       - name: Package
         run: |
@@ -105,7 +105,7 @@ jobs:
           dofile("premake5.lua")
           '@ | Set-Content ci_premake5.lua
           premake5 --file=ci_premake5.lua vs2022
-          MSBuild.exe saffron-engine-2d-ci.sln /property:Configuration=Release /property:Platform=x64
+          MSBuild.exe build\saffron-engine-2d-ci.sln /property:Configuration=Release /property:Platform=x64
 
       - name: Package
         shell: pwsh

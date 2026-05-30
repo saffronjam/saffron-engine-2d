@@ -50,4 +50,4 @@ jobs:
           premake5 --file=ci_premake5.lua gmake2
 
       - name: Build
-        run: make config=release saffron-engine-2d -j2
+        run: make -f build/Makefile config=release saffron-engine-2d -j2

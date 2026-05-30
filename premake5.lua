@@ -5,7 +5,7 @@ OutObj     = _MAIN_SCRIPT_DIR .. "/build/obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg
 OutBinDist = _MAIN_SCRIPT_DIR .. "/build/dist/%{cfg.system}/"
 OutLoc     = _MAIN_SCRIPT_DIR .. "/build/"
 PrjLoc     = _MAIN_SCRIPT_DIR .. "/build/"
-WrkLoc     = _MAIN_SCRIPT_DIR .. "/"
+WrkLoc     = _MAIN_SCRIPT_DIR .. "/build/"
 AstFol     = "assets/"
 
 local function GetBasePath()
@@ -77,7 +77,7 @@ module.Project = "saffron-engine-2d"
 
 module.Include = function ()
     includedirs {
-        GetBasePath() .. "source"
+        GetBasePath() .. "src"
     }    
     -- Include third parties
     IncludeAll()
@@ -161,7 +161,7 @@ project (module.Project)
 	-- explicit includes normally.
 	filter "system:windows"
 		pchheader ("saffron_pch.h")
-		pchsource ("source/saffron_pch.cpp")
+		pchsource ("src/saffron_pch.cpp")
 	filter {}
 
 	targetdir (OutBin)
@@ -169,17 +169,17 @@ project (module.Project)
 	location (OutLoc)
 
     files {
-        "source/**.h",
-		"source/**.c",
-		"source/**.hpp",
-		"source/**.cpp",
+        "src/**.h",
+		"src/**.c",
+		"src/**.hpp",
+		"src/**.cpp",
     }
 
     -- Compile only the matching platform implementation
     filter "system:not windows"
-        removefiles { "source/saffron/platform/windows/**" }
+        removefiles { "src/saffron/platform/windows/**" }
     filter "system:not linux"
-        removefiles { "source/saffron/platform/linux/**" }
+        removefiles { "src/saffron/platform/linux/**" }
     filter {}
 
     disablewarnings {

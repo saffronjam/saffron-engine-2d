@@ -1,11 +1,11 @@
 # saffron-engine-2d — engine submodule
 
 2D framework used by fractals: SFML 2.x (window/graphics/audio/input), ImGui (with the engine's **own**
-SFML backend in `source/saffron/gui/GuiImpl.cpp` — `BackendPlatformName = "imgui_impl_sfml"`), OpenGL via
+SFML backend in `src/saffron/gui/GuiImpl.cpp` — `BackendPlatformName = "imgui_impl_sfml"`), OpenGL via
 Glad (compute + pixel shaders), Box2D (physics), spdlog (logging), jcv (Voronoi). Static library;
 the client links it. `git submodule` of `saffronjam/saffron-engine-2d`.
 
-## source/saffron layout
+## src/saffron layout
 
 `Core/` (App, Window, Run, Clock, ThreadPool, SIMD.h, Singleton), `Graphics/`, `Gui/` (ImGui panes incl.
 `ViewportPane`, `Terminal`), `Input/`, `Lighting/`, `Math/`, `Physics/` (Box2D wrappers — fractals uses
