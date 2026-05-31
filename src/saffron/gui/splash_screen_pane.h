@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics/Texture.hpp>
-
 #include "saffron/base.h"
 #include "saffron/core/batch.h"
 #include "saffron/gui/fade_pane.h"
@@ -33,7 +31,6 @@ private:
 	std::string _title;
 
 	std::shared_ptr<class Batch> _batch;
-	std::shared_ptr<sf::Texture> _texture;
 	bool _hidden = false;
 	bool _finishedFadeIn = false;
 	bool _finishedFadeOut = false;

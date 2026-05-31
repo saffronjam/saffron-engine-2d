@@ -8,9 +8,7 @@ namespace saffron
 {
 auto AppProperties::CreateFullscreen(std::string name) -> AppProperties
 {
-	const auto dm = sf::VideoMode::getDesktopMode();
-	const uint halfWidth = dm.width / 3, halfHeight = dm.height / 3;
-	return {std::move(name), 2 * halfWidth, 2 * halfHeight, dm.width / 2 - halfWidth, dm.height / 2 - halfHeight, true};
+	return CreateMaximized(std::move(name));
 }
 
 auto AppProperties::CreateMaximized(std::string name) -> AppProperties
@@ -53,12 +51,6 @@ App::App(const AppProperties& properties) :
 	Log::CoreInfo("Creating application {0}", properties.Name);
 
 	_window->Closed.Subscribe(SE_EV_ACTION(App::OnWindowClose));
-	_window->SetIcon("Editor/Saffron_windowIcon.png");
-
-	if (properties.Fullscreen)
-	{
-		_window->SetFullscreen(true);
-	}
 
 	_splashScreenBatch->Submit([this]
 	{
@@ -138,11 +130,6 @@ void App::Exit()
 
 void App::OnUpdate()
 {
-	if (Keyboard::IsDown(sf::Keyboard::LAlt) && Keyboard::IsPressed(sf::Keyboard::Enter))
-	{
-		_window->SetFullscreen(!_window->IsFullscreen());
-	}
-
 	static bool open = false;
 	if (Keyboard::IsPressed(sf::Keyboard::Escape))
 	{
@@ -162,11 +149,6 @@ void App::OnUpdate()
 	if (ImGui::BeginPopupModal("###Exitmenu", &open,
 	                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 	{
-		if (ImGui::Button("Fullscreen", {100, 0}))
-		{
-			_window->SetFullscreen(!_window->IsFullscreen());
-		}
-
 		if (ImGui::Button("Exit", {100, 0}))
 		{
 			Exit();
@@ -394,10 +376,6 @@ auto App::Name() -> std::string
 
 void App::OnRenderMenuBar()
 {
-	if (ImGui::MenuItem("Fullscreen", "Alt+Enter", _window->IsFullscreen()))
-	{
-		_window->SetFullscreen(!_window->IsFullscreen());
-	}
 	if (ImGui::MenuItem("Exit", "Alt+F4"))
 	{
 		Exit();

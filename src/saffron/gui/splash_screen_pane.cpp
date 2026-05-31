@@ -4,7 +4,6 @@
 #include "saffron/core/global.h"
 #include "saffron/gui/gui.h"
 #include "saffron/gui/splash_screen_pane.h"
-#include "saffron/resource/texture_store.h"
 
 namespace saffron
 {
@@ -17,16 +16,6 @@ SplashScreenPane::SplashScreenPane(std::shared_ptr<class Batch> batch) :
 		return std::min(duration, timer * 2.0f) / duration * 255.0f;
 	}, sf::Time::Zero, false, sf::Color::Black)
 {
-	auto texture = TextureStore::TryGet("Editor/Saffron.png", true);
-	if (!texture)
-	{
-		Log::CoreError(texture.error().message);
-	}
-	else
-	{
-		_texture = *texture;
-	}
-
 	_fadeIn.Finished.Subscribe([this]
 	{
 		_finishedFadeIn = true;
@@ -97,11 +86,6 @@ void SplashScreenPane::OnGuiRender()
 	constexpr auto logoWidth = 200;
 	constexpr auto logoHeight = 200;
 	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
-	if (_texture != nullptr)
-	{
-		Gui::Image(*_texture, {logoWidth, logoHeight}, sf::FloatRect{0.0f, 0.0f, 1.0f, 1.0f},
-		           sf::Color(255, 255, 255, 255), sf::Color::Transparent);
-	}
 
 	Gui::SetFontSize(36);
 	ImGui::NewLine();
