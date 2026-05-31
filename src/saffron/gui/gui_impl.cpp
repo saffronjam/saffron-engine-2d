@@ -184,9 +184,12 @@ std::string s_clipboardText;
 // mouse cursors
 void loadMouseCursor(ImGuiMouseCursor imguiCursorType, sf::Cursor::Type sfmlCursorType);
 void updateMouseCursor(sf::Window& window);
+void resetMouseCursor(sf::Window& window);
 
 sf::Cursor* s_mouseCursors[ImGuiMouseCursor_COUNT];
 bool s_mouseCursorLoaded[ImGuiMouseCursor_COUNT];
+sf::Cursor s_shutdownCursor;
+bool s_shutdownCursorLoaded = false;
 } // namespace
 
 namespace GuiImpl
@@ -484,8 +487,10 @@ void Render()
 	RenderDrawLists(ImGui::GetDrawData());
 }
 
-void Shutdown()
+void Shutdown(sf::Window& window)
 {
+	resetMouseCursor(window);
+
 	ImGui::GetIO().Fonts->TexID = static_cast<ImTextureID>(nullptr);
 
 	if (s_fontTexture)
@@ -1002,6 +1007,19 @@ void updateMouseCursor(sf::Window& window)
 				                : *s_mouseCursors[ImGuiMouseCursor_Arrow];
 			window.setMouseCursor(c);
 		}
+	}
+}
+
+void resetMouseCursor(sf::Window& window)
+{
+	window.setMouseCursorVisible(true);
+	if (!s_shutdownCursorLoaded)
+	{
+		s_shutdownCursorLoaded = s_shutdownCursor.loadFromSystem(sf::Cursor::Arrow);
+	}
+	if (s_shutdownCursorLoaded)
+	{
+		window.setMouseCursor(s_shutdownCursor);
 	}
 }
 } // end of anonymous namespace

@@ -70,7 +70,7 @@ Gui::Gui() :
 
 Gui::~Gui()
 {
-	GuiImpl::SFML::Shutdown();
+	GuiImpl::SFML::Shutdown(App::Instance().Window().NativeWindow());
 }
 
 void Gui::OnGuiRender()

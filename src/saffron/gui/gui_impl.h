@@ -34,7 +34,7 @@ void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, sf::T
 void Render(sf::RenderTarget& target);
 void Render();
 
-void Shutdown();
+void Shutdown(sf::Window& window);
 
 void UpdateFontTexture();
 auto GetFontTexture() -> sf::Texture&;
