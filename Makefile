@@ -1,6 +1,12 @@
 PROJECT := $(notdir $(CURDIR))
 config ?= release
+jobs ?= $(shell nproc 2>/dev/null || echo 4)
 PREMAKE ?= $(or $(wildcard $(HOME)/tools/premake5),premake5)
+CCACHE := $(shell command -v ccache 2>/dev/null)
+
+ifneq ($(CCACHE),)
+	BUILD_ENV := CCACHE_CPP2=yes CC="$(CCACHE) gcc" CXX="$(CCACHE) g++"
+endif
 
 .PHONY: configure build run format lint prepare-for-commit clean
 
@@ -12,9 +18,10 @@ configure:
 	mv Makefile build/Makefile; \
 	cp $$tmp Makefile; chmod 0644 Makefile; \
 	rm -f $$tmp
+	@if [ -d build/obj ] && grep -Rqs 'source/' build/obj; then rm -rf build/obj; fi
 
 build: configure
-	$(MAKE) --no-print-directory -f build/Makefile config=$(config) $(PROJECT)
+	$(BUILD_ENV) $(MAKE) --no-print-directory -f build/Makefile config=$(config) $(PROJECT) -j$(jobs)
 
 run: build
 	@echo "$(PROJECT) is a static library; no executable is produced."

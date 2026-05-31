@@ -155,14 +155,11 @@ project (module.Project)
 		buildoptions { "/std:c++latest" }
 	filter {}
 
-	-- MSVC-style PCH: every .cpp already #includes "saffron_pch.h" explicitly.
-	-- gcc's force-include PCH double-defines pragma-once headers, so only
-	-- enable the precompiled header on Windows; Linux just compiles the
-	-- explicit includes normally.
-	filter "system:windows"
-		pchheader ("saffron_pch.h")
-		pchsource ("src/saffron_pch.cpp")
-	filter {}
+	-- Premake emits compiler-native PCH rules for both MSVC and GCC/Clang.
+	-- Source files include this header explicitly, so keep one shared PCH
+	-- definition instead of per-compiler build paths.
+	pchheader ("saffron_pch.h")
+	pchsource ("src/saffron_pch.cpp")
 
 	targetdir (OutBin)
 	objdir (OutObj)
